@@ -1,0 +1,31 @@
+{
+    "files.associations": {
+        "glfw3.h": "c",
+        "windows.h": "c",
+        "window.h": "c",
+        "init.h": "c",
+        "iostream": "cpp",
+        "game.h": "c",
+        "fast_obj.h": "c",
+        "string.h": "c",
+        "load.h": "c",
+        "assert.h": "c",
+        "draw.h": "c",
+        "xml.h": "c",
+        "cute_tiled.h": "c",
+        "glew.h": "c",
+        "bmp_loader.h": "c",
+        "limits.h": "c",
+        "lodepng.h": "c",
+        "load_texture.h": "c",
+        "cute_tiled.hpp": "c",
+        "load_shaders.h": "c",
+        "stdint.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
+}

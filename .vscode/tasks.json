@@ -1,0 +1,59 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		// {
+		// 	"type": "shell",
+		// 	"label": "Client build",
+		// 	"command": "gcc",
+		// 	"args": [
+
+		// 		"-o",
+		// 		"${workspaceFolder}\\builds\\client.exe",
+
+		// 		"${workspaceFolder}\\client\\client.c",
+
+		// 		"-L${workspaceFolder}\\libs",
+		// 		"-I${workspaceFolder}\\includes",
+
+        //         "-lglfw3",
+		// 		"-lglew32s",
+		// 		"-lopengl32",
+        //         "-lgdi32", 
+
+        //         "-fdiagnostics-color=always",
+
+		// 		"-pipe", //No temp files
+		// 		"-Wall", //More warnings to warnings god!
+		// 		// "-pipe",
+		// 		// "-pipe",
+		// 		// "-pipe",
+		// 		// "-pipe",
+		// 		// "-pipe",
+
+		// 		// "-O2"
+		// 	],
+		// 	"options": {
+		// 		"cwd": "${fileDirname}"
+		// 	},
+		// 	"problemMatcher": [
+		// 		"$gcc"
+		// 	],
+		// 	"group": {
+		// 		"kind": "build",
+		// 		"isDefault": true
+		// 	},
+		// 	"detail": "компилятор: MINGW gcc"
+		// },
+		{
+            "label": "make",
+            "type": "shell",
+            "command": "mingw32-make",
+            "group": "build",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+            }
+        }
+	]
+}
