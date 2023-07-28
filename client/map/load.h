@@ -5,7 +5,6 @@
 #include "../common/game.h"
 #include "../draw/load_texture.h"
 #include "../map/cute_tiled.h"
-#include "../draw/load_shaders.h"
 #include "../common/vec.h"
 #include <malloc.h>
 
@@ -20,3 +19,12 @@ typedef struct level_t
 void load_level(Game_t* game);
 
 void free_level(Game_t* game);
+
+/*
+load_chunk
+
+load chunks that need to be loaded, unload not nedeed ones 
+
+free_chunk
+
+*/

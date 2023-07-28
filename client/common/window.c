@@ -6,7 +6,7 @@ struct Window_t create_window()
 {
     struct Window_t window = {};
 
-    assert(glfwInit() == GLFW_TRUE);
+    assert(glfwInit());
 
     glfwWindowHint(GLFW_SAMPLES, 1); // 4x antialiasing
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // We want OpenGL 4.6

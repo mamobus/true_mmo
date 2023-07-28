@@ -5,16 +5,25 @@
 #include "../map/cute_tiled.h"
 #include "vec.h"
 
+typedef struct uniforms_t
+{
+    GLuint textureID;
+    GLuint camera_coords;
+    // GLuint textureID;
+} uniforms_t;
+
+
 typedef struct draw_buffer
 {
     GLuint programID; 
     GLuint tilesetID;
-    GLuint textureID;
     GLuint VertexArrayID;
     GLuint vertex_buffer;
     GLuint tile_buffer;
     size_t tile_count;
-    // GLuint instance_bufer;
+
+    uniforms_t uni;
+    
     Vec3* vertex_data;
     float* tile_data;
 } draw_buffer;

@@ -3,6 +3,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include "../common/game.h"
+#include "../draw/load_shaders.h"
 
 typedef struct Game_t Game_t;
 

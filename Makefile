@@ -1,4 +1,4 @@
-workspace_folder := C:/prog/game_2D
+workspace_folder := C:/prog/true_mmo
 precompiled_folder := $(workspace_folder)/client/precompiled
 client_folder := $(workspace_folder)/client
 

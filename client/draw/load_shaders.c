@@ -42,23 +42,27 @@ void compile_and_check(GLuint shader_id, const char* shader_code)
     // #endif
 }
 
-GLuint load_shaders(const char * vertex_file_path,const char * fragment_file_path) 
+GLuint load_shaders(const char * vertex_file_path, const char * geometry_file_path, const char * fragment_file_path)
 {
     // Создаем шейдерные объекты вершинного и фрагментного шейдеров
-    GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    GLuint vertexShaderID   = glCreateShader(GL_VERTEX_SHADER);
+    GLuint geometryShaderID   = glCreateShader(GL_GEOMETRY_SHADER);
     GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
     // Читаем код шейдеров из файла
     char *vertexShaderCode   = get_shader_code(vertex_file_path  );
+    char *geometryShaderCode = get_shader_code(geometry_file_path);
     char *fragmentShaderCode = get_shader_code(fragment_file_path);
 
     compile_and_check(vertexShaderID  , vertexShaderCode  );
+    compile_and_check(geometryShaderID, geometryShaderCode);
     compile_and_check(fragmentShaderID, fragmentShaderCode);
     // printf("%s\nNEW\n%s\nEND\n", vertexShaderCode, fragmentShaderCode);
 
     // Связываем вершинный и фрагментный шейдеры в программу шейдеров
     GLuint programID = glCreateProgram();
-    glAttachShader(programID, vertexShaderID);
+    glAttachShader(programID, vertexShaderID  );
+    glAttachShader(programID, geometryShaderID);
     glAttachShader(programID, fragmentShaderID);
     glLinkProgram(programID);
 
@@ -76,11 +80,14 @@ GLuint load_shaders(const char * vertex_file_path,const char * fragment_file_pat
     }
 
     // Освобождаем ресурсы
-    if(vertexShaderCode != NULL)
+    if(vertexShaderCode   != NULL)
         free(vertexShaderCode);
+    if(geometryShaderCode != NULL)
+        free(geometryShaderCode);
     if(fragmentShaderCode != NULL)
         free(fragmentShaderCode);
-    glDeleteShader(vertexShaderID);
+    glDeleteShader(vertexShaderID  );
+    glDeleteShader(geometryShaderID);
     glDeleteShader(fragmentShaderID);
 
     return programID;

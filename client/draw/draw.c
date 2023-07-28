@@ -1,16 +1,18 @@
 #include "draw.h"
 
 
-void load_level_in_GPU(Game_t* game)
+void init_draw(Game_t* game)
 {
+    game->draw.programID = load_shaders("../client/draw/shaders/vertex.glsl", "../client/draw/shaders/geometry.glsl", "../client/draw/shaders/fragment.glsl");
 
+    
 }
 
 void draw(Game_t* game)
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, game->draw.tilesetID);
-    glUniform1i(game->draw.textureID, 0);
+    glUniform1i(game->draw.uni.textureID, 0);
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, game->draw.vertex_buffer);
