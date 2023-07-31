@@ -2,55 +2,29 @@
 
 #define PRINT printf("line %d, function %s\n", __LINE__, __FUNCTION__);
 
+char* get_tileset_path(char* map_path, char* relative_tileset_path)
+{
+    int len;
+    char* tileset_path;
+    tileset_path = calloc((strlen(map_path) + strlen(relative_tileset_path) + 1), sizeof(char));
+    strcat(tileset_path, map_path);
+    for (len = strlen(tileset_path); tileset_path[len] != '/' && len > 0; len--);
+    tileset_path[len]='\0';
+    strcat(tileset_path, "/");
+    strcat(tileset_path, relative_tileset_path);
+}
+
 void load_level(Game_t* game)
 {
-    char* map_path = "C:/Users/platonvin/Documents/tiled/gsdfgf/untitled.tmj";
-    char* texture_path;
-    int len;
+    char* map_path = "C:/prog/true_mmo/assets/map/map.tmj";
+    char* tileset_path = "C:/prog/true_mmo/assets/tileset/sprite.png";
     cute_tiled_tileset_t tileset;
     cute_tiled_map_t* map;
 
-
-    //загружаем карту
+    //загружаемся
     game->map = cute_tiled_load_map_from_file(map_path, 0);
     map = game->map;
     tileset = game->map->tilesets[0];
-    game->draw.tile_count = game->map->layers[0].data_count;
-
-
-    //находим путь картинки тайлсета
-    texture_path = calloc((strlen(map_path) + strlen(tileset.image.ptr) + 1), sizeof(char));
-    strcat(texture_path, map_path);
-    for (len = strlen(texture_path); texture_path[len] != '/' && len > 0; len--);
-    texture_path[len]='\0';
-    strcat(texture_path, "/");
-    strcat(texture_path, tileset.image.ptr);
-    
-    
-    game->draw.uni.textureID = loadTexture(texture_path);
-    game->draw.programID     = load_shaders("../client/draw/shaders/vertex.glsl", "../client/draw/shaders/fragment.glsl");
-    game->draw.vertex_data = calloc(game->draw.tile_count, sizeof(Vec3));
-    game->draw.tile_data   = calloc(game->draw.tile_count, sizeof(float));
-    //копируем с преобразованем типа и вычислением координат
-    for (size_t i = 0; i < game->draw.tile_count; i++)
-    {
-        game->draw.vertex_data[i].x = i % map->layers[0].width;
-        game->draw.vertex_data[i].y = i / map->layers[0].width;
-        game->draw.vertex_data[i].z = 0;
-        game->draw.tile_data[i] = (float) game->map->layers[0].data[i];
-    }
-    
-    for(int i = 0; i < game->draw.tile_count; i++)
-    {
-        if(i % map->layers[0].width == 0)
-        {
-            printf("\n");
-        }
-        printf("(%.2f,%.2f)%.2f;  ", game->draw.vertex_data[i].x, 
-                                           game->draw.vertex_data[i].y, 
-                                        //    game->draw.vertex_data[i].z, 
-                                           game->draw.tile_data[i]);
-    }
     
     // //нужно для опенгл, не трогать
     // glGenVertexArrays(1, &game->draw.VertexArrayID);
@@ -67,7 +41,6 @@ void load_level(Game_t* game)
     // game->draw.uni.textureID = glGetUniformLocation(game->draw.programID, "myTexture");
     
     cute_tiled_free_map(game->map);
-    free(texture_path);
 }
 
 void free_level(Game_t* game)

@@ -1,0 +1,49 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "map.tmj": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.16666666666669,
+                "y": 88.33333333333334
+            }
+        },
+        "map.tmj#tileset": {
+            "scaleInDock": 1
+        },
+        "untitled.tmj": {
+            "scale": 1.0414959016393441,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 488.7201180521398,
+                "y": 216.99557304476144
+            }
+        }
+    },
+    "last.imagePath": "C:/prog/true_mmo/assets/tileset",
+    "map.lastUsedFormat": "json",
+    "map.orientation": null,
+    "map.tileHeight": 16,
+    "openFiles": [
+    ],
+    "project": "untiled.tiled-project",
+    "recentFiles": [
+        "map.tmj",
+        "untitled.tmj"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 32
+    }
+}

@@ -5,7 +5,6 @@ void init_draw(Game_t* game)
 {
     game->draw.programID = load_shaders("../client/draw/shaders/vertex.glsl", "../client/draw/shaders/geometry.glsl", "../client/draw/shaders/fragment.glsl");
 
-    
 }
 
 void draw(Game_t* game)

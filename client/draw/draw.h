@@ -7,6 +7,6 @@
 
 typedef struct Game_t Game_t;
 
-void load_level_in_GPU(Game_t* game);
+void init_draw(Game_t* game);
 
 void draw(Game_t* game);

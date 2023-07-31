@@ -2165,6 +2165,7 @@ cute_tiled_tileset_t* cute_tiled_tileset(cute_tiled_map_internal_t* m)
 			cute_tiled_skip_array(m);
 			break;
 
+
 		default:
 			CUTE_TILED_CHECK(0, "Unknown identifier found.");
 		}
@@ -2290,6 +2291,14 @@ static int cute_tiled_dispatch_map_internal(cute_tiled_map_internal_t* m)
 
 	case 2498445529143042872U: // nextlayerid
 		cute_tiled_read_int(m, &m->map.nextlayerid);
+		break;
+
+	case 18082816309487282231U: // staggeraxis: unsupported
+		cute_tiled_skip_object(m);
+		break;
+
+	case 16693286153064272296U: // staggerindex: unsupported
+		cute_tiled_skip_object(m);
 		break;
 
 	default:
