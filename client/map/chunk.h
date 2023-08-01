@@ -5,10 +5,3 @@
 // #include "../map/cute_tiled.h"
 // #include "../common/vec.h"
 #include <malloc.h>
-
-//TODO double vbo support
-
-typedef struct chunk_info_t
-{
-    
-} chunk_info_t;
