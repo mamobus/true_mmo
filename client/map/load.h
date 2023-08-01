@@ -17,11 +17,8 @@ void load_level(Game_t* game);
 
 void free_level(Game_t* game);
 
-/*
-load_chunk
-
-load chunks that need to be loaded, unload not nedeed ones 
-
-free_chunk
-
-*/
+void create_shunk_system();
+void load_map_to_chunks();
+void load_chunk();
+void free_chunk();
+void handle_shunk_system();

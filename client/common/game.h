@@ -5,6 +5,11 @@
 #include "../map/cute_tiled.h"
 #include "vec.h"
 
+typedef struct chunk_system_t
+{
+    
+} chunk_system_t;
+
 typedef struct uniforms_t
 {
     GLuint textureID;
@@ -13,7 +18,7 @@ typedef struct uniforms_t
 } uniforms_t;
 
 
-typedef struct draw_buffer
+typedef struct draw_t
 {
     GLuint programID; 
     GLuint tilesetID;
@@ -26,13 +31,13 @@ typedef struct draw_buffer
     
     Vec3* vertex_data;
     float* tile_data;
-} draw_buffer;
+} draw_t;
 
 typedef struct Game_t
 {
     Window_t window;
     cute_tiled_map_t* map;
-    draw_buffer draw;
+    draw_t draw;
 } Game_t;
 
 void give_this_game_a_window(Game_t* game);
