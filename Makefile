@@ -49,5 +49,7 @@ $(precompiled_folder)/map/load.o: $(client_folder)/map/load.c $(client_folder)/m
 $(precompiled_folder)/draw/load_shaders.o: $(client_folder)/draw/load_shaders.c $(client_folder)/draw/load_shaders.h
 	$(CC) -c $(client_folder)/draw/load_shaders.c -o $(precompiled_folder)/draw/load_shaders.o $(include_flags) $(libs)
 
+# full:
+
 run:
 	$(workspace_folder)/builds/client.exe

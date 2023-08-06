@@ -56,7 +56,6 @@ void create_shunk_system()
 {
     chunk_system_t chunk_system;
     chunk_system.chunks = calloc(chunk_system.max, sizeof(chunk_t));
-
     //load surrounding chunks
 }
 

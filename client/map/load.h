@@ -18,7 +18,7 @@ typedef struct tile_elem_t
 
 typedef struct chunk_t
 {
-    int x;
+    int x;                                                                          
     int y;
     int tile_count;
 
