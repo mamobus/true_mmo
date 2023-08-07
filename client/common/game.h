@@ -4,11 +4,7 @@
 #include "window.h"
 #include "../map/cute_tiled.h"
 #include "vec.h"
-
-typedef struct chunk_system_t
-{
-    
-} chunk_system_t;
+#include "../map/chunk.h"
 
 typedef struct uniforms_t
 {
@@ -38,6 +34,7 @@ typedef struct Game_t
     Window_t window;
     cute_tiled_map_t* map;
     draw_t draw;
+    chunk_system_t chunk_system;
 } Game_t;
 
 void give_this_game_a_window(Game_t* game);
