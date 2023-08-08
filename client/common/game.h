@@ -5,6 +5,7 @@
 #include "../map/cute_tiled.h"
 #include "vec.h"
 #include "../map/chunk.h"
+#include "player.h"
 
 typedef struct uniforms_t
 {
@@ -35,6 +36,7 @@ typedef struct Game_t
     cute_tiled_map_t* map;
     draw_t draw;
     chunk_system_t chunk_system;
+    player_t player;
 } Game_t;
 
 void give_this_game_a_window(Game_t* game);

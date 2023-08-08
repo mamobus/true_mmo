@@ -13,4 +13,3 @@ void load_level(chunk_system_t* chunk_system);
 
 void free_level(chunk_system_t* chunk_system);
 
-

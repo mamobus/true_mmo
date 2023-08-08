@@ -25,4 +25,4 @@ void draw(Game_t* game)
 
     glDisableVertexAttribArray(0);
     // glDisableVertexAttribArray(1);
-}
+} 
