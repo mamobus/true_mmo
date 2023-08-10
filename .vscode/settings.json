@@ -29,7 +29,8 @@
         "vec.h": "c",
         "malloc.h": "c",
         "player.h": "c",
-        "chunk.h": "c"
+        "chunk.h": "c",
+        "math.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

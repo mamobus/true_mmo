@@ -14,3 +14,7 @@ char* get_tileset_path(char* map_path, char* relative_tileset_path)
     strcat(tileset_path, relative_tileset_path);
 }
 
+void load_map_from_file(char* map_path, map_t* map)
+{
+    cute_tiled_map_t* cute_map = cute_tiled_load_map_from_file(map_path, 0);
+}

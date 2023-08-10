@@ -1,24 +1,17 @@
 #include "chunk.h"
 
 //load chunks one by one into vbos and calloced memory. Use SQL to manage chunks in file
-chunk_system_t create_shunk_system()
+void create_shunk_system(chunk_system_t* chunk_system)
 {
-    chunk_system_t chunk_system;
-    chunk_system.chunk_count = 0;
-    chunk_system.current_x = 0;
-    chunk_system.current_y = 0;
-    // chunk_system.chunks = calloc(chunk_system.max, sizeof(chunk_t));
-    chunk_system.chunks = calloc(49, sizeof(chunk_t)); //current
-    //load surrounding chunks
-
-    return chunk_system;
+    chunk_system->draw_chunks = calloc(25, sizeof(chunk_draw_t));
+    load_map_from_file("", &chunk_system->map);
 }
 
-void load_chunk(chunk_t* chunk, int chunk_x, int chunk_y)
+void load_chunk(chunk_draw_t* chunk, int chunk_x, int chunk_y)
 {
 }
 
-void free_chunk(chunk_t* chunk)
+void free_chunk(chunk_draw_t* chunk)
 {
 }
 
@@ -33,6 +26,7 @@ is_chunk_too_far_away(int chunk_x, int chunk_y, float player_x, float player_y)
     }
 }
 
+//on chunk_cross
 void handle_shunk_system(chunk_system_t* chunk_system, player_t player)
 {
     for (int i = 0; i < chunk_system->chunk_count; i++)
@@ -43,3 +37,4 @@ void handle_shunk_system(chunk_system_t* chunk_system, player_t player)
         }
     }
 }
+ 
