@@ -30,7 +30,8 @@
         "malloc.h": "c",
         "player.h": "c",
         "chunk.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "gl.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

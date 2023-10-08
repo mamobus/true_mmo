@@ -1,14 +1,13 @@
-workspace_folder := C:/prog/true_mmo
-precompiled_folder := $(workspace_folder)/client/precompiled
-client_folder := $(workspace_folder)/client
+precompiled_folder := $(CURDIR)/client/precompiled
+client_folder := $(CURDIR)/client
 
-include_flags := -L$(workspace_folder)/libs -I$(workspace_folder)/includes
-flags := -o $(workspace_folder)/builds/client.exe $(include_flags) -fdiagnostics-color=always
+include_flags := -L$(CURDIR)/libs -I$(CURDIR)/includes
+flags := -o $(CURDIR)/builds/client.exe $(include_flags) -fdiagnostics-color=always
 special_flags := -pipe #-Wall -O2
 libs := -lglfw3 -lglew32s -lopengl32 -lgdi32
 CC = C:\msys64\mingw64\bin\gcc.exe
 
-precompiled_libs := \
+precompiled_client_libs := \
 	$(precompiled_folder)/client.o \
 	$(precompiled_folder)/common/game.o \
 	$(precompiled_folder)/common/window.o \
@@ -19,8 +18,8 @@ precompiled_libs := \
 	$(precompiled_folder)/map/cute_tiled.o \
 	$(precompiled_folder)/draw/load_shaders.o
 
-all: $(precompiled_libs)
-	$(CC) $(flags) $(precompiled_libs) $(libs) $(special_flags)
+client_: $(precompiled_client_libs)
+	$(CC) $(flags) $(precompiled_client_libs) $(libs) $(special_flags)
 
 $(precompiled_folder)/client.o: $(client_folder)/client.c
 	$(CC) -c $(client_folder)/client.c -o $(precompiled_folder)/client.o $(include_flags) $(libs)
@@ -49,7 +48,10 @@ $(precompiled_folder)/map/load.o: $(client_folder)/map/load.c $(client_folder)/m
 $(precompiled_folder)/draw/load_shaders.o: $(client_folder)/draw/load_shaders.c $(client_folder)/draw/load_shaders.h
 	$(CC) -c $(client_folder)/draw/load_shaders.c -o $(precompiled_folder)/draw/load_shaders.o $(include_flags) $(libs)
 
+importer_: 
+	gcc $(CURDIR)/importer/import.c $(special_flags) -o $(CURDIR)/builds/imorter.exe
 # full:
 
 run:
-	$(workspace_folder)/builds/client.exe
+	$(CURDIR)/builds/imorter.exe
+	$(CURDIR)/builds/client.exe

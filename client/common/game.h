@@ -10,7 +10,7 @@ typedef struct Game_t
 {
     Window_t window;
     draw_t draw;
-    chunk_system_t chunk_system;
+    chunk_manager_t chunk_system;
     player_t player;
 } Game_t;
 

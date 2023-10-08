@@ -1,4 +1,8 @@
+
+#define GLEW_STATIC
 #include <GL/glew.h>
+#include <GL/gl.h>
+#include <GLFW/glfw3.h>
 
 #include "common/game.h"
 #include "common/window.h"
@@ -13,7 +17,7 @@ int main()
 
     // give_this_game_a_window(&game);
 
-    load_level(&game);
+    // load_level(&game);
 
     while(!glfwWindowShouldClose(game.window.pointer))
     {
