@@ -14,8 +14,8 @@ precompiled_client_libs := \
 	$(precompiled_folder)/draw/draw.o \
 	$(precompiled_folder)/draw/load_texture.o \
 	$(precompiled_folder)/draw/lodepng.o \
-	$(precompiled_folder)/map/load.o \
-	$(precompiled_folder)/map/cute_tiled.o \
+	$(precompiled_folder)/load/chunk.o \
+	$(precompiled_folder)/load/cute_tiled.o \
 	$(precompiled_folder)/draw/load_shaders.o
 
 client_: $(precompiled_client_libs)
@@ -24,8 +24,8 @@ client_: $(precompiled_client_libs)
 $(precompiled_folder)/client.o: $(client_folder)/client.c
 	$(CC) -c $(client_folder)/client.c -o $(precompiled_folder)/client.o $(include_flags) $(libs)
 
-$(precompiled_folder)/map/cute_tiled.o: $(client_folder)/map/cute_tiled.c $(client_folder)/map/cute_tiled.h
-	$(CC) -c $(client_folder)/map/cute_tiled.c -o $(precompiled_folder)/map/cute_tiled.o $(include_flags) $(libs)
+$(precompiled_folder)/load/cute_tiled.o: $(client_folder)/load/cute_tiled.c $(client_folder)/load/cute_tiled.h
+	$(CC) -c $(client_folder)/load/cute_tiled.c -o $(precompiled_folder)/load/cute_tiled.o $(include_flags) $(libs)
 
 $(precompiled_folder)/common/game.o: $(client_folder)/common/game.c $(client_folder)/common/game.h
 	$(CC) -c $(client_folder)/common/game.c -o $(precompiled_folder)/common/game.o $(include_flags) $(libs)
@@ -42,16 +42,17 @@ $(precompiled_folder)/draw/load_texture.o: $(client_folder)/draw/load_texture.c 
 $(precompiled_folder)/draw/lodepng.o: $(client_folder)/draw/lodepng.c $(client_folder)/draw/lodepng.h
 	$(CC) -c $(client_folder)/draw/lodepng.c -o $(precompiled_folder)/draw/lodepng.o $(include_flags) $(libs)
 
-$(precompiled_folder)/map/load.o: $(client_folder)/map/load.c $(client_folder)/map/load.h
-	$(CC) -c $(client_folder)/map/load.c -o $(precompiled_folder)/map/load.o $(include_flags) $(libs)
+$(precompiled_folder)/load/chunk.o: $(client_folder)/load/chunk.c $(client_folder)/load/chunk.h
+	$(CC) -c $(client_folder)/load/chunk.c -o $(precompiled_folder)/load/chunk.o $(include_flags) $(libs)
 
 $(precompiled_folder)/draw/load_shaders.o: $(client_folder)/draw/load_shaders.c $(client_folder)/draw/load_shaders.h
 	$(CC) -c $(client_folder)/draw/load_shaders.c -o $(precompiled_folder)/draw/load_shaders.o $(include_flags) $(libs)
 
-importer_: 
-	gcc $(CURDIR)/importer/import.c $(special_flags) -o $(CURDIR)/builds/imorter.exe
+$(CURDIR)/builds/imorter.exe: 
+	gcc $(CURDIR)/importer/import.c $(special_flags) $(libs) -o $(CURDIR)/builds/imorter.exe
 # full:
-
+import: 
+	$(CURDIR)/builds/imorter.exe
 run:
 	$(CURDIR)/builds/imorter.exe
 	$(CURDIR)/builds/client.exe

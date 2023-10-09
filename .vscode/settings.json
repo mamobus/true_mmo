@@ -31,7 +31,8 @@
         "player.h": "c",
         "chunk.h": "c",
         "math.h": "c",
-        "gl.h": "c"
+        "gl.h": "c",
+        "debug_defines.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }
