@@ -1,0 +1,7 @@
+builds/client.exe
+client/precompiled/client.o
+client/precompiled/draw/draw.o
+client/precompiled/draw/load_shaders.o
+client/precompiled/load/chunk.o
+client/precompiled/load/cute_tiled.o
+client/precompiled/load/load.o

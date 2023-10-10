@@ -1,5 +1,5 @@
+// #define _DEBUG_
 #define GLEW_STATIC
-#define _DEBUG_
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -7,7 +7,7 @@
 #include "common/game.h"
 #include "common/window.h"
 #include "draw/draw.h"
-#include "map/load.h"
+// #include "load/chunk.h"
 
 int main()
 {
@@ -15,15 +15,18 @@ int main()
 
     Game_t game;
 
-    // give_this_game_a_window(&game);
+    init_draw(&game.draw);
 
-    // load_level(&game);
+    give_this_game_a_window(&game);
 
     while(!glfwWindowShouldClose(game.window.pointer))
     {
         glfwPollEvents();
+        draw(&game.draw);
+        glfwSwapBuffers(game.window.pointer);
     }
 
     glfwTerminate();
+    terminate_draw(&game.draw);
     // dasd
 }

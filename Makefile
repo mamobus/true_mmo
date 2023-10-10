@@ -11,11 +11,11 @@ precompiled_client_libs := \
 	$(precompiled_folder)/client.o \
 	$(precompiled_folder)/common/game.o \
 	$(precompiled_folder)/common/window.o \
-	$(precompiled_folder)/draw/draw.o \
-	$(precompiled_folder)/draw/load_texture.o \
-	$(precompiled_folder)/draw/lodepng.o \
 	$(precompiled_folder)/load/chunk.o \
 	$(precompiled_folder)/load/cute_tiled.o \
+	$(precompiled_folder)/draw/draw.o \
+	$(precompiled_folder)/draw/lodepng.o \
+	$(precompiled_folder)/draw/load_texture.o \
 	$(precompiled_folder)/draw/load_shaders.o
 
 client_: $(precompiled_client_libs)
@@ -51,7 +51,7 @@ $(precompiled_folder)/draw/load_shaders.o: $(client_folder)/draw/load_shaders.c 
 $(CURDIR)/builds/imorter.exe: 
 	gcc $(CURDIR)/importer/import.c $(special_flags) $(libs) -o $(CURDIR)/builds/imorter.exe
 # full:
-import: 
+import_: 
 	$(CURDIR)/builds/imorter.exe
 run:
 	$(CURDIR)/builds/imorter.exe

@@ -1,5 +1,5 @@
-#include "../client/map/cute_tiled.c"
-#include "../client/map/cute_tiled.h"
+#include "../client/load/cute_tiled.c"
+// #include "../client/load/cute_tiled.h"
 // #include "../client/map/chunk.h"
 #include <stdio.h>
 
@@ -74,7 +74,7 @@ int main()
                     x = (float)column;
                     y = (float)line;
                     z = 0;
-                    val = (float)data[line*width + column];
+                    val = (float)data[line*width + column] - 1;
                     print("x %f y %f z %f\n", x, y, z);
                     print("data[line*width + column] %f\n", val);
                     fwrite(&x  , sizeof(float), 1, chunk_file);

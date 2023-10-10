@@ -1,10 +1,10 @@
 #pragma once
 
+#define GLEW_STATIC
+#include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define GLEW_STATIC
-#include <GL/glew.h>
 
 char* get_shader_code(const char* file_name);
 

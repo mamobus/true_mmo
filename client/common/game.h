@@ -1,8 +1,9 @@
 #pragma once
 
+#define GLEW_STATIC
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "window.h"
-#include "../map/chunk.h"
 #include "../draw/draw.h"
 #include "player.h"
 
@@ -10,7 +11,6 @@ typedef struct Game_t
 {
     Window_t window;
     draw_t draw;
-    chunk_manager_t chunk_system;
     player_t player;
 } Game_t;
 

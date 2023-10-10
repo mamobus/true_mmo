@@ -4,10 +4,12 @@
 #include <GL/glew.h>
 #include "../common/vec.h"
 #include "../draw/load_shaders.h"
+#include "../draw/load_texture.h"
+#include "../load/chunk.h"
 
 typedef struct uniforms_t
 {
-    GLuint textureID;
+    GLuint tileset_texture;
     GLuint camera_coords;
     // GLuint textureID;
 } uniforms_t;
@@ -16,18 +18,17 @@ typedef struct uniforms_t
 typedef struct draw_t
 {
     GLuint programID; 
-    GLuint tilesetID;
+    GLuint tileset_textureID;
     GLuint VertexArrayID;
-    GLuint vertex_buffer;
-    GLuint tile_buffer;
-    size_t tile_count;
 
+    chunk_manager_t chunk_manager;
     uniforms_t uni;
-    
-    Vec3* vertex_data;
-    float* tile_data;
 } draw_t;
 
 void init_draw(draw_t* draw);
 
+void draw_chunk(draw_t* draw, int x, int y);
+
 void draw(draw_t* draw);
+
+void terminate_draw(draw_t* draw);
