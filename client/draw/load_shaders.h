@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../includes/debug_defines.h"
+
 char* get_shader_code(const char* file_name);
 
 void compile_and_check(GLuint shader_id, const char* shader_code);

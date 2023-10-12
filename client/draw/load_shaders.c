@@ -2,6 +2,7 @@
 
 char* get_shader_code(const char* file_name)
 {
+    // printf("file_name == %s\n", file_name);
     char *shader_code = NULL;
     FILE *shader_file = fopen(file_name, "r");
     if(shader_file != NULL) {
@@ -15,6 +16,7 @@ char* get_shader_code(const char* file_name)
         }
         fclose(shader_file);
     }
+    else printf("Shader code == %s\n", shader_code);
     
     return shader_code;
 }
@@ -25,7 +27,8 @@ void compile_and_check(GLuint shader_id, const char* shader_code)
     int infoLogLength;
 
     // Компилируем шейдер
-    glShaderSource(shader_id, 1, (const char**)&shader_code, NULL);
+    const char* ptr = shader_code;
+    glShaderSource(shader_id, 1, &ptr, NULL);
     glCompileShader(shader_id);
     
     // Проверяем результат компиляции шейдера
@@ -48,7 +51,7 @@ GLuint load_shaders(const char * vertex_file_path, const char * geometry_file_pa
     GLuint vertexShaderID   = glCreateShader(GL_VERTEX_SHADER);
     // GLuint geometryShaderID = glCreateShader(GL_GEOMETRY_SHADER);
     GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
+    
     // Читаем код шейдеров из файла
     char *vertexShaderCode   = get_shader_code(vertex_file_path  );
     // char *geometryShaderCode = get_shader_code(geometry_file_path);

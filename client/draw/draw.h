@@ -7,6 +7,8 @@
 #include "../draw/load_texture.h"
 #include "../load/chunk.h"
 
+#include "../includes/debug_defines.h"
+
 typedef struct uniforms_t
 {
     GLuint tileset_texture;

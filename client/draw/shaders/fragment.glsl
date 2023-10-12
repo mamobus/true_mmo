@@ -1,12 +1,18 @@
 #version 460 core
 
 // in vec3 coords;
-in float tileset_uv;
+in vec2 tileset_uv;
 
 out vec4 fragColor;
+uniform sampler2D my_tileset_texture;
 
 void main() {
     // Use the geomCoords and geomUV to determine the final fragment color
-    coord_on_a_tileset = gl_PointCoord / 32.0 + tileset_uv;
-    fragColor = texture2D(my_tileset_texture, coord_on_a_tileset);
+    vec2 coord_on_a_tileset = gl_PointCoord / 32.0 + tileset_uv;
+    fragColor = texture(my_tileset_texture, coord_on_a_tileset);
+    if (fragColor.w < 0.5)
+    {
+        discard;
+    }
+    // fragColor = vec4(0.45, 0.19, 0.82, 1.0);
 }

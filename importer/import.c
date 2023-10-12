@@ -14,8 +14,8 @@ int main()
 {
     char* cute_map_file = "assets/map/map.tmj";
 
-    FILE* chunk_file         = fopen("assets/map/chunk_file", "w");
-    FILE* chunk_manager_file = fopen("assets/map/chunk_manager", "w");
+    FILE* chunk_file   = fopen("assets/map/chunk_file", "wb");
+    FILE* manager_file = fopen("assets/map/chunk_manager", "wb");
 
     cute_tiled_map_t* cute_map = cute_tiled_load_map_from_file(cute_map_file, 0);
     int* data = cute_map->layers[0].data;
@@ -49,8 +49,17 @@ int main()
     //     print("\n");
     // }
     print("\nchunks_height %d chunks_width %d\n", chunks_height, chunks_width);
-    fwrite(&chunks_height, sizeof(int), 1, chunk_manager_file);
-    fwrite(&chunks_width , sizeof(int), 1, chunk_manager_file);
+    assert(fwrite(&chunks_height, sizeof(int), 1, manager_file)==1);
+    // fprintf(manager_file, "%d ", chunks_height);
+    // int pos = ftell(manager_file);
+    // fseek(manager_file, 0, SEEK_SET);
+    // int test_height = -1;
+    // assert(fread(&test_height, sizeof(int), 1, manager_file)==1);
+    // printf("test_height %d\n\n", test_height);
+
+    // fseek(manager_file, pos, SEEK_SET);
+
+    assert(fwrite(&chunks_width , sizeof(int), 1, manager_file)==1);
 
     for (int chunk_line = 0; chunk_line < chunks_height; chunk_line++)
     {
@@ -61,7 +70,7 @@ int main()
             offset = ftell(chunk_file);
             tiles_in_chunk = 0;
             print("offset %d\n", offset);
-            fwrite(&offset, sizeof(int), 1, chunk_manager_file);
+            fwrite(&offset, sizeof(int), 1, manager_file);
 
             for(int column = chunk_column*CHUNK_SIZE; column < (chunk_column + 1)*CHUNK_SIZE && column < width; column++)
             {
@@ -85,13 +94,20 @@ int main()
                 }
             }
             print("tiles_in_chunk %d\n", tiles_in_chunk);
-            fwrite(&tiles_in_chunk, sizeof(int), 1, chunk_manager_file);
+            fwrite(&tiles_in_chunk, sizeof(int), 1, manager_file);
             
             // copy chunk to chunkmap
         }
     }
     fclose(chunk_file);
-    fclose(chunk_manager_file);
+    fclose(manager_file);
+
+    manager_file = fopen("assets/map/chunk_manager", "rb");
+
+    int temp = 66;
+    assert(fread(&temp, sizeof(int), 1, manager_file)==1);
+
+    fclose(manager_file);
 
     return 0;
 }

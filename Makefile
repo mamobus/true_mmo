@@ -1,3 +1,5 @@
+.ONESHELL:
+
 precompiled_folder := $(CURDIR)/client/precompiled
 client_folder := $(CURDIR)/client
 
@@ -18,7 +20,18 @@ precompiled_client_libs := \
 	$(precompiled_folder)/draw/load_texture.o \
 	$(precompiled_folder)/draw/load_shaders.o
 
-client_: $(precompiled_client_libs)
+client_libs := \
+	$(precompiled_folder)/client.c \
+	$(precompiled_folder)/common/game.c \
+	$(precompiled_folder)/common/window.c \
+	$(precompiled_folder)/load/chunk.c \
+	$(precompiled_folder)/load/cute_tiled.c \
+	$(precompiled_folder)/draw/draw.c \
+	$(precompiled_folder)/draw/lodepng.c \
+	$(precompiled_folder)/draw/load_texture.c \
+	$(precompiled_folder)/draw/load_shaders.c
+
+client_: $(precompiled_client_libs) 
 	$(CC) $(flags) $(precompiled_client_libs) $(libs) $(special_flags)
 
 $(precompiled_folder)/client.o: $(client_folder)/client.c
@@ -49,10 +62,14 @@ $(precompiled_folder)/draw/load_shaders.o: $(client_folder)/draw/load_shaders.c 
 	$(CC) -c $(client_folder)/draw/load_shaders.c -o $(precompiled_folder)/draw/load_shaders.o $(include_flags) $(libs)
 
 $(CURDIR)/builds/imorter.exe: 
-	gcc $(CURDIR)/importer/import.c $(special_flags) $(libs) -o $(CURDIR)/builds/imorter.exe
+	gcc $(CURDIR)/importer/import.c $(special_flags) -o $(CURDIR)/builds/imorter.exe
 # full:
-import_: 
+import_: $(CURDIR)/importer/import.c
+	gcc $(CURDIR)/importer/import.c $(special_flags) -o $(CURDIR)/builds/imorter.exe
 	$(CURDIR)/builds/imorter.exe
-run:
-	$(CURDIR)/builds/imorter.exe
+
+# uptodate: $(client_)
+
+run: client_ $(precompiled_client_libs) 
+	cd ./builds && \
 	$(CURDIR)/builds/client.exe
