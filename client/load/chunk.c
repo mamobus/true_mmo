@@ -16,7 +16,7 @@ void load_chunk_manager(char* manager_file_name, char* chunk_file_name, chunk_ma
     assert(fread(&chunk_manager->width , sizeof(int), 1, manager_file)==1);
 
     // Allocate memory for the height*width chunks
-    chunk_manager->chunks = calloc(chunk_manager->height * chunk_manager->width, sizeof(chunk_t*));
+    chunk_manager->chunks = calloc(chunk_manager->height * chunk_manager->width, sizeof(chunk_t));
     // assert(chunk_manager->chunks != 0);
 
     // Read the 2D array of chunk_t objects from the file
@@ -55,10 +55,13 @@ void load_chunk(chunk_manager_t* chunk_manager, int x, int y)
     if (chunk->tiles != 0)
     {
         return; //cause already loaded
+        printf("dont try to load loaded\n");
     }
     //so its not loaded
     //now we have buffer
     chunk->tiles = calloc(chunk->tile_count, sizeof(tile_t));
+    void* calloced_memory = (void*)chunk->tiles;
+    assert(calloced_memory != 0);
     //lets read into it
     fseek(chunk_manager->chunk_file, chunk->offset, SEEK_SET);
     fread(chunk->tiles, sizeof(tile_t), chunk->tile_count, chunk_manager->chunk_file);
@@ -69,7 +72,7 @@ void load_chunk(chunk_manager_t* chunk_manager, int x, int y)
 
     int size;
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    printf("size is %d\n", size);
+    printf("chunk size is %d\n", size);
 }
 
 void free_chunk(chunk_manager_t* chunk_manager, int x, int y)
@@ -88,11 +91,12 @@ void free_chunk(chunk_manager_t* chunk_manager, int x, int y)
 
 void load_all_chunks(chunk_manager_t* chunk_manager)
 {
-    for(int column=0; column < chunk_manager->width; column++)
+    for(int y=0; y < chunk_manager->height; y++)
     {
-        for(int line=0; line < chunk_manager->height; line++)
+        for(int x=0; x < chunk_manager->width; x++)
         {
-            load_chunk(chunk_manager, column, line);
+            printf("trying to load chunk x%d y%d", x, y);
+            load_chunk(chunk_manager, x, y);
         }
     }
 }

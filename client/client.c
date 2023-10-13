@@ -4,25 +4,31 @@
 // #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
+#include "common/input.h"
 #include "common/game.h"
-#include "common/window.h"
-#include "draw/draw.h"
+// #include "common/window.h"
+// #include "draw/draw.h"
 // #include "load/chunk.h"
+
+
 double start, stop;
 int frames;
 int main()
 {
     assert(glfwInit());
 
-    Game_t game;
+    Game_t game = {0};
 
     give_this_game_a_window(&game);
-    glfwSwapInterval(0);
+    // glfwSwapInterval(0);
 
     init_draw(&game.draw);
 
-    while(!glfwWindowShouldClose(game.window.pointer))
+    setup_input(&game);
+
+    while(!glfwWindowShouldClose(game.window.pointer) && glfwGetKey(game.window.pointer, GLFW_KEY_ESCAPE) != GLFW_PRESS)
     {
+/*___________*/
 stop = glfwGetTime();
 frames++;
 if (stop-start > 1)
@@ -31,12 +37,14 @@ if (stop-start > 1)
     start = stop;
     frames = 0;
 }
+/*___________*/
 
         glfwPollEvents();
         draw(&game.draw);
         glfwSwapBuffers(game.window.pointer);
     }
 
+    printf("PROG_END");
 
     glfwTerminate();
     terminate_draw(&game.draw);

@@ -3,19 +3,20 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "map.tmj",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
         "": {
             "scaleInDock": 1
         },
         "map.tmj": {
-            "scale": 4,
+            "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 123.125,
-                "y": 27.5
+                "x": 187.33333333333331,
+                "y": 45
             }
         },
         "map.tmj#tileset": {
@@ -35,6 +36,7 @@
     "map.orientation": null,
     "map.tileHeight": 16,
     "openFiles": [
+        "map.tmj"
     ],
     "project": "untiled.tiled-project",
     "recentFiles": [

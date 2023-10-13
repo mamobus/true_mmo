@@ -32,7 +32,9 @@
         "chunk.h": "c",
         "math.h": "c",
         "gl.h": "c",
-        "debug_defines.h": "c"
+        "debug_defines.h": "c",
+        "camera.h": "c",
+        "input.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

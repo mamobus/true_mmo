@@ -5,7 +5,7 @@ client_folder := $(CURDIR)/client
 
 include_flags := -L$(CURDIR)/libs -I$(CURDIR)/includes
 flags := -o $(CURDIR)/builds/client.exe $(include_flags) -fdiagnostics-color=always
-special_flags := -pipe #-Wall -O2
+special_flags := -pipe #-O2 -Wall 
 libs := -lglfw3 -lglew32s -lopengl32 -lgdi32
 CC = C:\msys64\mingw64\bin\gcc.exe
 
@@ -13,6 +13,8 @@ precompiled_client_libs := \
 	$(precompiled_folder)/client.o \
 	$(precompiled_folder)/common/game.o \
 	$(precompiled_folder)/common/window.o \
+	$(precompiled_folder)/common/input.o \
+	$(precompiled_folder)/common/camera.o \
 	$(precompiled_folder)/load/chunk.o \
 	$(precompiled_folder)/load/cute_tiled.o \
 	$(precompiled_folder)/draw/draw.o \
@@ -20,16 +22,16 @@ precompiled_client_libs := \
 	$(precompiled_folder)/draw/load_texture.o \
 	$(precompiled_folder)/draw/load_shaders.o
 
-client_libs := \
-	$(precompiled_folder)/client.c \
-	$(precompiled_folder)/common/game.c \
-	$(precompiled_folder)/common/window.c \
-	$(precompiled_folder)/load/chunk.c \
-	$(precompiled_folder)/load/cute_tiled.c \
-	$(precompiled_folder)/draw/draw.c \
-	$(precompiled_folder)/draw/lodepng.c \
-	$(precompiled_folder)/draw/load_texture.c \
-	$(precompiled_folder)/draw/load_shaders.c
+# client_libs := \ outdated
+# 	$(precompiled_folder)/client.c \
+# 	$(precompiled_folder)/common/game.c \
+# 	$(precompiled_folder)/common/window.c \
+# 	$(precompiled_folder)/load/chunk.c \
+# 	$(precompiled_folder)/load/cute_tiled.c \
+# 	$(precompiled_folder)/draw/draw.c \
+# 	$(precompiled_folder)/draw/lodepng.c \
+# 	$(precompiled_folder)/draw/load_texture.c \
+# 	$(precompiled_folder)/draw/load_shaders.c
 
 client_: $(precompiled_client_libs) 
 	$(CC) $(flags) $(precompiled_client_libs) $(libs) $(special_flags)
@@ -42,6 +44,12 @@ $(precompiled_folder)/load/cute_tiled.o: $(client_folder)/load/cute_tiled.c $(cl
 
 $(precompiled_folder)/common/game.o: $(client_folder)/common/game.c $(client_folder)/common/game.h
 	$(CC) -c $(client_folder)/common/game.c -o $(precompiled_folder)/common/game.o $(include_flags) $(libs)
+
+$(precompiled_folder)/common/camera.o: $(client_folder)/common/camera.c $(client_folder)/common/camera.h
+	$(CC) -c $(client_folder)/common/camera.c -o $(precompiled_folder)/common/camera.o $(include_flags) $(libs)
+
+$(precompiled_folder)/common/input.o: $(client_folder)/common/input.c $(client_folder)/common/input.h
+	$(CC) -c $(client_folder)/common/input.c -o $(precompiled_folder)/common/input.o $(include_flags) $(libs)
 
 $(precompiled_folder)/common/window.o: $(client_folder)/common/window.c $(client_folder)/common/window.h
 	$(CC) -c $(client_folder)/common/window.c -o $(precompiled_folder)/common/window.o $(include_flags) $(libs)

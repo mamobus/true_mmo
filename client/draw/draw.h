@@ -3,6 +3,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include "../common/vec.h"
+#include "../common/camera.h"
 #include "../draw/load_shaders.h"
 #include "../draw/load_texture.h"
 #include "../load/chunk.h"
@@ -12,7 +13,7 @@
 typedef struct uniforms_t
 {
     GLuint tileset_texture;
-    GLuint camera_coords;
+    GLuint camera_pos;
     // GLuint textureID;
 } uniforms_t;
 
@@ -25,6 +26,8 @@ typedef struct draw_t
 
     chunk_manager_t chunk_manager;
     uniforms_t uni;
+
+    camera_t camera;
 } draw_t;
 
 void init_draw(draw_t* draw);

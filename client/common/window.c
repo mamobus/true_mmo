@@ -18,7 +18,7 @@ struct Window_t create_window()
     window.width = mode->width;
     window.height = mode->height;
 
-    window.pointer = glfwCreateWindow(666, 666, "renderer_gl", 0, 0);
+    window.pointer = glfwCreateWindow(1920, 1080, "renderer_gl", 0, 0);
     if(window.pointer == 0)
     {  
         glfwWindowHint(GLFW_SAMPLES, 1); // 4x antialiasing

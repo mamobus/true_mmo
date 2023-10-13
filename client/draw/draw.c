@@ -11,30 +11,37 @@ void init_draw(draw_t* draw)
     draw->programID = load_shaders("../client/draw/shaders/vertex.glsl", "../client/draw/shaders/geometry.glsl", "../client/draw/shaders/fragment.glsl");
     glGenVertexArrays(1, &draw->VertexArrayID);
 	glBindVertexArray(draw->VertexArrayID);
+
     //there i load things that are not that hard to create extra functions for that
     draw->tileset_textureID = loadTexture("../assets/tileset/Sprite.png");
     draw->uni.tileset_texture  = glGetUniformLocation(draw->programID, "my_tileset_texture");
-    // stride_xy = glGetUniformLocation(draw->programID, "stride_xy");
+    draw->uni.camera_pos       = glGetUniformLocation(draw->programID, "camera_pos");
+
+
     load_chunk_manager("../assets/map/chunk_manager", "../assets/map/chunk_file", &draw->chunk_manager);
     load_all_chunks(&draw->chunk_manager);
 
-    for (int i = 0; i < draw->chunk_manager.height*draw->chunk_manager.width; i++)
-    {
-        for(int j = 0; j < draw->chunk_manager.chunks[i].tile_count; j++)
-        {
-            printf("x%1f y%1f z%1f num%2f\n", draw->chunk_manager.chunks[i].tiles[j].x, draw->chunk_manager.chunks[i].tiles[j].y, draw->chunk_manager.chunks[i].tiles[j].z, draw->chunk_manager.chunks[i].tiles[j].tile_num);
-        }
-        printf("\n");
-    }
+    // for (int i = 0; i < draw->chunk_manager.height*draw->chunk_manager.width; i++)
+    // {
+    //     for(int j = 0; j < draw->chunk_manager.chunks[i].tile_count; j++)
+    //     {
+    //         printf("x%1f y%1f z%1f num%2f\n", draw->chunk_manager.chunks[i].tiles[j].x, draw->chunk_manager.chunks[i].tiles[j].y, draw->chunk_manager.chunks[i].tiles[j].z, draw->chunk_manager.chunks[i].tiles[j].tile_num);
+    //     }
+    //     printf("\n");
+    // }
 
     // //for debugging
     // glGenBuffers(1, &vbo);
     // glBindBuffer(GL_ARRAY_BUFFER, vbo);
     // // glBufferData(GL_ARRAY_BUFFER, sizeof(tiles), tiles, GL_STATIC_DRAW);
     // glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_GEQUAL); 
 
+    
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL); 
+    // printf("before GL_DEPTH_CLAMP\n");
+    glEnable(GL_DEPTH_CLAMP);
+    // printf("after GL_DEPTH_CLAMP\n");
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -52,15 +59,26 @@ void init_draw(draw_t* draw)
     glPointParameterf(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
     
     glClearColor(0.19, 0.82, 0.69, 1.0);
+
+    printf("setup finished\n");
 }
 
 void draw_chunk(draw_t* draw, int x, int y)
 {
+    // printf("s");
     int width  = draw->chunk_manager.width;
     int height = draw->chunk_manager.height;
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     chunk_t chunk = draw->chunk_manager.chunks[x + y*width];
+    if (chunk.vbo == 0)
+    {
+        for (int i=0; i < chunk.tile_count; i++)
+        {
+            printf("%d ", chunk.tiles[i].tile_num);
+        }
+        printf("\n");
+    }
     assert(chunk.vbo != 0);
     glBindBuffer(GL_ARRAY_BUFFER, chunk.vbo);
     //{x,y,z} per vertex
@@ -71,12 +89,13 @@ void draw_chunk(draw_t* draw, int x, int y)
     // glVertexAttribPointer(1, 1, GL_FLOAT, 0, 3*sizeof(float), 3);
     
     glDrawArrays(GL_POINTS, 0, chunk.tile_count);
+    // printf("e ");
 }
 
 void draw(draw_t* draw)
 {
-    glClear(GL_COLOR_BUFFER_BIT);
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(draw->programID);
 
@@ -84,7 +103,8 @@ void draw(draw_t* draw)
     glBindTexture(GL_TEXTURE_2D, draw->tileset_textureID);
     glUniform1i(draw->uni.tileset_texture, 0);
 
-    // glUniform2f(stride_xy, stride_x, stride_y);
+    printf("%2f %2f\n", draw->camera.position.x, draw->camera.position.y);
+    glUniform2f(draw->uni.camera_pos, draw->camera.position.x, draw->camera.position.y);
     // stride_x += 0.001;
     // stride_y += 0.001;
 
