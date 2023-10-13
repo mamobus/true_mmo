@@ -65,49 +65,53 @@ int main()
     {
         for (int chunk_column = 0; chunk_column < chunks_width; chunk_column++)
         {
-            //for each layer
-            //copy chunk to chunkfile
             offset = ftell(chunk_file);
             tiles_in_chunk = 0;
             print("offset %d\n", offset);
             fwrite(&offset, sizeof(int), 1, manager_file);
 
-            for(int column = chunk_column*CHUNK_SIZE; column < (chunk_column + 1)*CHUNK_SIZE && column < width; column++)
+            //for each layer
+            for (cute_tiled_layer_t* layer = &cute_map->layers[0]; layer != NULL; layer = layer->next)
             {
-                for(int line = chunk_line*CHUNK_SIZE; line < (chunk_line + 1)*CHUNK_SIZE && line < height; line++)
-                {   
-                    if (data[line*width + column] == 0)
-                    {
-                        continue;
+                //copy chunk from current layer to chunkfile
+                data = layer->data;
+                for(int column = chunk_column*CHUNK_SIZE; column < (chunk_column + 1)*CHUNK_SIZE && column < width; column++)
+                {
+                    for(int line = chunk_line*CHUNK_SIZE; line < (chunk_line + 1)*CHUNK_SIZE && line < height; line++)
+                    {   
+                        if (data[line*width + column] == 0)
+                        {
+                            continue;
+                        }
+                        x = (float)column;
+                        y = (float)line;
+                        z = (float)layer->id;
+                        val = (float)data[line*width + column] - 1;
+                        print("x %2.1f y %2.1f z %2.1f\n", x, y, z);
+                        // print("data[line*width + column] %f\n", val);
+                        fwrite(&x  , sizeof(float), 1, chunk_file);
+                        fwrite(&y  , sizeof(float), 1, chunk_file);
+                        fwrite(&z  , sizeof(float), 1, chunk_file);
+                        fwrite(&val, sizeof(float), 1, chunk_file);
+                        tiles_in_chunk++;
                     }
-                    x = (float)column;
-                    y = (float)line;
-                    z = 0;
-                    val = (float)data[line*width + column] - 1;
-                    print("x %f y %f z %f\n", x, y, z);
-                    print("data[line*width + column] %f\n", val);
-                    fwrite(&x  , sizeof(float), 1, chunk_file);
-                    fwrite(&y  , sizeof(float), 1, chunk_file);
-                    fwrite(&z  , sizeof(float), 1, chunk_file);
-                    fwrite(&val, sizeof(float), 1, chunk_file);
-                    tiles_in_chunk++;
                 }
             }
             print("tiles_in_chunk %d\n", tiles_in_chunk);
             fwrite(&tiles_in_chunk, sizeof(int), 1, manager_file);
-            
-            // copy chunk to chunkmap
         }
     }
     fclose(chunk_file);
     fclose(manager_file);
 
-    manager_file = fopen("assets/map/chunk_manager", "rb");
+    cute_tiled_free_map(cute_map);
 
-    int temp = 66;
-    assert(fread(&temp, sizeof(int), 1, manager_file)==1);
+    // manager_file = fopen("assets/map/chunk_manager", "rb");
 
-    fclose(manager_file);
+    // int temp = 66;
+    // assert(fread(&temp, sizeof(int), 1, manager_file)==1);
+
+    // fclose(manager_file);
 
     return 0;
 }

@@ -11,7 +11,7 @@ uniform vec2 window_size;
 mat3 transform = mat3(
     +1.0, -0.5,  -1.0,
     -1.0, -0.5,  -1.0,
-    +0.0, +0.0,  0
+    +0.0, +1.0,  +0.0
 );
 
 // vec2 sf = vec2(64.0, 64.0);
@@ -19,11 +19,13 @@ mat3 transform = mat3(
 void main(){
     vec3 clip_coords = transform * vertex_coords;
     clip_coords.xy = clip_coords.xy * 64.0 / window_size.yx;
+    
+    //apply camera
     clip_coords.xy -= camera_pos.xy;
+
+    //for propper sorting
     clip_coords.z /= 1000;
-    // clip_coords.x -= stride_xy.x;
-    // clip_coords.y -= stride_xy.y;
-    // gl_Position = vec4(0.1,-0.1, 0.5, 1.0);
+
     gl_Position = vec4(clip_coords, 1.0);
     gl_PointSize = 64.0;
 
