@@ -7,11 +7,11 @@
 // #include "camera.h"
 #include "player.h"
 #include "../draw/draw.h"
-#include "window.h"
+// #include "window.h"
 
 typedef struct Game_t
 {
-    Window_t window;
+    // Window_t window;
     draw_t draw;
     // player_t player;
 } Game_t;

@@ -5,7 +5,8 @@ layout(location = 1) in float tile_num;
 
 out vec2 tileset_uv;
 
-uniform vec2 camera_pos;
+uniform vec2 camera_pos; 
+uniform vec2 window_size; 
 
 mat3 transform = mat3(
     +1.0, -0.5,  -1.0,
@@ -13,16 +14,11 @@ mat3 transform = mat3(
     +0.0, +0.0,  0
 );
 
-mat3 scale = mat3(
-    +1.0, -0.5,  -1.0,
-    -1.0, -0.5,  -1.0,
-    +0.0, +0.0,  0
-);
-
+// vec2 sf = vec2(64.0, 64.0);
 
 void main(){
-    vec3 clip_coords = vertex_coords / 22;
-    clip_coords = transform * clip_coords;
+    vec3 clip_coords = transform * vertex_coords;
+    clip_coords.xy = clip_coords.xy * 64.0 / window_size.yx;
     clip_coords.xy -= camera_pos.xy;
     clip_coords.z /= 1000;
     // clip_coords.x -= stride_xy.x;

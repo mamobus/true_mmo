@@ -16,26 +16,15 @@ void init_draw(draw_t* draw)
     draw->tileset_textureID = loadTexture("../assets/tileset/Sprite.png");
     draw->uni.tileset_texture  = glGetUniformLocation(draw->programID, "my_tileset_texture");
     draw->uni.camera_pos       = glGetUniformLocation(draw->programID, "camera_pos");
+    draw->uni.window_size      = glGetUniformLocation(draw->programID, "window_size");
+
+
+    printf("winsize %d %d\n", draw->window.height, draw->window.width);
+    printf("winsize %d %d\n", draw->window.height, draw->window.width);
 
 
     load_chunk_manager("../assets/map/chunk_manager", "../assets/map/chunk_file", &draw->chunk_manager);
     load_all_chunks(&draw->chunk_manager);
-
-    // for (int i = 0; i < draw->chunk_manager.height*draw->chunk_manager.width; i++)
-    // {
-    //     for(int j = 0; j < draw->chunk_manager.chunks[i].tile_count; j++)
-    //     {
-    //         printf("x%1f y%1f z%1f num%2f\n", draw->chunk_manager.chunks[i].tiles[j].x, draw->chunk_manager.chunks[i].tiles[j].y, draw->chunk_manager.chunks[i].tiles[j].z, draw->chunk_manager.chunks[i].tiles[j].tile_num);
-    //     }
-    //     printf("\n");
-    // }
-
-    // //for debugging
-    // glGenBuffers(1, &vbo);
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // // glBufferData(GL_ARRAY_BUFFER, sizeof(tiles), tiles, GL_STATIC_DRAW);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
-
     
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL); 
@@ -103,8 +92,9 @@ void draw(draw_t* draw)
     glBindTexture(GL_TEXTURE_2D, draw->tileset_textureID);
     glUniform1i(draw->uni.tileset_texture, 0);
 
-    printf("%2f %2f\n", draw->camera.position.x, draw->camera.position.y);
-    glUniform2f(draw->uni.camera_pos, draw->camera.position.x, draw->camera.position.y);
+    // printf("%2f %2f\n", draw->camera.position.x, draw->camera.position.y);
+    glUniform2f(draw->uni.camera_pos , draw->camera.position.x, draw->camera.position.y);
+    glUniform2f(draw->uni.window_size, draw->window.height    , draw->window.width     );
     // stride_x += 0.001;
     // stride_y += 0.001;
 

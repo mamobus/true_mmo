@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vec.h"
+#include "../common/vec.h"
 
 typedef struct camera_t
 {

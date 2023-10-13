@@ -6,5 +6,5 @@ void give_this_game_a_window(Game_t* game)
 
     window = create_window();
 
-    game->window = window;
+    game->draw.window = window;
 }

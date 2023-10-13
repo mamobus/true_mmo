@@ -15,10 +15,10 @@ struct Window_t create_window()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 
     const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    window.width = mode->width;
-    window.height = mode->height;
+    window.width  = mode->width  / 2;
+    window.height = mode->height / 2;
 
-    window.pointer = glfwCreateWindow(1920, 1080, "renderer_gl", 0, 0);
+    window.pointer = glfwCreateWindow(window.width, window.height, "renderer_gl", 0, 0);
     if(window.pointer == 0)
     {  
         glfwWindowHint(GLFW_SAMPLES, 1); // 4x antialiasing
@@ -26,7 +26,7 @@ struct Window_t create_window()
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 
-        window.pointer = glfwCreateWindow(666, 666, "renderer_gl", 0, 0);
+        window.pointer = glfwCreateWindow(window.width, window.height, "renderer_gl", 0, 0);
     }
 
     assert(window.pointer);

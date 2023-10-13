@@ -26,7 +26,7 @@ int main()
 
     setup_input(&game);
 
-    while(!glfwWindowShouldClose(game.window.pointer) && glfwGetKey(game.window.pointer, GLFW_KEY_ESCAPE) != GLFW_PRESS)
+    while(!glfwWindowShouldClose(game.draw.window.pointer) && glfwGetKey(game.draw.window.pointer, GLFW_KEY_ESCAPE) != GLFW_PRESS)
     {
 /*___________*/
 stop = glfwGetTime();
@@ -41,7 +41,7 @@ if (stop-start > 1)
 
         glfwPollEvents();
         draw(&game.draw);
-        glfwSwapBuffers(game.window.pointer);
+        glfwSwapBuffers(game.draw.window.pointer);
     }
 
     printf("PROG_END");

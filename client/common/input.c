@@ -33,5 +33,5 @@ void setup_input(Game_t* game)
 {
     camera_o = &game->draw.camera;
 
-    glfwSetKeyCallback(game->window.pointer, key_callback);
+    glfwSetKeyCallback(game->draw.window.pointer, key_callback);
 }
