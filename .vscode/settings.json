@@ -34,7 +34,15 @@
         "gl.h": "c",
         "debug_defines.h": "c",
         "camera.h": "c",
-        "input.h": "c"
+        "input.h": "c",
+        "entity.h": "c",
+        "vector.h": "c",
+        "stdio_s.h": "c",
+        "corecrt_stdio_config.h": "c",
+        "corecrt.h": "c",
+        "_mingw.h": "c",
+        "_mingw_mac.h": "c",
+        "_mingw_secapi.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

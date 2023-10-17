@@ -15,26 +15,26 @@ precompiled_client_libs := \
 	$(precompiled_folder)/common/game.o \
 	$(precompiled_folder)/common/input.o \
 	$(precompiled_folder)/load/chunk.o \
-	$(precompiled_folder)/load/cute_tiled.o \
 	$(precompiled_folder)/draw/window.o \
 	$(precompiled_folder)/draw/camera.o \
 	$(precompiled_folder)/draw/draw.o \
 	$(precompiled_folder)/draw/load/lodepng.o \
 	$(precompiled_folder)/draw/load/load_texture.o \
-	$(precompiled_folder)/draw/load/load_shaders.o
+	$(precompiled_folder)/draw/load/load_shaders.o \
+	$(precompiled_folder)/logic/mob.o
 
 client_libs := \
 	$(client_folder)/client.c \
 	$(client_folder)/common/game.c \
 	$(client_folder)/common/input.c \
 	$(client_folder)/load/chunk.c \
-	$(client_folder)/load/cute_tiled.c \
 	$(client_folder)/draw/window.c \
 	$(client_folder)/draw/camera.c \
 	$(client_folder)/draw/draw.c \
 	$(client_folder)/draw/load/lodepng.c \
 	$(client_folder)/draw/load/load_texture.c \
-	$(client_folder)/draw/load/load_shaders.c
+	$(client_folder)/draw/load/load_shaders.c \
+	$(client_folder)/logic/mob.c
 
 client_: $(precompiled_client_libs) 
 	$(CC) $(flags) $(precompiled_client_libs) $(libs) $(special_flags)
@@ -42,8 +42,8 @@ client_: $(precompiled_client_libs)
 $(precompiled_folder)/client.o: $(client_folder)/client.c
 	$(CC) -c $(client_folder)/client.c -o $(precompiled_folder)/client.o $(include_flags) $(libs)
 
-$(precompiled_folder)/load/cute_tiled.o: $(client_folder)/load/cute_tiled.c $(client_folder)/load/cute_tiled.h
-	$(CC) -c $(client_folder)/load/cute_tiled.c -o $(precompiled_folder)/load/cute_tiled.o $(include_flags) $(libs)
+# $(precompiled_folder)/load/cute_tiled.o: $(client_folder)/load/cute_tiled.c $(client_folder)/load/cute_tiled.h
+# 	$(CC) -c $(client_folder)/load/cute_tiled.c -o $(precompiled_folder)/load/cute_tiled.o $(include_flags) $(libs)
 
 $(precompiled_folder)/common/game.o: $(client_folder)/common/game.c $(client_folder)/common/game.h
 	$(CC) -c $(client_folder)/common/game.c -o $(precompiled_folder)/common/game.o $(include_flags) $(libs)
@@ -71,6 +71,9 @@ $(precompiled_folder)/draw/load/load_shaders.o: $(client_folder)/draw/load/load_
 
 $(precompiled_folder)/load/chunk.o: $(client_folder)/load/chunk.c $(client_folder)/load/chunk.h
 	$(CC) -c $(client_folder)/load/chunk.c -o $(precompiled_folder)/load/chunk.o $(include_flags) $(libs)
+
+$(precompiled_folder)/logic/mob.o: $(client_folder)/logic/mob.c $(client_folder)/logic/mob.h
+	$(CC) -c $(client_folder)/logic/mob.c -o $(precompiled_folder)/logic/mob.o $(include_flags) $(libs)
 
 $(CURDIR)/builds/imorter.exe: 
 	gcc $(CURDIR)/importer/import.c $(special_flags) -o $(CURDIR)/builds/imorter.exe

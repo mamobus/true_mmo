@@ -50,6 +50,15 @@ void init_draw(draw_t* draw)
     glClearColor(0.19, 0.82, 0.69, 1.0);
 
     printf("setup finished\n");
+
+
+    mob_t mob = {0};
+    mob.id = 12; 
+    mob.pos.x = 2.0f; 
+    mob.pos.y = 2.0f; 
+    mob.pos.z = 2.0f;
+    mob.state = 4;
+    mob_add(mob, 644, draw->mob_manager);
 }
 
 void draw_chunk(draw_t* draw, int x, int y)
@@ -81,6 +90,20 @@ void draw_chunk(draw_t* draw, int x, int y)
     // printf("e ");
 }
 
+void draw_mob_list(draw_t* draw, mob_list_t* mob_list)
+{
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
+    assert(mob_list->vbo != 0);
+    glBindBuffer(GL_ARRAY_BUFFER, mob_list->vbo);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, 0, 4*sizeof(float), 0*sizeof(float));
+    glVertexAttribPointer(1, 1, GL_FLOAT, 0, 4*sizeof(float), 3*sizeof(float));
+    
+    glDrawArrays(GL_POINTS, 0, cvector_size(mob_list->draw_mobs));
+}
+
 void draw(draw_t* draw)
 {
     // glClear(GL_COLOR_BUFFER_BIT);
@@ -97,7 +120,8 @@ void draw(draw_t* draw)
     glUniform2f(draw->uni.window_size, draw->window.height    , draw->window.width     );
     // stride_x += 0.001;
     // stride_y += 0.001;
-
+    // glEnableVertexAttribArray(0);
+    // glEnableVertexAttribArray(1);
     for (int y=0; y < draw->chunk_manager.height; y++)
     {
         for (int x=0; x < draw->chunk_manager.width; x++)
@@ -107,18 +131,14 @@ void draw(draw_t* draw)
         }
     }
 
-    // glEnableVertexAttribArray(0);
-    // glEnableVertexAttribArray(1);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // glVertexAttribPointer(0, 3, GL_FLOAT, 0, 16, 0);
-    // glVertexAttribPointer(1, 1, GL_FLOAT, 0, 3*sizeof(float), 3*sizeof(float));
-    // glVertexAttribPointer(1, 1, GL_FLOAT, 0, 3*sizeof(float), 0);
-    
-    // glDrawArrays(GL_POINTS, 0, sizeof(v)/16);
-
+    mob_prepare_draw_data(draw->mob_manager);
+    for (int i=0; i < cvector_size(draw->mob_manager); i++)
+    {
+        draw_mob_list(draw, &draw->mob_manager[i]);
+    }
     // glDisableVertexAttribArray(0);
     // glDisableVertexAttribArray(1);
+
 } 
 
 void terminate_draw(draw_t* draw)

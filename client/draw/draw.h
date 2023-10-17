@@ -8,6 +8,7 @@
 #include "../draw/load/load_shaders.h"
 #include "../draw/load/load_texture.h"
 #include "../load/chunk.h"
+#include "../logic/mob.h"
 
 #include "../includes/debug_defines.h"
 
@@ -31,6 +32,8 @@ typedef struct draw_t
 
     camera_t camera;
     Window_t window;
+
+    mob_manager_t mob_manager;
 } draw_t;
 
 void init_draw(draw_t* draw);

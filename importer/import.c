@@ -1,4 +1,4 @@
-#include "../client/load/cute_tiled.c"
+#include "cute_tiled.c"
 // #include "../client/load/cute_tiled.h"
 // #include "../client/map/chunk.h"
 #include <stdio.h>

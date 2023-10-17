@@ -4,7 +4,6 @@
 #include <GL/glew.h>
 #include <malloc.h>
 #include <stdio.h>
-#include "cute_tiled.h"
 #include <assert.h>
 #include "../includes/debug_defines.h"
 

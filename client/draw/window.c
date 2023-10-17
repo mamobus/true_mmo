@@ -15,8 +15,10 @@ struct Window_t create_window()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 
     const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    window.width  = mode->width  / 2;
-    window.height = mode->height / 2;
+    // window.width  = mode->width  / 2;
+    // window.height = mode->height / 2;
+    window.width = mode->width ;
+    window.height = mode->height;
 
     window.pointer = glfwCreateWindow(window.width, window.height, "renderer_gl", 0, 0);
     if(window.pointer == 0)

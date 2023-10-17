@@ -12,6 +12,7 @@
 
 
 double start, stop;
+// double frame_start, frame_stop; //for lowest fps in 1 second
 int frames;
 int main()
 {
@@ -20,7 +21,7 @@ int main()
     Game_t game = {0};
 
     give_this_game_a_window(&game);
-    // glfwSwapInterval(0);
+    glfwSwapInterval(0);
 
     init_draw(&game.draw);
 
@@ -31,9 +32,9 @@ int main()
 /*___________*/
 stop = glfwGetTime();
 frames++;
-if (stop-start > 1)
+if (stop-start > 4.0) //every 4 seconds
 {
-    printf("fps = %3lf\n", ((double)frames)/(stop-start));
+    printf("FPS=%.2lf MSPF=%lf\n", ((double)frames)/(stop-start), 1000*(stop-start)/((double)frames));
     start = stop;
     frames = 0;
 }

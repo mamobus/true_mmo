@@ -16,7 +16,7 @@ void load_chunk_manager(char* manager_file_name, char* chunk_file_name, chunk_ma
     assert(fread(&chunk_manager->width , sizeof(int), 1, manager_file)==1);
 
     // Allocate memory for the height*width chunks
-    chunk_manager->chunks = calloc(chunk_manager->height * chunk_manager->width, sizeof(chunk_t));
+    chunk_manager->chunks = calloc(chunk_manager->height * chunk_manager->width, sizeof(chunk_t ));
     // assert(chunk_manager->chunks != 0);
 
     // Read the 2D array of chunk_t objects from the file

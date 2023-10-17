@@ -12,6 +12,7 @@ void main() {
     fragColor = texture(my_tileset_texture, coord_on_a_tileset);
     if (fragColor.w < 0.5)
     {
+        //withou this discard transparent parts of sprites block others
         discard;
     }
     // fragColor = vec4(0.45, 0.19, 0.82, 1.0);
