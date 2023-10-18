@@ -18,6 +18,8 @@ typedef struct uniforms_t
     GLuint camera_pos;
     GLuint window_size;
     // GLuint textureID;
+    GLuint point_size;
+    GLuint grid_size;
 } uniforms_t;
 
 

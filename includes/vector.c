@@ -4,7 +4,7 @@
 //  Created by Mashpoe on 2/26/19.
 //
 
-#include "vec.h"
+#include "vector.h"
 #include <string.h>
 
 typedef struct vector_data vector_data;
@@ -20,6 +20,7 @@ vector_data* vector_alloc(vec_size_t alloc, vec_size_t size)
 {
 	vector_data* v_data = (vector_data*)
 		malloc(sizeof(vector_data) + alloc * size);
+assert(v_data != NULL);
 	v_data->alloc = alloc;
 	return v_data;
 }
@@ -29,6 +30,7 @@ vector_data* vector_get_data(vector vec) { return &((vector_data*)vec)[-1]; }
 vector vector_create(void)
 {
 	vector_data* v = (vector_data*)malloc(sizeof(vector_data));
+assert(v != NULL);
 	v->alloc = 0;
 	v->length = 0;
 
@@ -113,6 +115,7 @@ vector _vector_copy(vector vec, vec_type_t type_size)
 	vector_data* vec_data = vector_get_data(vec);
 	size_t alloc_size = sizeof(vector_data) + vec_data->length * type_size;
 	vector_data* v = (vector_data*)malloc(alloc_size);
+assert(v != NULL);
 	memcpy(v, vec_data, alloc_size);
 	return (void*)&v->buff;
 }

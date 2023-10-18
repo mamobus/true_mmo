@@ -72,7 +72,7 @@ void load_chunk(chunk_manager_t* chunk_manager, int x, int y)
 
     int size;
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    printf("chunk size is %d\n", size);
+    printf(" chunk size is %d\n", size);
 }
 
 void free_chunk(chunk_manager_t* chunk_manager, int x, int y)

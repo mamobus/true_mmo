@@ -42,7 +42,13 @@
         "corecrt.h": "c",
         "_mingw.h": "c",
         "_mingw_mac.h": "c",
-        "_mingw_secapi.h": "c"
+        "_mingw_secapi.h": "c",
+        "mob.h": "c",
+        "system_error": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

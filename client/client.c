@@ -18,10 +18,11 @@ int main()
 {
     assert(glfwInit());
 
+
     Game_t game = {0};
 
     give_this_game_a_window(&game);
-    glfwSwapInterval(0);
+    // glfwSwapInterval(0);
 
     init_draw(&game.draw);
 
