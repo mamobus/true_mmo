@@ -3,6 +3,7 @@
         {
             "name": "true_mmo",
             "includePath": [
+                "${workspaceFolder}/client",
                 "${workspaceFolder}/includes"
             ],
             "cStandard": "c11",

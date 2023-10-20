@@ -4,29 +4,29 @@
 // float stride_x = 0;
 // float stride_y = 0;
 
-void init_draw(draw_t* draw)
+void init_draw(game_t* game)
 {
     GLenum err = glewInit();
 
-    draw->programID = load_shaders("../client/draw/shaders/vertex.glsl", "../client/draw/shaders/geometry.glsl", "../client/draw/shaders/fragment.glsl");
-    glGenVertexArrays(1, &draw->VertexArrayID);
-	glBindVertexArray(draw->VertexArrayID);
+    game->programID = load_shaders("../assets/shaders/vertex.glsl", "../assets/shaders/geometry.glsl", "../assets/shaders/fragment.glsl");
+    glGenVertexArrays(1, &game->VertexArrayID);
+	glBindVertexArray(game->VertexArrayID);
 
     //there i load things that are not that hard to create extra functions for that
-    draw->tileset_textureID = loadTexture("../assets/tileset/Sprite.png");
-    draw->uni.tileset_texture  = glGetUniformLocation(draw->programID, "my_tileset_texture");
-    draw->uni.camera_pos       = glGetUniformLocation(draw->programID, "camera_pos");
-    draw->uni.window_size      = glGetUniformLocation(draw->programID, "window_size");
-    draw->uni.point_size       = glGetUniformLocation(draw->programID, "point_size");
-    draw->uni.grid_size        = glGetUniformLocation(draw->programID, "grid_size");
+    game->tileset_textureID = loadTexture("../assets/tileset/Sprite.png");
+    game->uni.map_tileset  = glGetUniformLocation(game->programID, "my_tileset_texture");
+    game->uni.camera_pos       = glGetUniformLocation(game->programID, "camera_pos");
+    game->uni.window_size      = glGetUniformLocation(game->programID, "window_size");
+    game->uni.point_size       = glGetUniformLocation(game->programID, "point_size");
+    game->uni.grid_size        = glGetUniformLocation(game->programID, "grid_size");
 
 
-    printf("winsize %d %d\n", draw->window.height, draw->window.width);
-    printf("winsize %d %d\n", draw->window.height, draw->window.width);
+    printf("winsize %d %d\n", game->window.height, game->window.width);
+    printf("winsize %d %d\n", game->window.height, game->window.width);
 
 
-    load_chunk_manager("../assets/map/chunk_manager", "../assets/map/chunk_file", &draw->chunk_manager);
-    load_all_chunks(&draw->chunk_manager);
+    load_chunk_manager("../assets/map/chunk_manager", "../assets/map/chunk_file", game);
+    load_all_chunks(game);
     
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL); 
@@ -65,24 +65,24 @@ void init_draw(draw_t* draw)
     mob.vel.y = 0.001f; 
     mob.vel.z = 0.001f;
     mob.tile_num = 0;
-    draw->mob_manager = vector_create();
-    printf("vector_size(draw->mob_manager) %d\n", vector_size(draw->mob_manager));
+    game->mob_manager = vector_create();
+    printf("vector_size(game->mob_manager) %d\n", vector_size(game->mob_manager));
     print
-    mob_add(mob, 644, &draw->mob_manager);
+    mob_add(mob, 644, &game->mob_manager);
 
-    for (int d=0; d < vector_size(draw->mob_manager); d++)
+    for (int d=0; d < vector_size(game->mob_manager); d++)
     {
-        printf("%d\n", draw->mob_manager[d].mobs[0].id);
+        printf("%d\n", game->mob_manager[d].mobs[0].id);
     }
 
     printf("mob setup finished\n");
 }
 
-void draw_chunk(draw_t* draw, int x, int y)
+void draw_chunk(game_t* game, int x, int y)
 {
-    int width  = draw->chunk_manager.width;
-    int height = draw->chunk_manager.height;
-    chunk_t chunk = draw->chunk_manager.chunks[x + y*width];
+    int width  = game->chunk_manager.width;
+    int height = game->chunk_manager.height;
+    chunk_t chunk = game->chunk_manager.chunks[x + y*width];
 
     assert(chunk.vbo != 0);
     glBindBuffer(GL_ARRAY_BUFFER, chunk.vbo);
@@ -93,11 +93,11 @@ void draw_chunk(draw_t* draw, int x, int y)
     glDrawArrays(GL_POINTS, 0, chunk.tile_count);
 }
 
-void draw_mob_list(draw_t* draw, mob_list_t* mob_list)
+void draw_mob_list(game_t* game, mob_list_t* mob_list)
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mob_list->mob_sprite);
-    glUniform1i(draw->uni.tileset_texture, 0);
+    glUniform1i(game->uni.map_tileset, 0);
 
     assert(mob_list->vbo != 0);
     glBindBuffer(GL_ARRAY_BUFFER, mob_list->vbo);
@@ -108,51 +108,51 @@ void draw_mob_list(draw_t* draw, mob_list_t* mob_list)
     glDrawArrays(GL_POINTS, 0, vector_size(mob_list->draw_mobs));
 }
 
-void draw(draw_t* draw)
+void draw(game_t* game)
 {
     // glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(draw->programID);
+    glUseProgram(game->programID);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, draw->tileset_textureID);
-    glUniform1i(draw->uni.tileset_texture, 0);
+    glBindTexture(GL_TEXTURE_2D, game->tileset_textureID);
+    glUniform1i(game->uni.map_tileset, 0);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    // printf("%2f %2f\n", draw->camera.position.x, draw->camera.position.y);
-    glUniform2f(draw->uni.camera_pos , draw->camera.position.x, draw->camera.position.y);
-    glUniform2f(draw->uni.window_size, draw->window.height    , draw->window.width     );
+    // printf("%2f %2f\n", game->camera.position.x, game->camera.position.y);
+    glUniform2f(game->uni.camera_pos , game->camera.position.x, game->camera.position.y);
+    glUniform2f(game->uni.window_size, game->window.height    , game->window.width     );
 
-    glUniform1f(draw->uni.point_size, 64.0);
-    glUniform1f(draw->uni.grid_size , 32.0);
+    glUniform1f(game->uni.point_size, 64.0);
+    glUniform1f(game->uni.grid_size , 32.0);
 
-    for (int y=0; y < draw->chunk_manager.height; y++)
+    for (int y=0; y < game->chunk_manager.height; y++)
     {
-        for (int x=0; x < draw->chunk_manager.width; x++)
+        for (int x=0; x < game->chunk_manager.width; x++)
         {
             // printf("CH_D ");
-            draw_chunk(draw, x, y);
+            draw_chunk(game, x, y);
         }
     }
 
-    glUniform1f(draw->uni.point_size, 128.0);
-    glUniform1f(draw->uni.grid_size , 7.0);
+    glUniform1f(game->uni.point_size, 128.0);
+    glUniform1f(game->uni.grid_size , 7.0);
 
-    mob_prepare_draw_data(draw->mob_manager);
-    for (int i=0; i < vector_size(draw->mob_manager); i++)
+    mob_prepare_draw_data(game->mob_manager);
+    for (int i=0; i < vector_size(game->mob_manager); i++)
     {
 
-        draw_mob_list(&draw, &draw->mob_manager[i]);
+        draw_mob_list(game, &game->mob_manager[i]);
     }
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 } 
 
-void terminate_draw(draw_t* draw)
+void terminate_draw(game_t* game)
 {
-    glDeleteVertexArrays(1, &draw->VertexArrayID);
-    free_chunk_manager(&draw->chunk_manager);
+    glDeleteVertexArrays(1, &game->VertexArrayID);
+    free_chunk_manager(game);
 }

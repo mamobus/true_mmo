@@ -2,9 +2,9 @@
 
 #include "window.h"
 
-struct Window_t create_window() 
+void create_window(game_t* game)
 {
-    struct Window_t window = {};
+    window_t window = {};
 
     assert(glfwInit());
 
@@ -15,33 +15,26 @@ struct Window_t create_window()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 
     const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    // window.width  = mode->width  / 2;
-    // window.height = mode->height / 2;
     window.width = mode->width ;
     window.height = mode->height;
 
-    window.pointer = glfwCreateWindow(window.width, window.height, "renderer_gl", 0, 0);
-    if(window.pointer == 0)
+    window.pointer = glfwCreateWindow(window.width, window.height, "renderer_gl", glfwGetPrimaryMonitor(), 0);
+    if(window.pointer == 0) //so 4.6 is too modern
     {  
         glfwWindowHint(GLFW_SAMPLES, 1); // 4x antialiasing
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // We want OpenGL 4.6
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Then wee want OpenGL 3.3
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 
-        window.pointer = glfwCreateWindow(window.width, window.height, "renderer_gl", 0, 0);
+        window.pointer = glfwCreateWindow(window.width, window.height, "renderer_gl", glfwGetPrimaryMonitor(), 0);
     }
-
     assert(window.pointer);
 
-    glfwMakeContextCurrent(window.pointer);
 
-    //disables vsync
-    // glfwSwapInterval( 0 );
+    glfwMakeContextCurrent(window.pointer);
 
     glfwSetInputMode(window.pointer, GLFW_STICKY_KEYS, 1);
     // glfwSetInputMode(window.pointer, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-
-    return window;
+    game->window = window;
 }

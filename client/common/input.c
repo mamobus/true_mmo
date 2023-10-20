@@ -29,9 +29,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }   
 
-void setup_input(Game_t* game)
+void setup_input(game_t* game)
 {
-    camera_o = &game->draw.camera;
+    camera_o = &game->camera;
 
-    glfwSetKeyCallback(game->draw.window.pointer, key_callback);
+    glfwSetKeyCallback(game->window.pointer, key_callback);
 }

@@ -1,3 +1,4 @@
+#pragma once
 /*************************************************************************
  * GLFW 3.3 - www.glfw.org
  * A library for OpenGL, window and input
@@ -25,7 +26,6 @@
  *    distribution.
  *
  *************************************************************************/
-#pragma once
 #ifndef _glfw3_h_
 #define _glfw3_h_
 

@@ -1,34 +1,35 @@
 // #define _DEBUG_
 #define GLEW_STATIC
 #include <GL/glew.h>
-// #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-#include "common/input.h"
-#include "common/game.h"
-// #include "common/window.h"
-// #include "draw/draw.h"
-// #include "load/chunk.h"
+#include "common/game_t.h"
+
+#include <common/input.h>
+#include <draw/window/window.h>
+#include <draw/camera/camera.h>
+#include <draw/draw.h>
+#include <logic/mob/mob.h>
+#include <map/chunk.h>
+
 
 
 double start, stop;
 // double frame_start, frame_stop; //for lowest fps in 1 second
 int frames;
+
 int main()
 {
-    assert(glfwInit());
+    game_t game = {0};
 
-
-    Game_t game = {0};
-
-    give_this_game_a_window(&game);
+    create_window(&game);
     // glfwSwapInterval(0);
 
-    init_draw(&game.draw);
+    init_draw(&game);
 
     setup_input(&game);
 
-    while(!glfwWindowShouldClose(game.draw.window.pointer) && glfwGetKey(game.draw.window.pointer, GLFW_KEY_ESCAPE) != GLFW_PRESS)
+    while(!glfwWindowShouldClose(game.window.pointer) && glfwGetKey(game.window.pointer, GLFW_KEY_ESCAPE) != GLFW_PRESS)
     {
 /*___________*/
 stop = glfwGetTime();
@@ -42,13 +43,13 @@ if (stop-start > 4.0) //every 4 seconds
 /*___________*/
 
         glfwPollEvents();
-        draw(&game.draw);
-        glfwSwapBuffers(game.draw.window.pointer);
+        draw(&game);
+        glfwSwapBuffers(game.window.pointer);
     }
 
     printf("PROG_END");
 
     glfwTerminate();
-    terminate_draw(&game.draw);
+    terminate_draw(&game);
     // dasd
 }

@@ -160,7 +160,7 @@ void mob_prepare_draw_data(mob_manager_t mob_manager)
             draw_mob.pos      =         mob_manager[i].mobs[j].pos;
             draw_mob.tile_num = (float) mob_manager[i].mobs[j].tile_num;
 
-            printf("%.1f %.1f %.1f %.1f\n", draw_mob.pos.x, draw_mob.pos.y, draw_mob.pos.z, draw_mob.tile_num);
+            // printf("%.1f %.1f %.1f %.1f\n", draw_mob.pos.x, draw_mob.pos.y, draw_mob.pos.z, draw_mob.tile_num);
             
             vector_add(&mob_manager[i].draw_mobs, draw_mob);
     // print

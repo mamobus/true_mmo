@@ -1,104 +1,100 @@
 .ONESHELL:
 
-precompiled_folder := $(CURDIR)/client/precompiled
-client_folder := $(CURDIR)/client
+compiled := $(CURDIR)/client/precompiled
+client := $(CURDIR)/client
 
-include_flags := -L$(CURDIR)/libs -I$(CURDIR)/includes
+include_flags := -L$(CURDIR)/libs -I$(CURDIR)/includes -I$(CURDIR)/client
 flags := -o $(CURDIR)/builds/client.exe $(include_flags) -fdiagnostics-color=always
 special_flags := -pipe #-O2 -Wall 
-special_flags_optimized := -pipe #-O2 # -Wall 
+special_flags_optimized := -pipe -O3 # -Wall 
 libs := -lglfw3 -lglew32s -lopengl32 -lgdi32
-CC = C:\msys64\mingw64\bin\gcc.exe
+GCC = C:\msys64\mingw64\bin\gcc.exe
 
 precompiled_client_libs := \
-	$(precompiled_folder)/client.o \
-	$(precompiled_folder)/common/game.o \
-	$(precompiled_folder)/common/input.o \
-	$(precompiled_folder)/load/chunk.o \
-	$(precompiled_folder)/draw/window.o \
-	$(precompiled_folder)/draw/camera.o \
-	$(precompiled_folder)/draw/draw.o \
-	$(precompiled_folder)/draw/load/lodepng.o \
-	$(precompiled_folder)/draw/load/load_texture.o \
-	$(precompiled_folder)/draw/load/load_shaders.o \
-	$(precompiled_folder)/logic/mob.o \
-	$(precompiled_folder)/includes/vector.o
+	$(compiled)/client.o \
+	$(compiled)/input.o \
+	$(compiled)/chunk.o \
+	$(compiled)/window.o \
+	$(compiled)/camera.o \
+	$(compiled)/draw.o \
+	$(compiled)/lodepng.o \
+	$(compiled)/load_texture.o \
+	$(compiled)/load_shaders.o \
+	$(compiled)/mob.o \
+	$(compiled)/vector.o
 
 client_libs := \
-	$(client_folder)/client.c \
-	$(client_folder)/common/game.c \
-	$(client_folder)/common/input.c \
-	$(client_folder)/load/chunk.c \
-	$(client_folder)/draw/window.c \
-	$(client_folder)/draw/camera.c \
-	$(client_folder)/draw/draw.c \
-	$(client_folder)/draw/load/lodepng.c \
-	$(client_folder)/draw/load/load_texture.c \
-	$(client_folder)/draw/load/load_shaders.c \
-	$(client_folder)/logic/mob.c \
+	$(client)/client.c \
+	$(client)/common/input.c \
+	$(client)/map/chunk.c \
+	$(client)/draw/window/window.c \
+	$(client)/draw/camera/camera.c \
+	$(client)/draw/draw.c \
+	$(client)/draw/load/lodepng.c \
+	$(client)/draw/load/load_texture.c \
+	$(client)/draw/load/load_shaders.c \
+	$(client)/logic/mob/mob.c \
 	$(CURDIR)/includes/vector.c
 
 client_libs_headers := \
-	$(client_folder)/common/game.h \
-	$(client_folder)/common/input.h \
-	$(client_folder)/load/chunk.h \
-	$(client_folder)/draw/window.h \
-	$(client_folder)/draw/camera.h \
-	$(client_folder)/draw/draw.h \
-	$(client_folder)/draw/load/lodepng.h \
-	$(client_folder)/draw/load/load_texture.h \
-	$(client_folder)/draw/load/load_shaders.h \
-	$(client_folder)/logic/mob.h \
+	$(client)/common/game_t.h \
+	$(client)/common/input.h \
+	$(client)/map/chunk.h \
+	$(client)/map/chunk_t.h \
+	$(client)/draw/window/window.h \
+	$(client)/draw/window/window_t.h \
+	$(client)/draw/camera/camera.h \
+	$(client)/draw/camera/camera_t.h \
+	$(client)/draw/draw.h \
+	$(client)/draw/load/lodepng.h \
+	$(client)/draw/load/load_texture.h \
+	$(client)/draw/load/load_shaders.h \
+	$(client)/logic/mob/mob.h \
+	$(client)/logic/mob/mob_t.h \
 	$(CURDIR)/includes/vector.h
 
 
 client_: $(precompiled_client_libs) 
-	$(CC) $(flags) $(precompiled_client_libs) $(libs) $(special_flags)
+	$(GCC) $(flags) $(precompiled_client_libs) $(libs) $(special_flags)
 
-$(precompiled_folder)/client.o: $(client_folder)/client.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/client.c -o $(precompiled_folder)/client.o $(include_flags) $(libs)
+$(compiled)/client.o: $(client)/client.c $(client_libs_headers)
+	$(GCC) -c $(client)/client.c -o $(compiled)/client.o $(include_flags) $(libs)
 
-# $(precompiled_folder)/load/cute_tiled.o: $(client_folder)/load/cute_tiled.c $(client_folder)/load/cute_tiled.h
-# 	$(CC) -c $(client_folder)/load/cute_tiled.c -o $(precompiled_folder)/load/cute_tiled.o $(include_flags) $(libs)
+$(compiled)/input.o: $(client)/common/input.c $(client_libs_headers)
+	$(GCC) -c $(client)/common/input.c -o $(compiled)/input.o $(include_flags) $(libs)
 
-$(precompiled_folder)/common/game.o: $(client_folder)/common/game.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/common/game.c -o $(precompiled_folder)/common/game.o $(include_flags) $(libs)
+$(compiled)/camera.o: $(client)/draw/camera/camera.c $(client_libs_headers)
+	$(GCC) -c $(client)/draw/camera/camera.c -o $(compiled)/camera.o $(include_flags) $(libs)
 
-$(precompiled_folder)/common/input.o: $(client_folder)/common/input.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/common/input.c -o $(precompiled_folder)/common/input.o $(include_flags) $(libs)
+$(compiled)/window.o: $(client)/draw/window/window.c $(client_libs_headers)
+	$(GCC) -c $(client)/draw/window/window.c -o $(compiled)/window.o $(include_flags) $(libs)
 
-$(precompiled_folder)/draw/camera.o: $(client_folder)/draw/camera.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/draw/camera.c -o $(precompiled_folder)/draw/camera.o $(include_flags) $(libs)
+$(compiled)/draw.o: $(client)/draw/draw.c $(client_libs_headers)
+	$(GCC) -c $(client)/draw/draw.c -o $(compiled)/draw.o $(include_flags) $(libs)
 
-$(precompiled_folder)/draw/window.o: $(client_folder)/draw/window.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/draw/window.c -o $(precompiled_folder)/draw/window.o $(include_flags) $(libs)
+$(compiled)/load_texture.o: $(client)/draw/load/load_texture.c $(client_libs_headers)
+	$(GCC) -c $(client)/draw/load/load_texture.c -o $(compiled)/load_texture.o $(include_flags) $(libs)
 
-$(precompiled_folder)/draw/draw.o: $(client_folder)/draw/draw.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/draw/draw.c -o $(precompiled_folder)/draw/draw.o $(include_flags) $(libs)
+$(compiled)/lodepng.o: $(client)/draw/load/lodepng.c $(client_libs_headers)
+	$(GCC) -c $(client)/draw/load/lodepng.c -o $(compiled)/lodepng.o $(include_flags) $(libs)
 
-$(precompiled_folder)/draw/load/load_texture.o: $(client_folder)/draw/load/load_texture.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/draw/load/load_texture.c -o $(precompiled_folder)/draw/load/load_texture.o $(include_flags) $(libs)
+$(compiled)/load_shaders.o: $(client)/draw/load/load_shaders.c $(client_libs_headers)
+	$(GCC) -c $(client)/draw/load/load_shaders.c -o $(compiled)/load_shaders.o $(include_flags) $(libs)
 
-$(precompiled_folder)/draw/load/lodepng.o: $(client_folder)/draw/load/lodepng.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/draw/load/lodepng.c -o $(precompiled_folder)/draw/load/lodepng.o $(include_flags) $(libs)
+$(compiled)/chunk.o: $(client)/map/chunk.c $(client_libs_headers)
+	$(GCC) -c $(client)/map/chunk.c -o $(compiled)/chunk.o $(include_flags) $(libs)
 
-$(precompiled_folder)/draw/load/load_shaders.o: $(client_folder)/draw/load/load_shaders.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/draw/load/load_shaders.c -o $(precompiled_folder)/draw/load/load_shaders.o $(include_flags) $(libs)
+$(compiled)/mob.o: $(client)/logic/mob/mob.c $(client_libs_headers)
+	$(GCC) -c $(client)/logic/mob/mob.c -o $(compiled)/mob.o $(include_flags) $(libs)
 
-$(precompiled_folder)/load/chunk.o: $(client_folder)/load/chunk.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/load/chunk.c -o $(precompiled_folder)/load/chunk.o $(include_flags) $(libs)
-
-$(precompiled_folder)/logic/mob.o: $(client_folder)/logic/mob.c $(client_libs_headers)
-	$(CC) -c $(client_folder)/logic/mob.c -o $(precompiled_folder)/logic/mob.o $(include_flags) $(libs)
-
-$(precompiled_folder)/includes/vector.o: $(CURDIR)/includes/vector.c $(client_libs_headers)
-	$(CC) -c $(CURDIR)/includes/vector.c -o $(precompiled_folder)/includes/vector.o $(include_flags) $(libs)
+$(compiled)/vector.o: $(CURDIR)/includes/vector.c $(client_libs_headers)
+	$(GCC) -c $(CURDIR)/includes/vector.c -o $(compiled)/vector.o $(include_flags) $(libs)
 
 $(CURDIR)/builds/imorter.exe: 
-	gcc $(CURDIR)/importer/import.c $(special_flags) -o $(CURDIR)/builds/imorter.exe
+	$(GCC) $(CURDIR)/importer/import.c $(special_flags_optimized) -o $(CURDIR)/builds/imorter.exe
 # full:
 import_: $(CURDIR)/importer/import.c
-	gcc $(CURDIR)/importer/import.c $(special_flags) -o $(CURDIR)/builds/imorter.exe
+	$(GCC) $(CURDIR)/importer/import.c $(special_flags) -o $(CURDIR)/builds/imorter.exe
 	$(CURDIR)/builds/imorter.exe
 
 # uptodate: $(client_)
@@ -107,5 +103,5 @@ run: client_ $(precompiled_client_libs)
 	cd ./builds && \
 	$(CURDIR)/builds/client.exe
 
-client_o2:
-	$(CC) $(flags) $(client_libs) $(libs) $(special_flags_optimized)
+client_opt:
+	$(GCC) $(flags) $(client_libs) $(libs) $(special_flags_optimized)
