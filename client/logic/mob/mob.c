@@ -1,20 +1,41 @@
 #include "mob.h"
 
-//find type_id, add to the list
-void mob_add(mob_t mob, int type_id, mob_manager_t* mob_manager)
-{   
-    for(int i=0; i < vector_size(*mob_manager); i++)
+void mob_create_manager(game_t* game)
+{
+    game->mob_manager = vector_create();
+}
+
+void mob_free_manager(game_t* game)
+{
+    for(int i=0; i < vector_size(game->mob_manager); i++)
     {
-        if((*mob_manager)[i].type_id == type_id)
+        
+        vector_free(game->mob_manager[i].draw_mobs);
+        vector_free(game->mob_manager[i].mobs);
+
+        assert(game->mob_manager[i].vbo != 0);
+        glDeleteBuffers(1, &game->mob_manager[i].vbo);
+
+        glDeleteTextures(1, &game->mob_manager[i].mob_sprite);
+    }
+    vector_free(game->mob_manager);
+}
+
+//find type_id, add to the list
+void mob_add(mob_t mob, int type_id, game_t* game)
+{
+    for(int i=0; i < vector_size(game->mob_manager); i++)
+    {
+        if(game->mob_manager[i].type_id == type_id)
         {
             //then its right mob list, just add mob to it
-            vector_add(&(*mob_manager)[i].mobs, mob);
+            vector_add(&game->mob_manager[i].mobs, mob);
             return;
         } 
     }
     
     //so we have not found right mob type_id, lets create list for this type_id
-    _mob_create_list_with_mob(mob_manager, type_id, mob);
+    _mob_create_list_with_mob(&game->mob_manager, type_id, mob);
 }
 
 //for iternal use 
@@ -69,6 +90,7 @@ void mob_set_state(mob_t* mob, int tile_num)
     mob->tile_num = tile_num;
 }
 
+//replace with fast search
 mob_t* mob_find_by_id(int id, mob_manager_t mob_manager)
 {
     for(int i=0; i < vector_size(mob_manager); i++)
@@ -125,7 +147,7 @@ void mob_update(mob_t* mob)
         if(state & STAND_BIT)
         {
             //if already standing animation, move it
-            //otherwise start it. Might be not from start
+            //otherwise start it. Might be not from start tho should work perfectly
             if(state & LEFT_BIT)
             {
                 // printf("STATE LEFT BIT\n");

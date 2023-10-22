@@ -14,6 +14,6 @@
 
 #include <common/game_t.h>
 
-void init_draw(game_t* game);
+void setup_draw(game_t* game);
 void draw(game_t* game);
 void terminate_draw(game_t* game);

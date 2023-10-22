@@ -13,7 +13,7 @@
 #include <math.h>
 
 //structs
-#include "mob_t.h"
+#include <common/game_t.h>
 
 #define MOVE_BIT  0b100000
 #define STAND_BIT 0b010000
@@ -24,6 +24,8 @@
 
 #define ANIMATION_FRAME_TIME 0.18F
 
+void mob_create_manager(game_t* game);
+void mob_free_manager  (game_t* game);
 
 void mob_add(mob_t mob, int type_id,                mob_manager_t* mob_manager);
 void mob_del(int id,    int type_id,                mob_manager_t mob_manager);

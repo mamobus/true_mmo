@@ -4,7 +4,7 @@
 // float stride_x = 0;
 // float stride_y = 0;
 
-void init_draw(game_t* game)
+void setup_draw(game_t* game)
 {
     GLenum err = glewInit();
 

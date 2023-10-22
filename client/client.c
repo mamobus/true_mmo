@@ -12,11 +12,24 @@
 #include <logic/mob/mob.h>
 #include <map/chunk.h>
 
+void print_fps()
+{
+    static double start, stop;
+    // double frame_start, frame_stop; //for lowest fps in 1 second
+    static int frames;
+    
+    /*___________*/
+    stop = glfwGetTime();
+    frames++;
+    if (stop-start > 4.0) //every 4 seconds
+    {
+        printf("FPS=%.2lf MSPF=%lf\n", ((double)frames)/(stop-start), 1000*(stop-start)/((double)frames));
+        start = stop;
+        frames = 0;
+    }
+    /*___________*/
+}
 
-
-double start, stop;
-// double frame_start, frame_stop; //for lowest fps in 1 second
-int frames;
 
 int main()
 {
@@ -25,22 +38,13 @@ int main()
     create_window(&game);
     // glfwSwapInterval(0);
 
-    init_draw(&game);
+    setup_draw(&game);
 
     setup_input(&game);
 
     while(!glfwWindowShouldClose(game.window.pointer) && glfwGetKey(game.window.pointer, GLFW_KEY_ESCAPE) != GLFW_PRESS)
     {
-/*___________*/
-stop = glfwGetTime();
-frames++;
-if (stop-start > 4.0) //every 4 seconds
-{
-    printf("FPS=%.2lf MSPF=%lf\n", ((double)frames)/(stop-start), 1000*(stop-start)/((double)frames));
-    start = stop;
-    frames = 0;
-}
-/*___________*/
+        print_fps();
 
         glfwPollEvents();
         draw(&game);
