@@ -46,6 +46,18 @@ void _mob_create_list_with_mob(mob_manager_t* mob_manager, int type_id, mob_t mo
 
     glGenBuffers(1, &new_mob_list.vbo);
 
+    double start_time = glfwGetTime();
+    int counter = 0;
+
+    // while (glfwGetTime() - start_time < 5.0)
+    // {
+    //     new_mob_list.mob_sprite = loadTexture("../assets/mob_sprites/stolen_girl.png");
+    //     glDeleteTextures(1, &new_mob_list.mob_sprite);
+    //     counter++;
+    // }
+
+    printf("ms per texture loading & unloading %lf\n", 5000.0/(double)counter);
+
     new_mob_list.mob_sprite = loadTexture("../assets/mob_sprites/stolen_girl.png"); // so its only one but its ok
     printf("loaded stolen_girl = %d\n", new_mob_list.mob_sprite);
     //probably causes A LOT OF LAG
@@ -56,8 +68,10 @@ void _mob_create_list_with_mob(mob_manager_t* mob_manager, int type_id, mob_t mo
     vector_add(mob_manager, new_mob_list); //so we've added mob_list with new type to manager
 }
 
-void mob_del(int id, int type_id, mob_manager_t mob_manager)
+void mob_del(int id, int type_id, game_t* game)
 {
+    mob_manager_t mob_manager = game->mob_manager;
+
     for(int i=0; i < vector_size(mob_manager); i++)
     {
         if(mob_manager[i].type_id == type_id)
@@ -91,8 +105,10 @@ void mob_set_state(mob_t* mob, int tile_num)
 }
 
 //replace with fast search
-mob_t* mob_find_by_id(int id, mob_manager_t mob_manager)
+mob_t* mob_find_by_id(int id, game_t* game)
 {
+    mob_manager_t mob_manager = game->mob_manager;
+
     for(int i=0; i < vector_size(mob_manager); i++)
     {
         for(int j=0; j < vector_size(mob_manager[i].mobs); j++)
@@ -106,8 +122,10 @@ mob_t* mob_find_by_id(int id, mob_manager_t mob_manager)
     }
 }
 
-mob_t* mob_find_by_id_and_type(int id, int type_id, mob_manager_t mob_manager)
+mob_t* mob_find_by_id_and_type(int id, int type_id, game_t* game)
 {
+    mob_manager_t mob_manager = game->mob_manager;
+
     for(int i=0; i < vector_size(mob_manager); i++)
     {
         if(mob_manager[i].type_id == type_id)
@@ -164,8 +182,10 @@ void mob_update(mob_t* mob)
     }
 }
 
-void mob_prepare_draw_data(mob_manager_t mob_manager)
+void mob_prepare_draw_data(game_t* game)
 {
+    mob_manager_t mob_manager = game->mob_manager;
+
     draw_mob_t draw_mob = {0};
     for(int i=0; i < vector_size(mob_manager); i++)
     {

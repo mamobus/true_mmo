@@ -27,11 +27,11 @@
 void mob_create_manager(game_t* game);
 void mob_free_manager  (game_t* game);
 
-void mob_add(mob_t mob, int type_id,                mob_manager_t* mob_manager);
-void mob_del(int id,    int type_id,                mob_manager_t mob_manager);
+void mob_add(mob_t mob, int type_id,                game_t* game);
+void mob_del(int id,    int type_id,                game_t* game);
 void mob_set_state(mob_t* mob, int state);
 
-mob_t* mob_find_by_id         (int id,              mob_manager_t mob_manager);
-mob_t* mob_find_by_id_and_type(int id, int type_id, mob_manager_t mob_manager);
+mob_t* mob_find_by_id         (int id,              game_t* game);
+mob_t* mob_find_by_id_and_type(int id, int type_id, game_t* game);
 
-void mob_prepare_draw_data(mob_manager_t mob_manager);
+void mob_prepare_draw_data(game_t* game);

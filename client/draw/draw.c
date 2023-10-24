@@ -68,7 +68,7 @@ void setup_draw(game_t* game)
     game->mob_manager = vector_create();
     printf("vector_size(game->mob_manager) %d\n", vector_size(game->mob_manager));
     print
-    mob_add(mob, 644, &game->mob_manager);
+    mob_add(mob, 644, game);
 
     for (int d=0; d < vector_size(game->mob_manager); d++)
     {
