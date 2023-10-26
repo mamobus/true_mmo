@@ -15,7 +15,7 @@ void main() {
     vec2 coord_on_a_tileset;
     vec2 reversed_PointCoord;
     
-    if (sign(tileset_uv) != -1.0)
+    if (sign(tileset_uv.x) != -1.0)
     {
         coord_on_a_tileset = gl_PointCoord / grid_size + tileset_uv;
     }

@@ -46,8 +46,8 @@ void _mob_create_list_with_mob(mob_manager_t* mob_manager, int type_id, mob_t mo
 
     glGenBuffers(1, &new_mob_list.vbo);
 
-    double start_time = glfwGetTime();
-    int counter = 0;
+    // double start_time = glfwGetTime();
+    // int counter = 0;
 
     // while (glfwGetTime() - start_time < 5.0)
     // {
@@ -56,7 +56,7 @@ void _mob_create_list_with_mob(mob_manager_t* mob_manager, int type_id, mob_t mo
     //     counter++;
     // }
 
-    printf("ms per texture loading & unloading %lf\n", 5000.0/(double)counter);
+    // printf("ms per texture loading & unloading %lf\n", 5000.0/(double)counter);
 
     new_mob_list.mob_sprite = loadTexture("../assets/mob_sprites/stolen_girl.png"); // so its only one but its ok
     printf("loaded stolen_girl = %d\n", new_mob_list.mob_sprite);

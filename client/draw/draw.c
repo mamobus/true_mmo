@@ -53,6 +53,7 @@ void setup_draw(game_t* game)
 
     printf("setup finished\n");
 
+    mob_create_manager(game);
 
     mob_t mob = {0};
     mob.id = 12; 
@@ -65,7 +66,6 @@ void setup_draw(game_t* game)
     mob.vel.y = 0.001f; 
     mob.vel.z = 0.001f;
     mob.tile_num = 0;
-    game->mob_manager = vector_create();
     printf("vector_size(game->mob_manager) %d\n", vector_size(game->mob_manager));
     print
     mob_add(mob, 644, game);
@@ -141,7 +141,7 @@ void draw(game_t* game)
     glUniform1f(game->uni.point_size, 128.0);
     glUniform1f(game->uni.grid_size , 7.0);
 
-    mob_prepare_draw_data(game->mob_manager);
+    mob_prepare_draw_data(game);
     for (int i=0; i < vector_size(game->mob_manager); i++)
     {
 
