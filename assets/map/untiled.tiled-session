@@ -12,11 +12,11 @@
             "scaleInDock": 1
         },
         "map.tmj": {
-            "scale": 2,
-            "selectedLayer": 1,
+            "scale": 1,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 369.5,
-                "y": 225
+                "x": 410,
+                "y": 277
             }
         },
         "map.tmj#tileset": {

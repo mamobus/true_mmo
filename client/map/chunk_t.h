@@ -3,18 +3,19 @@
 #include <stdio.h>
 #include <GLFW/glfw3.h>
 
-typedef struct tile_t
+typedef struct block_t
 {
-    float x, y, z;
+    // float x, y, z;
+    Vec3 pos;
     float tile_num;
-} tile_t;
+} block_t;
 
 typedef struct chunk_t
 {
     //those ints are in general not zero
-    int offset, tile_count;
+    int offset, block_count;
     //can be zero and usually is
-    tile_t* tiles;
+    block_t* blocks;
     //can be zero and usually is
     GLuint vbo;
 } chunk_t;

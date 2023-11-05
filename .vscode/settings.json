@@ -50,7 +50,22 @@
         "type_traits": "c",
         "utility": "c",
         "mob_t.h": "c",
-        "game_t.h": "c"
+        "game_t.h": "c",
+        "projectile_t.h": "c",
+        "effect_t.h": "c",
+        "collision.h": "c",
+        "time.h": "c",
+        "random": "c",
+        "ccd.h": "c",
+        "vec3.h": "c",
+        "float.h": "c",
+        "compiler.h": "c",
+        "player_movement.h": "c",
+        "*.tcc": "c",
+        "update.h": "c",
+        "ode.h": "c",
+        "objects.h": "c",
+        "misc.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

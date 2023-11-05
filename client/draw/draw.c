@@ -24,9 +24,6 @@ void setup_draw(game_t* game)
     printf("winsize %d %d\n", game->window.height, game->window.width);
     printf("winsize %d %d\n", game->window.height, game->window.width);
 
-
-    load_chunk_manager("../assets/map/chunk_manager", "../assets/map/chunk_file", game);
-    load_all_chunks(game);
     
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL); 
@@ -36,6 +33,9 @@ void setup_draw(game_t* game)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    
+    glEnable(GL_POLYGON_SMOOTH);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -52,30 +52,6 @@ void setup_draw(game_t* game)
     glClearColor(0.19, 0.82, 0.69, 1.0);
 
     printf("setup finished\n");
-
-    mob_create_manager(game);
-
-    mob_t mob = {0};
-    mob.id = 12; 
-    mob.state = STAND_BIT | LEFT_BIT | DOWN_BIT;
-    mob.last_frame_time = 0;
-    mob.pos.x = 2.0f; 
-    mob.pos.y = 2.0f; 
-    mob.pos.z = 5.0f;
-    mob.vel.x = 0.001f; 
-    mob.vel.y = 0.001f; 
-    mob.vel.z = 0.001f;
-    mob.tile_num = 0;
-    printf("vector_size(game->mob_manager) %d\n", vector_size(game->mob_manager));
-    print
-    mob_add(mob, 644, game);
-
-    for (int d=0; d < vector_size(game->mob_manager); d++)
-    {
-        printf("%d\n", game->mob_manager[d].mobs[0].id);
-    }
-
-    printf("mob setup finished\n");
 }
 
 void draw_chunk(game_t* game, int x, int y)
@@ -90,7 +66,7 @@ void draw_chunk(game_t* game, int x, int y)
     glVertexAttribPointer(0, 3, GL_FLOAT, 0, 4*sizeof(float), 0*sizeof(float));
     glVertexAttribPointer(1, 1, GL_FLOAT, 0, 4*sizeof(float), 3*sizeof(float));
     
-    glDrawArrays(GL_POINTS, 0, chunk.tile_count);
+    glDrawArrays(GL_POINTS, 0, chunk.block_count);
 }
 
 void draw_mob_list(game_t* game, mob_list_t* mob_list)
@@ -123,7 +99,8 @@ void draw(game_t* game)
     glEnableVertexAttribArray(1);
 
     // printf("%2f %2f\n", game->camera.position.x, game->camera.position.y);
-    glUniform2f(game->uni.camera_pos , game->camera.position.x, game->camera.position.y);
+    // game->camera.position.z = 1.0;
+    glUniform3f(game->uni.camera_pos , game->camera.position.x, game->camera.position.y, game->camera.position.z);
     glUniform2f(game->uni.window_size, game->window.height    , game->window.width     );
 
     glUniform1f(game->uni.point_size, 64.0);

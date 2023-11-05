@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "../common/vec.h"
+#include <vec.h>
 
 //use code generation for client & server the same time
 /*

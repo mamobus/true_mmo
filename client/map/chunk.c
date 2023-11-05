@@ -26,12 +26,12 @@ void load_chunk_manager(char* manager_file_name, char* chunk_file_name, game_t* 
         {
             chunk_t* chunk = &(game->chunk_manager.chunks[x + y*game->chunk_manager.height]);
             chunk->vbo = 0; // not loaded
-            chunk->tiles = NULL; // not loaded
+            chunk->blocks = NULL; // not loaded
 
             // Read the chunk's offset and length
             assert(fread(&chunk->offset, sizeof(int), 1, manager_file)==1);
-            assert(fread(&chunk->tile_count, sizeof(int), 1, manager_file)==1);
-            printf("offset:%d tile_count:%d\n", chunk->offset, chunk->tile_count);
+            assert(fread(&chunk->block_count, sizeof(int), 1, manager_file)==1);
+            printf("offset:%d block_count:%d\n", chunk->offset, chunk->block_count);
         }
     }
 
@@ -52,7 +52,7 @@ void load_chunk(game_t* game, int x, int y)
 {
     //if is loaded
     chunk_t* chunk = &game->chunk_manager.chunks[x + y*game->chunk_manager.width];
-    if (chunk->tiles != 0)
+    if (chunk->blocks != 0)
     {
         printf("do not load loaded, please\n");
         return; //cause already loaded
@@ -60,16 +60,16 @@ void load_chunk(game_t* game, int x, int y)
     //so its not loaded
 
     //now we have buffer
-    chunk->tiles = calloc(chunk->tile_count, sizeof(tile_t));
-    assert(chunk->tiles != 0);
+    chunk->blocks = calloc(chunk->block_count, sizeof(block_t));
+    assert(chunk->blocks != 0);
 
     //lets read into it
     fseek(game->chunk_manager.chunk_file, chunk->offset, SEEK_SET);
-    fread(chunk->tiles, sizeof(tile_t), chunk->tile_count, game->chunk_manager.chunk_file);
+    fread(chunk->blocks, sizeof(block_t), chunk->block_count, game->chunk_manager.chunk_file);
 
     glGenBuffers(1, &chunk->vbo);
     glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
-    glBufferData(GL_ARRAY_BUFFER, chunk->tile_count * sizeof(tile_t), chunk->tiles, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, chunk->block_count * sizeof(block_t), chunk->blocks, GL_STATIC_DRAW);
 
     int size;
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -80,13 +80,13 @@ void free_chunk(game_t* game, int x, int y)
 {
     //if is not loaded
     chunk_t* chunk = &game->chunk_manager.chunks[x + y*game->chunk_manager.width];
-    if (chunk->tiles == 0)
+    if (chunk->blocks == 0)
     {
         printf("unloading not loaded chunk\n");
         return; //cause already unloaded
     }
 
-    free(chunk->tiles);
+    free(chunk->blocks);
 
     glDeleteBuffers(1, &chunk->vbo);
 }

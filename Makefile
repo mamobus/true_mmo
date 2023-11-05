@@ -7,7 +7,7 @@ include_flags := -L$(CURDIR)/libs -I$(CURDIR)/includes -I$(CURDIR)/client
 flags := -o $(CURDIR)/builds/client.exe $(include_flags) -fdiagnostics-color=always
 special_flags := -pipe #-O2 -Wall 
 special_flags_optimized := -pipe -O3 -fomit-frame-pointer #-march=native# -Wall 
-libs := -lglfw3 -lglew32s -lopengl32 -lgdi32
+libs := -lglfw3 -lglew32s -lopengl32 -lgdi32 -lccd -lode_singled
 GCC = C:\msys64\mingw64\bin\gcc.exe
 
 precompiled_client_libs := \
@@ -21,6 +21,7 @@ precompiled_client_libs := \
 	$(compiled)/load_texture.o \
 	$(compiled)/load_shaders.o \
 	$(compiled)/mob.o \
+	$(compiled)/update.o \
 	$(compiled)/vector.o
 
 client_libs := \
@@ -34,9 +35,11 @@ client_libs := \
 	$(client)/draw/load/load_texture.c \
 	$(client)/draw/load/load_shaders.c \
 	$(client)/logic/mob/mob.c \
+	$(client)/physics/update/update.c \
 	$(CURDIR)/includes/vector.c
 
 client_libs_headers := \
+	$(client)/common/player.h \
 	$(client)/common/game_t.h \
 	$(client)/common/input.h \
 	$(client)/map/chunk.h \
@@ -51,6 +54,7 @@ client_libs_headers := \
 	$(client)/draw/load/load_shaders.h \
 	$(client)/logic/mob/mob.h \
 	$(client)/logic/mob/mob_t.h \
+	$(client)/physics/update/update.h \
 	$(CURDIR)/includes/vector.h
 
 
@@ -87,6 +91,9 @@ $(compiled)/chunk.o: $(client)/map/chunk.c $(client_libs_headers)
 $(compiled)/mob.o: $(client)/logic/mob/mob.c $(client_libs_headers)
 	$(GCC) -c $(client)/logic/mob/mob.c -o $(compiled)/mob.o $(include_flags) $(libs)
 
+$(compiled)/update.o: $(client)/physics/update/update.c $(client_libs_headers)
+	$(GCC) -c $(client)/physics/update/update.c -o $(compiled)/update.o $(include_flags) $(libs)
+
 $(compiled)/vector.o: $(CURDIR)/includes/vector.c $(client_libs_headers)
 	$(GCC) -c $(CURDIR)/includes/vector.c -o $(compiled)/vector.o $(include_flags) $(libs)
 
@@ -105,3 +112,5 @@ run: client_ $(precompiled_client_libs)
 
 client_opt:
 	$(GCC) $(flags) $(client_libs) $(libs) $(special_flags_optimized)
+	cd ./builds && \
+	$(CURDIR)/builds/client.exe

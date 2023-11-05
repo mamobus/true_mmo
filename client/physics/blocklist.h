@@ -1,0 +1,1 @@
+// #define block(type_id, collider)

@@ -58,6 +58,11 @@ void _mob_create_list_with_mob(mob_manager_t* mob_manager, int type_id, mob_t mo
 
     // printf("ms per texture loading & unloading %lf\n", 5000.0/(double)counter);
 
+    // char mob_file_name [26] = "../assets/mob_sprites/";
+    // char mob_name [3] = {};
+    // sprintf(mob_name, "%d", type_id);
+    // strcpy(&mob_file_name[22], mob_name);
+
     new_mob_list.mob_sprite = loadTexture("../assets/mob_sprites/stolen_girl.png"); // so its only one but its ok
     printf("loaded stolen_girl = %d\n", new_mob_list.mob_sprite);
     //probably causes A LOT OF LAG
@@ -154,30 +159,37 @@ void mob_update(mob_t* mob)
     double current_time;
     //do we need to update frame?
     current_time = glfwGetTime();
-    if(current_time - mob->last_frame_time > ANIMATION_FRAME_TIME)
+    if(current_time - mob->last_frame_time > MOB_ANIMATION_FRAME_TIME)
     {
         //then we need to switch our animation frame
         mob->last_frame_time = current_time;
 
         int state    = mob->state;
         int tile_num = mob->tile_num;
+
+        int shift = 0;
+
+        if(state & MOB_STAND_BIT)
+            shift = 0;
+        if(state & MOB_MOVE_BIT)
+            shift = 12;
+        if(state & MOB_ATTACK_BIT)
+            shift = 26;
+        if(state & MOB_CAST_BIT)
+            shift = 50;
         
-        if(state & STAND_BIT)
+        if(state & MOB_LEFT_BIT)
         {
-            //if already standing animation, move it
-            //otherwise start it. Might be not from start tho should work perfectly
-            if(state & LEFT_BIT)
-            {
-                // printf("STATE LEFT BIT\n");
-                if (state & DOWN_BIT) tile_num = +((abs(tile_num) + 1) % 6);
-                else                  tile_num = +((abs(tile_num) + 1) % 6 + 6);
-            }
-            if(state & RIGHT_BIT)
-            {
-                if (state & DOWN_BIT) tile_num = -((abs(tile_num) + 1) % 6);
-                else                  tile_num = -((abs(tile_num) + 1) % 6 + 6);
-            }
+            // printf("STATE LEFT BIT\n");
+            if (state & MOB_DOWN_BIT) tile_num = +((abs(tile_num) + 1) % 6);
+            else                  tile_num = +((abs(tile_num) + 1) % 6 + 6);
         }
+        if(state & MOB_RIGHT_BIT)
+        {
+            if (state & MOB_DOWN_BIT) tile_num = -((abs(tile_num) + 1) % 6);
+            else                  tile_num = -((abs(tile_num) + 1) % 6 + 6);
+        }
+
         mob->tile_num = tile_num;
     }
 }

@@ -7,9 +7,11 @@ typedef struct mob_t
 {
     Vec3 pos;
     Vec3 vel;
+
     double last_frame_time;
     int state; // stores bits
     int tile_num; // for drawing
+    
     int id; //that is world id, unique for every mob
 } mob_t;
 

@@ -15,21 +15,23 @@
 //structs
 #include <common/game_t.h>
 
-#define MOVE_BIT  0b100000
-#define STAND_BIT 0b010000
-#define LEFT_BIT  0b001000
-#define RIGHT_BIT 0b000100
-#define UP_BIT    0b000010
-#define DOWN_BIT  0b000001
+#define MOB_CAST_BIT   0b10000000
+#define MOB_ATTACK_BIT 0b01000000
+#define MOB_MOVE_BIT   0b00100000
+#define MOB_STAND_BIT  0b00010000
 
-#define ANIMATION_FRAME_TIME 0.18F
+#define MOB_LEFT_BIT   0b1000
+#define MOB_RIGHT_BIT  0b0100
+#define MOB_UP_BIT     0b0010
+#define MOB_DOWN_BIT   0b0001
+
+#define MOB_ANIMATION_FRAME_TIME 0.18F
 
 void mob_create_manager(game_t* game);
 void mob_free_manager  (game_t* game);
 
 void mob_add(mob_t mob, int type_id,                game_t* game);
 void mob_del(int id,    int type_id,                game_t* game);
-void mob_set_state(mob_t* mob, int state);
 
 mob_t* mob_find_by_id         (int id,              game_t* game);
 mob_t* mob_find_by_id_and_type(int id, int type_id, game_t* game);

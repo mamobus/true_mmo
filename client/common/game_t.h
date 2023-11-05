@@ -9,7 +9,13 @@
 #include <draw/camera/camera_t.h>
 #include <draw/window/window_t.h>
 #include <logic/mob/mob_t.h>
+#include <logic/projectile/projectile_t.h>
+#include <logic/effect/effect_t.h>
 #include <map/chunk_t.h>
+#include <physics/collision/collision_t.h>
+
+#include <common/player.h>
+
 
 typedef struct uniforms_t
 {
@@ -33,4 +39,11 @@ typedef struct game_t
 
     chunk_manager_t chunk_manager;
     mob_manager_t mob_manager;
+    projectile_manager_t projectile_manager;
+    effect_manager_t effect_manager;
+    
+    player_t player;
+
+    double last_frame_time;
+    double time_elapsed;
 } game_t;

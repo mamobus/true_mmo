@@ -85,9 +85,9 @@ int main()
                         }
                         x = (float)column;
                         y = (float)line;
-                        z = (float)layer->id;
+                        z = (float) (-(int)layer->offsety / 16);
                         val = (float)data[line*width + column] - 1;
-                        print("x %2.1f y %2.1f z %2.1f\n", x, y, z);
+                        // print("x %2.1f y %2.1f z %2.1f\n", x, y, z);
                         // print("data[line*width + column] %f\n", val);
                         fwrite(&x  , sizeof(float), 1, chunk_file);
                         fwrite(&y  , sizeof(float), 1, chunk_file);

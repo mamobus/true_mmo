@@ -13,7 +13,6 @@ typedef struct projectile_t
     int tile_num; // for drawing
 
     int id; //that is world id, unique for every projectile
-    int type_id; //that is entity id, same for every projectile of one type
 } projectile_t;
 
 typedef struct draw_projectile_t
@@ -22,17 +21,19 @@ typedef struct draw_projectile_t
     float tile_num; // for drawing
 } draw_projectile_t;
 
-typedef struct projectile_manager_t
+typedef struct projectile_list_t
 {
-    //we have only one sprite and vbo for all the projectiles
+    int type_id; //that is entity id, same for every projectile in list
     GLuint projectile_sprite;
-    GLuint vbo; 
+    GLuint vbo;
     int sprite_size; //transforms into gl_pointsize insite shaders
     int texture_grid_size;
 
-    //draw_projectiles in vector. Dont forget to vector_free
+    //draw_projectiles in vector. Dont forget to cvector_free
     draw_projectile_t* draw_projectiles;
-
-    //projectiles in vector. Dont forget to vector_free
+    //projectiles in vector. Dont forget to cvector_free
     projectile_t* projectiles;
-} projectile_manager_t;
+} projectile_list_t;
+
+//projectile_listss in vector. Dont forget to cvector_free
+typedef projectile_list_t* projectile_manager_t;

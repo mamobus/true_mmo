@@ -6,10 +6,7 @@
 
 #include <common/game_t.h>
 
-static camera_t* camera_o;
-
-void move_camera_x(float x);
-void move_camera_y(float y);
+extern game_t game;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
