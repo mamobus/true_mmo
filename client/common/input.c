@@ -1,4 +1,5 @@
 #include "input.h"
+#include <math.h>
 
 void set_dirX(float x)
 {
@@ -12,24 +13,24 @@ void set_dirZ(float z)
 {
     game.player.dir.z = z;
 }
-void set_dir(Vec3 dir)
+void set_dir(Vec3d dir)
 {
     game.player.dir = dir;
 }
-void add_dir(Vec3 dir)
+void add_dir(Vec3d dir)
 {
     game.player.dir.x += dir.x;
     game.player.dir.y += dir.y;
     game.player.dir.z += dir.z;
 }
-void sub_dir(Vec3 dir)
+void sub_dir(Vec3d dir)
 {
     game.player.dir.x -= dir.x;
     game.player.dir.y -= dir.y;
     game.player.dir.z -= dir.z;
 }
 
-// Vec3 right = {}
+// Vec3d right = {}
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -37,63 +38,80 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_D && action == GLFW_PRESS){    
         // set_dirX(+1.0f);
         // set_dirY(-1.0f);
-        add_dir((Vec3){+1,-1,0});
+        add_dir((Vec3d){+1,-1,0});
     }
     if (key == GLFW_KEY_D && action == GLFW_RELEASE){
         // set_dirX(0);
         // set_dirY(0);
-        sub_dir((Vec3){+1,-1,0});
+        sub_dir((Vec3d){+1,-1,0});
     }
 
     if (key == GLFW_KEY_A && action == GLFW_PRESS){
         // set_dirX(-1.0f);
         // set_dirY(+1.0f);
-        add_dir((Vec3){-1,+1,0});
+        add_dir((Vec3d){-1,+1,0});
     }
     if (key == GLFW_KEY_A && action == GLFW_RELEASE){   
         // set_dirX(0);
         // set_dirY(0);
-        sub_dir((Vec3){-1,+1,0});
+        sub_dir((Vec3d){-1,+1,0});
     }
 
     if (key == GLFW_KEY_W && action == GLFW_PRESS){
         // set_dirX(-1.0f);
         // set_dirY(-1.0f);
-        add_dir((Vec3){-1,-1,0});
+        add_dir((Vec3d){-1,-1,0});
     }
     if (key == GLFW_KEY_W && action == GLFW_RELEASE){
         // set_dirX(0);
         // set_dirY(0);
-        sub_dir((Vec3){-1,-1,0});
+        sub_dir((Vec3d){-1,-1,0});
     }
 
     if (key == GLFW_KEY_S && action == GLFW_PRESS){
         // set_dirX(+1.0f);
         // set_dirY(+1.0f);
-        add_dir((Vec3){+1,+1,0});
+        add_dir((Vec3d){+1,+1,0});
     }
     if (key == GLFW_KEY_S && action == GLFW_RELEASE){
         // set_dirX(0);
         // set_dirY(0);
-        sub_dir((Vec3){+1,+1,0});
+        sub_dir((Vec3d){+1,+1,0});
     }
 
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
-        set_dirZ(1.0f);
+        game.player.vel.z = +3.33;
     }
     if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE){
         set_dirZ(0);
     }
 
-    if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS){
-        set_dirZ(-1.0f);    
-    }
-    if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE){
-        set_dirZ(0);
-    }
+    // if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS){
+    //     set_dirZ(-1.0f);    
+    // }
+    // if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_RELEASE){
+    //     set_dirZ(0);
+    // }
 }   
+
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    double x, y;
+    x = xpos - 1920/2;
+    y = ypos - 1080/2;
+
+    double distance_from_center = x*x + y*y;
+
+    if (distance_from_center > 5.0)
+    {
+        game.player.dir.x = x / sqrt(distance_from_center); 
+        game.player.dir.y = y / sqrt(distance_from_center); 
+    }
+    else game.player.dir = (Vec3d){0,0,0};
+}
 
 void setup_input(game_t* game)
 {
     glfwSetKeyCallback(game->window.pointer, key_callback);
+    // glfwSetCursorPosCallback(game->window.pointer, cursor_position_callback);
 }

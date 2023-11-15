@@ -5,8 +5,8 @@
 
 typedef struct mob_t
 {
-    Vec3 pos;
-    Vec3 vel;
+    Vec3d pos;
+    Vec3d vel;
 
     double last_frame_time;
     int state; // stores bits
@@ -17,7 +17,7 @@ typedef struct mob_t
 
 typedef struct draw_mob_t
 {
-    Vec3 pos;
+    Vec3f pos;
     float tile_num; // for drawing
 } draw_mob_t;
 

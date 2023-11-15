@@ -31,7 +31,7 @@ void load_chunk_manager(char* manager_file_name, char* chunk_file_name, game_t* 
             // Read the chunk's offset and length
             assert(fread(&chunk->offset, sizeof(int), 1, manager_file)==1);
             assert(fread(&chunk->block_count, sizeof(int), 1, manager_file)==1);
-            printf("offset:%d block_count:%d\n", chunk->offset, chunk->block_count);
+            // printf("offset:%d block_count:%d\n", chunk->offset, chunk->block_count);
         }
     }
 
@@ -73,7 +73,7 @@ void load_chunk(game_t* game, int x, int y)
 
     int size;
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    printf(" chunk size is %d\n", size);
+    // printf(" chunk size is %d\n", size);
 }
 
 void free_chunk(game_t* game, int x, int y)

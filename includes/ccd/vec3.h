@@ -15,7 +15,7 @@
  *  See the License for more information.
  */
 
-#define CCD_SINGLE
+#define CCD_DOUBLE
 
 #ifndef __CCD_VEC3_H__
 #define __CCD_VEC3_H__

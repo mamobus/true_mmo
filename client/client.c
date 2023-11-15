@@ -1,4 +1,5 @@
-// #define _DEBUG_
+// #define _DEBUG
+
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -24,10 +25,10 @@ void print_fps()
     frames++;
     if (stop-start > 1.0) //every 4 seconds
     {
-        printf("FPS=%.2lf MSPF=%lf\n", ((double)frames)/(stop-start), 1000*(stop-start)/((double)frames));
+        // printf("FPS=%.2lf MSPF=%lf\n", ((double)frames)/(stop-start), 1000*(stop-start)/((double)frames));
         printf("vel %.2lf %.2lf %.2lf\n", game.player.vel.x, game.player.vel.y, game.player.vel.z);
         printf("pos %.2lf %.2lf %.2lf\n", game.player.pos.x, game.player.pos.y, game.player.pos.z);
-        printf("acl %.2lf %.2lf %.2lf\n", game.player.acl.x, game.player.acl.y, game.player.acl.z);
+        // printf("acl %.2lf %.2lf %.2lf\n", game.player.acl.x, game.player.acl.y, game.player.acl.z);
         start = stop;
         frames = 0;
     }
@@ -59,12 +60,15 @@ int main()
     load_all_chunks(&game);
 
     mob_create_manager(&game);
+    hud_create_manager(&game);
 
 
     mob_t mob_that_is_player_for_now = {0};
     mob_that_is_player_for_now.id = 1;
     mob_that_is_player_for_now.state = MOB_MOVE_BIT || MOB_LEFT_BIT || MOB_DOWN_BIT;
     mob_add(mob_that_is_player_for_now, 0, &game);
+
+    // GLFW_KEY_LAST
 
     while(!glfwWindowShouldClose(game.window.pointer) && glfwGetKey(game.window.pointer, GLFW_KEY_ESCAPE) != GLFW_PRESS)
     {
@@ -74,18 +78,19 @@ int main()
         update_time(&game);
         update_player(&game);
         update_camera(&game);
-        
+                
         //update mob but for now its player
         mob_t* player_mob = mob_find_by_id_and_type(1, 0, &game);
         player_mob->pos = game.player.pos;
 
         draw(&game);
         glfwSwapBuffers(game.window.pointer);
-
+        
     }
 
     printf("PROG_END");
 
+    hud_destroy_manager(&game);
     glfwTerminate();
     terminate_draw(&game);
     // dasd

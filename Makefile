@@ -6,7 +6,7 @@ client := $(CURDIR)/client
 include_flags := -L$(CURDIR)/libs -I$(CURDIR)/includes -I$(CURDIR)/client
 flags := -o $(CURDIR)/builds/client.exe $(include_flags) -fdiagnostics-color=always
 special_flags := -pipe #-O2 -Wall 
-special_flags_optimized := -pipe -O3 -fomit-frame-pointer #-march=native# -Wall 
+special_flags_optimized := -pipe -O0 #-march=native# -Wall 
 libs := -lglfw3 -lglew32s -lopengl32 -lgdi32 -lccd -lode_singled
 GCC = C:\msys64\mingw64\bin\gcc.exe
 
@@ -20,8 +20,10 @@ precompiled_client_libs := \
 	$(compiled)/lodepng.o \
 	$(compiled)/load_texture.o \
 	$(compiled)/load_shaders.o \
+	$(compiled)/texture_manager.o \
 	$(compiled)/mob.o \
 	$(compiled)/update.o \
+	$(compiled)/hud.o \
 	$(compiled)/vector.o
 
 client_libs := \
@@ -31,8 +33,10 @@ client_libs := \
 	$(client)/draw/window/window.c \
 	$(client)/draw/camera/camera.c \
 	$(client)/draw/draw.c \
+	$(client)/HUD/hud.c \
 	$(client)/draw/load/lodepng.c \
 	$(client)/draw/load/load_texture.c \
+	$(client)/draw/textures/texture_manager.c \
 	$(client)/draw/load/load_shaders.c \
 	$(client)/logic/mob/mob.c \
 	$(client)/physics/update/update.c \
@@ -48,6 +52,9 @@ client_libs_headers := \
 	$(client)/draw/window/window_t.h \
 	$(client)/draw/camera/camera.h \
 	$(client)/draw/camera/camera_t.h \
+	$(client)/draw/textures/texture_manager_t.h \
+	$(client)/draw/textures/texture_manager.h \
+	$(client)/HUD/hud.h \
 	$(client)/draw/draw.h \
 	$(client)/draw/load/lodepng.h \
 	$(client)/draw/load/load_texture.h \
@@ -55,6 +62,8 @@ client_libs_headers := \
 	$(client)/logic/mob/mob.h \
 	$(client)/logic/mob/mob_t.h \
 	$(client)/physics/update/update.h \
+	$(CURDIR)/includes/debug_defines.h \
+	$(CURDIR)/includes/vec.h \
 	$(CURDIR)/includes/vector.h
 
 
@@ -73,6 +82,9 @@ $(compiled)/camera.o: $(client)/draw/camera/camera.c $(client_libs_headers)
 $(compiled)/window.o: $(client)/draw/window/window.c $(client_libs_headers)
 	$(GCC) -c $(client)/draw/window/window.c -o $(compiled)/window.o $(include_flags) $(libs)
 
+$(compiled)/hud.o: $(client)/HUD/hud.c $(client_libs_headers)
+	$(GCC) -c $(client)/HUD/hud.c -o $(compiled)/hud.o $(include_flags) $(libs)
+
 $(compiled)/draw.o: $(client)/draw/draw.c $(client_libs_headers)
 	$(GCC) -c $(client)/draw/draw.c -o $(compiled)/draw.o $(include_flags) $(libs)
 
@@ -84,6 +96,9 @@ $(compiled)/lodepng.o: $(client)/draw/load/lodepng.c $(client_libs_headers)
 
 $(compiled)/load_shaders.o: $(client)/draw/load/load_shaders.c $(client_libs_headers)
 	$(GCC) -c $(client)/draw/load/load_shaders.c -o $(compiled)/load_shaders.o $(include_flags) $(libs)
+
+$(compiled)/texture_manager.o: $(client)/draw/textures/texture_manager.c $(client_libs_headers)
+	$(GCC) -c $(client)/draw/textures/texture_manager.c -o $(compiled)/texture_manager.o $(include_flags) $(libs)
 
 $(compiled)/chunk.o: $(client)/map/chunk.c $(client_libs_headers)
 	$(GCC) -c $(client)/map/chunk.c -o $(compiled)/chunk.o $(include_flags) $(libs)

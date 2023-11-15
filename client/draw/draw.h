@@ -6,9 +6,11 @@
 #include <draw/camera/camera.h>
 #include <draw/window/window.h>
 #include <draw/load/load_shaders.h>
-#include <draw/load/load_texture.h>
+// #include <draw/load/load_texture.h>
+#include <draw/textures/texture_manager.h>
 #include <map/chunk.h>
 #include <logic/mob/mob.h>
+#include <HUD/hud.h>
 
 #include <debug_defines.h>
 

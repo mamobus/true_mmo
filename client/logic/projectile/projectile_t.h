@@ -5,8 +5,8 @@
 
 typedef struct projectile_t
 {
-    Vec3 pos;
-    Vec3 vel;
+    Vec3f pos;
+    Vec3f vel;
     
     double last_frame_time;
     int state; // stores bits
@@ -17,7 +17,7 @@ typedef struct projectile_t
 
 typedef struct draw_projectile_t
 {
-    Vec3 pos;
+    Vec3f pos;
     float tile_num; // for drawing
 } draw_projectile_t;
 

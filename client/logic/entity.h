@@ -15,7 +15,7 @@ array of arrays of vbo data
 
 typedef struct entity_t
 {
-    Vec3 position;
-    Vec3 velocity;
+    Vec3f position;
+    Vec3f velocity;
     int id;
 } entity_t;

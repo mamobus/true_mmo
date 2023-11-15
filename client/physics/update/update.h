@@ -3,6 +3,7 @@
 #include <common/game_t.h>
 #include <ccd/ccd.h>
 #include <vector.h>
+#include <iso646.h>
 
 #include <debug_defines.h>
 

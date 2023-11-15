@@ -65,7 +65,15 @@
         "update.h": "c",
         "ode.h": "c",
         "objects.h": "c",
-        "misc.h": "c"
+        "misc.h": "c",
+        "camera_t.h": "c",
+        "texture_manager.h": "c",
+        "stddef.h": "c",
+        "stdfix.h": "c",
+        "stdarg.h": "c",
+        "cstdint": "c",
+        "stdatomic.h": "c",
+        "iosfwd": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

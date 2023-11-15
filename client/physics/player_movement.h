@@ -4,4 +4,4 @@
 #include <ccd/ccd.h>
 #include <vector.h>
 
-void move_player(game_t* game, Vec2 direction);
+void move_player(game_t* game, Vec2f direction);

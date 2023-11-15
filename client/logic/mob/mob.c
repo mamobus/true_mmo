@@ -35,12 +35,14 @@ void mob_add(mob_t mob, int type_id, game_t* game)
     }
     
     //so we have not found right mob type_id, lets create list for this type_id
-    _mob_create_list_with_mob(&game->mob_manager, type_id, mob);
+    _mob_create_list_with_mob(game, type_id, mob);
 }
 
 //for iternal use 
-void _mob_create_list_with_mob(mob_manager_t* mob_manager, int type_id, mob_t mob)
+void _mob_create_list_with_mob(game_t* game, int type_id, mob_t mob)
 {
+
+
     mob_list_t new_mob_list = {0};
     new_mob_list.type_id = type_id;
 
@@ -63,14 +65,14 @@ void _mob_create_list_with_mob(mob_manager_t* mob_manager, int type_id, mob_t mo
     // sprintf(mob_name, "%d", type_id);
     // strcpy(&mob_file_name[22], mob_name);
 
-    new_mob_list.mob_sprite = loadTexture("../assets/mob_sprites/stolen_girl.png"); // so its only one but its ok
+    new_mob_list.mob_sprite = load_texture(game, MOB_STOLEN_GIRL); // so its only one but its ok
     printf("loaded stolen_girl = %d\n", new_mob_list.mob_sprite);
     //probably causes A LOT OF LAG
 
     new_mob_list.mobs = vector_create();
     new_mob_list.draw_mobs = vector_create();
     vector_add(&new_mob_list.mobs, mob);
-    vector_add(mob_manager, new_mob_list); //so we've added mob_list with new type to manager
+    vector_add(&game->mob_manager, new_mob_list); //so we've added mob_list with new type to manager
 }
 
 void mob_del(int id, int type_id, game_t* game)
@@ -211,7 +213,10 @@ void mob_prepare_draw_data(game_t* game)
             // printf("x %f x'%f\n", mob_manager[i].mobs[j].pos.x, mob_manager[i].mobs[j].vel.x);
             mob_update(&mob_manager[i].mobs[j]);
 
-            draw_mob.pos      =         mob_manager[i].mobs[j].pos;
+            draw_mob.pos.x = mob_manager[i].mobs[j].pos.x;
+            draw_mob.pos.y = mob_manager[i].mobs[j].pos.y;
+            draw_mob.pos.z = mob_manager[i].mobs[j].pos.z;
+            
             draw_mob.tile_num = (float) mob_manager[i].mobs[j].tile_num;
 
             // printf("%.1f %.1f %.1f %.1f\n", draw_mob.pos.x, draw_mob.pos.y, draw_mob.pos.z, draw_mob.tile_num);

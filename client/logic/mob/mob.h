@@ -6,7 +6,7 @@
 #define CVECTOR_LOGARITHMIC_GROWTH
 #include <vector.h>
 #include <vec.h>
-#include <draw/load/load_texture.h>
+#include <draw/textures/texture_manager.h>
 #include <debug_defines.h>
 
 //std libs
