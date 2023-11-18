@@ -15,7 +15,7 @@
 //reads manager from file
 void load_chunk_manager(char* manager_file_name, char* chunk_file_name, game_t* game);
 
-void free_chunk_manager(game_t* game);
+void chunk_destroy_manager(game_t* game);
 
 //also loads to VBO
 // void load_chunk(game_t* game, int x, int y);

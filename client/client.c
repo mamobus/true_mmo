@@ -80,7 +80,7 @@ int main()
         update_camera(&game);
                 
         //update mob but for now its player
-        mob_t* player_mob = mob_find_by_id_and_type(1, 0, &game);
+        mob_t* player_mob = mob_find(1, 0, &game);
         player_mob->pos = game.player.pos;
 
         draw(&game);
@@ -88,9 +88,14 @@ int main()
         
     }
 
-    printf("PROG_END");
+    printf("PROG_END\n");
 
     hud_destroy_manager(&game);
+    mob_destroy_manager(&game);
+    chunk_destroy_manager(&game);
+
+    printf("MANAGERS_DESTROYED\n");
+
     glfwTerminate();
     terminate_draw(&game);
     // dasd

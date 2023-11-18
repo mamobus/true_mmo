@@ -4,6 +4,7 @@
 #include <common/game_t.h>
 #include <draw/textures/texture_manager.h>
 #include <iso646.h>
+#include <math.h>
 
 #include <debug_defines.h>
 

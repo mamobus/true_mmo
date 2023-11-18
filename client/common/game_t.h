@@ -24,15 +24,15 @@ typedef struct uniforms_t
     GLuint map_tileset;
     GLuint hud_set;
     GLuint camera_pos;
-    GLuint window_size;
+    // GLuint window_size;
     // GLuint textureID;
-    GLuint point_size;
-    GLuint grid_size;
+    GLuint in_textr_size;
+    GLuint in_world_size;
 } uniforms_t;
 
 typedef struct game_t
 {
-    GLuint map_progID; 
+    GLuint tile_progID; 
     GLuint hud_progID; 
     GLuint tileset_textureID;
     GLuint VertexArrayID;
@@ -45,6 +45,7 @@ typedef struct game_t
 
     texture_manager_t texture_manager;
 
+    float scale; //scales ONLY map & entities
     mob_manager_t mob_manager;
     projectile_manager_t projectile_manager;
     effect_manager_t effect_manager;

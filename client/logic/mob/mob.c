@@ -5,7 +5,7 @@ void mob_create_manager(game_t* game)
     game->mob_manager = vector_create();
 }
 
-void mob_free_manager(game_t* game)
+void mob_destroy_manager(game_t* game)
 {
     for(int i=0; i < vector_size(game->mob_manager); i++)
     {
@@ -129,7 +129,7 @@ mob_t* mob_find_by_id(int id, game_t* game)
     }
 }
 
-mob_t* mob_find_by_id_and_type(int id, int type_id, game_t* game)
+mob_t* mob_find(int id, int type_id, game_t* game)
 {
     mob_manager_t mob_manager = game->mob_manager;
 

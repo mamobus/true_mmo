@@ -73,7 +73,8 @@
         "stdarg.h": "c",
         "cstdint": "c",
         "stdatomic.h": "c",
-        "iosfwd": "c"
+        "iosfwd": "c",
+        "hud.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

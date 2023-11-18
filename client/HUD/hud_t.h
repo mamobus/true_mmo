@@ -41,10 +41,8 @@ typedef struct hud_manager_t
 {
     GLuint texture; //everything is in one texture
     GLuint vbo; //holds EVERYTHING from pos to uv of ALL the
-    GLuint vbo_pos; //holds EVERYTHING from pos to uv of ALL the
-    GLuint vbo_uvs; //holds EVERYTHING from pos to uv of ALL the
 
-    // Vec2d total_scale;
+    Vec2f scale;
     int do_widgets_stick;
 
     hud_widget_t* widgets;

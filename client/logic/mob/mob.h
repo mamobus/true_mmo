@@ -27,13 +27,13 @@
 
 #define MOB_ANIMATION_FRAME_TIME 0.18F
 
-void mob_create_manager(game_t* game);
-void mob_free_manager  (game_t* game);
+void mob_create_manager (game_t* game);
+void mob_destroy_manager(game_t* game);
 
 void mob_add(mob_t mob, int type_id,                game_t* game);
 void mob_del(int id,    int type_id,                game_t* game);
 
-mob_t* mob_find_by_id         (int id,              game_t* game);
-mob_t* mob_find_by_id_and_type(int id, int type_id, game_t* game);
+void mob_set(mob_t mob, int id, int type_id, game_t* game);
+mob_t* mob_find(int id, int type_id, game_t* game);
 
 void mob_prepare_draw_data(game_t* game);
