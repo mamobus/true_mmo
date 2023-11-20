@@ -1,6 +1,5 @@
 #include <ccd/ccd.h>
 #define USE_32BITS
-#include <gjk/gjk.c>
 #include <vec.h>
 #include <math.h>
 
@@ -279,24 +278,7 @@ int main_2()
 int main()
 {
     // main_1();
-
-    // printf("rounded %f\n", round_away_from_zero(0.89));
-    // printf("rounded %f\n", round_away_from_zero(-0.89));
-    // printf("rounded %f\n", round_away_from_zero(0.09));
-    // printf("rounded %f\n", round_away_from_zero(-0.09));
-    // printf("rounded %f\n", round_away_from_zero(-0.0));
-    // printf("rounded %f\n", round_away_from_zero(+0.0));
-
     // main_2();
     // main_3();
     main_2();
 }
-
-/*
-16.7 0.46 -O0
-16.3 0.12 -O1
-16.0 0.12 -O2
-16.0 0.12 -O2
-16.3 0.11 -O2
-
-*/

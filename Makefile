@@ -7,7 +7,7 @@ include_flags := -L$(CURDIR)/libs -I$(CURDIR)/includes -I$(CURDIR)/client
 flags := -o $(CURDIR)/builds/client.exe $(include_flags) -fdiagnostics-color=always
 special_flags := -pipe #-O2 -Wall 
 special_flags_optimized := -pipe -O3 #-march=native# -Wall 
-libs := -lglfw3 -lglew32s -lopengl32 -lgdi32 -lccd
+libs := -lglfw3 -lglew32s -lopengl32 -lgdi32 -lccd -lenet64
 GCC = C:\msys64\mingw64\bin\gcc.exe
 
 precompiled_client_libs := \

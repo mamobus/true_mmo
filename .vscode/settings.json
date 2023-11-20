@@ -75,7 +75,8 @@
         "stdatomic.h": "c",
         "iosfwd": "c",
         "hud.h": "c",
-        "hud_t.h": "c"
+        "hud_t.h": "c",
+        "network.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

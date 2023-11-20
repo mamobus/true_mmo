@@ -5,10 +5,11 @@ state (is mob or projectile or skill or player etc..., then pos \ vel)
 if info package, than just info type, size and finally data
 */
 #define CVECTOR_LOGARITHMIC_GROWTH
-#include <vector.h>
 #include <vec.h>
-#include <draw/textures/texture_manager.h>
+#include <vector.h>
+#include <enet/enet.h>
 #include <debug_defines.h>
+
 
 //std libs
 #include <math.h>
@@ -17,5 +18,6 @@ if info package, than just info type, size and finally data
 #include <common/game_t.h>
 
 void net_create_manager(game_t* game);
+void net_destroy_manager(game_t* game);
 
 void net_update(game_t* game);
