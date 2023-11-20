@@ -5,8 +5,8 @@
 
 typedef struct effect_t
 {
-    Vec3f pos;
-    Vec3f vel;
+    vec3f pos;
+    vec3f vel;
 
     double last_frame_time;
     int state; // stores bits
@@ -17,7 +17,7 @@ typedef struct effect_t
 
 typedef struct draw_effect_t
 {
-    Vec3f pos;
+    vec3f pos;
     float tile_num; // for drawing
 } draw_effect_t;
 

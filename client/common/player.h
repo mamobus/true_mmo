@@ -4,11 +4,11 @@
 
 typedef struct player_t
 {
-    Vec3d pos; //местоположение
-    Vec3d vel; //скорость
-    Vec3d acl; //ускорение
+    vec3d pos; //местоположение
+    vec3d vel; //скорость
+    vec3d acl; //ускорение
 
-    Vec3d dir;
+    vec3d dir;
 
     int is_grounded;
 } player_t;

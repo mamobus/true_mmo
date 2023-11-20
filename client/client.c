@@ -47,7 +47,7 @@ game_t game = {0};
 
 int main()
 {
-    game.player.pos.z = 10;
+    game.player.pos.z = 1;
 
     create_window(&game);
     glfwSwapInterval(1);

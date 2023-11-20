@@ -1,10 +1,11 @@
 #pragma once
 
 
-// #define _DEBUG
+#define _DEBUG
 #ifdef _DEBUG
 #define prind(...) printf(__VA__ARGS__)
-#define print printf("File %s\nLine: %d\n\n", __FILE__, __LINE__);
+// #define print printf("File %s\nLine: %d\n\n", __FILE__, __LINE__);
+#define print printf("%d\n", __LINE__);
 #else
 #define print(...)  
 #endif

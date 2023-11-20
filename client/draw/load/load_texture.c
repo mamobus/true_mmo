@@ -1,5 +1,5 @@
 #include "load_texture.h"
-#include <GLFW/glfw3.h>
+// #include <GLFW/glfw3.h>
 
 GLuint loadTexture(const char* filename) {
     unsigned char* image;

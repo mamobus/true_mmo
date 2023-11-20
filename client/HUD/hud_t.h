@@ -10,7 +10,7 @@ typedef struct game_t game_t;
 
 typedef struct hud_status_bars_t
 {
-    Vec2f pos;  //relative to the center of widget
+    vec2f pos;  //relative to the center of widget
 
     // int health;
 
@@ -18,13 +18,13 @@ typedef struct hud_status_bars_t
 
 typedef struct hud_draw_elem_t
 {
-    Vertex2 lt1, lb1, rt1;
-    Vertex2 lb2, rt2, rb2;
+    vertex2 lt1, lb1, rt1;
+    vertex2 lb2, rt2, rb2;
 } hud_draw_elem_t;
 
 typedef struct hud_widget_t
 {
-    int (*on_mouse_click)(game_t* game, Vec2f nmouse_pos);
+    int (*on_mouse_click)(game_t* game, vec2f nmouse_pos);
     void (*handle_draw)(game_t* game);
 
 } hud_widget_t;
@@ -42,7 +42,7 @@ typedef struct hud_manager_t
     GLuint texture; //everything is in one texture
     GLuint vbo; //holds EVERYTHING from pos to uv of ALL the
 
-    Vec2f scale;
+    vec2f scale;
     int do_widgets_stick;
 
     hud_widget_t* widgets;

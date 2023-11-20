@@ -6,7 +6,7 @@
 typedef struct block_t
 {
     // float x, y, z;
-    Vec3f pos;
+    vec3f pos;
     float tile_num;
 } block_t;
 

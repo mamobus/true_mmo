@@ -4,6 +4,6 @@
 
 typedef struct camera_t
 {
-    Vec3d position;
-    Vec3d velocity;
+    vec3d position;
+    vec3d velocity;
 } camera_t;

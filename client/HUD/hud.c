@@ -52,7 +52,7 @@ void hud_prepare_draw_data(game_t* game)
     // {
     //     hud_draw_elem_t elem = game->hud_manager.draw_data[i];
 
-    //     Vertex2* verts = &elem;
+    //     vertex2* verts = &elem;
 
     //     for(int j=0; j < 4; j++)
     //     {
@@ -70,7 +70,7 @@ void push_widget(game_t* game, hud_widget_t widget)
     vector_add(&game->hud_manager.widgets, widget);
 }
 
-hud_draw_elem_t create_rect(Vec2f center, Vec2f size, Vec2f uv_topleft, Vec2f uv_bottomright)
+hud_draw_elem_t create_rect(vec2f center, vec2f size, vec2f uv_topleft, vec2f uv_bottomright)
 {
     hud_draw_elem_t elem = {0};
 
@@ -80,25 +80,25 @@ hud_draw_elem_t create_rect(Vec2f center, Vec2f size, Vec2f uv_topleft, Vec2f uv
 
     elem.lb1.pos.x = center.x - size.x / 2;
     elem.lb1.pos.y = center.y - size.y / 2;
-    // elem.lb1.uv = (Vec2f){uv_topleft.x, uv_bottomright.y};
+    // elem.lb1.uv = (vec2f){uv_topleft.x, uv_bottomright.y};
     elem.lb1.uv.x = uv_topleft.x;
     elem.lb1.uv.y = uv_bottomright.y;
 
     elem.rt1.pos.x = center.x + size.x / 2;
     elem.rt1.pos.y = center.y + size.y / 2;
-    // elem.rt1.uv = (Vec2f){uv_topleft.y, uv_bottomright.x};
+    // elem.rt1.uv = (vec2f){uv_topleft.y, uv_bottomright.x};
     elem.rt1.uv.x = uv_bottomright.x;
     elem.rt1.uv.y = uv_topleft.y;
 
     elem.lb2.pos.x = center.x - size.x / 2;
     elem.lb2.pos.y = center.y - size.y / 2;
-    // elem.lb2.uv = (Vec2f){uv_topleft.x, uv_bottomright.y};
+    // elem.lb2.uv = (vec2f){uv_topleft.x, uv_bottomright.y};
     elem.lb2.uv.x = uv_topleft.x;
     elem.lb2.uv.y = uv_bottomright.y;
 
     elem.rt2.pos.x = center.x + size.x / 2;
     elem.rt2.pos.y = center.y + size.y / 2;
-    // elem.rt2.uv = (Vec2f){uv_topleft.y, uv_bottomright.x};
+    // elem.rt2.uv = (vec2f){uv_topleft.y, uv_bottomright.x};
     elem.rt2.uv.x = uv_bottomright.x;
     elem.rt2.uv.y = uv_topleft.y;
 
@@ -109,7 +109,7 @@ hud_draw_elem_t create_rect(Vec2f center, Vec2f size, Vec2f uv_topleft, Vec2f uv
     return elem;
 }
 
-hud_draw_elem_t create_bar(Vec2f center, Vec2f size, Vec2f uv_topleft, Vec2f uv_bottomright, float fullness)
+hud_draw_elem_t create_bar(vec2f center, vec2f size, vec2f uv_topleft, vec2f uv_bottomright, float fullness)
 {
     center.x -= size.x/2;
     size.x   *= fullness;
@@ -124,11 +124,11 @@ hud_draw_elem_t create_bar(Vec2f center, Vec2f size, Vec2f uv_topleft, Vec2f uv_
     return bar;
 }
 
-void push_char(game_t* game, const char ch, float height, float width, Vec2f pos)
+void push_char(game_t* game, const char ch, float height, float width, vec2f pos)
 {
-    Vec2f uv_topleft, uv_bottomright;
-    // const Vec2f uv_text_origin = {416.f/512, 465.f/512};
-    const Vec2f uv_text_origin = {0.f/512, 440.f/512};
+    vec2f uv_topleft, uv_bottomright;
+    // const vec2f uv_text_origin = {416.f/512, 465.f/512};
+    const vec2f uv_text_origin = {0.f/512, 440.f/512};
     const float uv_char_width  =  8.f/512;
     const float uv_char_height = 12.f/512;
 
@@ -140,15 +140,15 @@ void push_char(game_t* game, const char ch, float height, float width, Vec2f pos
     uv_bottomright.x = uv_topleft.x + uv_char_width;
     uv_bottomright.y = uv_topleft.y + uv_char_height;
 
-    hud_draw_elem_t ch_elem = create_rect(pos, (Vec2f){width, height}, uv_topleft, uv_bottomright);
+    hud_draw_elem_t ch_elem = create_rect(pos, (vec2f){width, height}, uv_topleft, uv_bottomright);
     vector_add(&game->hud_manager.draw_data, ch_elem);
 }
 
-void push_text(game_t* game, const char* text, int count, float height, float width, Vec2f pos_left_bottom)
+void push_text(game_t* game, const char* text, int count, float height, float width, vec2f pos_left_bottom)
 {
     for (int i=0; i < count; i++)
     {
-        Vec2f char_pos = {0};
+        vec2f char_pos = {0};
         char_pos.x = pos_left_bottom.x + i*width + width/2;
         char_pos.y = pos_left_bottom.y +         + height/2;
 
@@ -157,9 +157,9 @@ void push_text(game_t* game, const char* text, int count, float height, float wi
 }
 
 //onmc = on mouse click. True if input in this window, false otherwise;
-int onmc_status_bars (game_t* game, Vec2f nmouse_pos)
+int onmc_status_bars (game_t* game, vec2f nmouse_pos)
 {
-    const Vec2f             sb_size = {0.1, 0.1};
+    const vec2f             sb_size = {0.1, 0.1};
     const hud_status_bars_t sb = game->hud_manager.storage.status_bars;
 
     //if inside widget
@@ -179,26 +179,26 @@ int onmc_status_bars (game_t* game, Vec2f nmouse_pos)
 void hd_status_bars(game_t* game)
 {
     const window_t window = game->window;
-    const Vec2f scale = game->hud_manager.scale;
-    Vec2f sb_size = {144.f / window.width * scale.x, 96.f / window.height * scale.y};
+    const vec2f scale = game->hud_manager.scale;
+    vec2f sb_size = {144.f / window.width * scale.x, 96.f / window.height * scale.y};
     
     hud_status_bars_t sb = game->hud_manager.storage.status_bars;
-    sb.pos = (Vec2f){-1.0+sb_size.x/2, +1.0-sb_size.y/2};
+    sb.pos = (vec2f){-1.0+sb_size.x/2, +1.0-sb_size.y/2};
 
-    hud_draw_elem_t background = create_rect(sb.pos, sb_size, (Vec2f){0, 0}, (Vec2f){144.f/512, 96.f/512});    
+    hud_draw_elem_t background = create_rect(sb.pos, sb_size, (vec2f){0, 0}, (vec2f){144.f/512, 96.f/512});    
     vector_add(&game->hud_manager.draw_data, background);
 
 
-    Vec2f hb_pos = {sb.pos.x, sb.pos.y - 24.f/window.height * scale.y};
-    Vec2f hb_size = {144.f / window.width * scale.x, 16.f / window.height * scale.y};
+    vec2f hb_pos = {sb.pos.x, sb.pos.y - 24.f/window.height * scale.y};
+    vec2f hb_size = {144.f / window.width * scale.x, 16.f / window.height * scale.y};
 
     float health_fullness = (glfwGetTime() / 20.0);
     health_fullness = health_fullness - truncf(health_fullness);
 
-    hud_draw_elem_t health_bar = create_bar(hb_pos, hb_size, (Vec2f){0, 96.f/512}, (Vec2f){144.f/512, 112.f/512}, health_fullness);
+    hud_draw_elem_t health_bar = create_bar(hb_pos, hb_size, (vec2f){0, 96.f/512}, (vec2f){144.f/512, 112.f/512}, health_fullness);
     vector_add(&game->hud_manager.draw_data, health_bar);
 
-    Vec2f text_pos = {0};
+    vec2f text_pos = {0};
     text_pos.x = sb.pos.x - sb_size.x/2;
     text_pos.y = sb.pos.y;
 

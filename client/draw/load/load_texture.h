@@ -5,5 +5,6 @@
 #include <GL/gl.h>
 #define LODEPNG_NO_COMPILE_ZLIB
 #include "lodepng.h"
+#include <GLFW/glfw3.h>
 
 GLuint loadTexture(const char* filename);

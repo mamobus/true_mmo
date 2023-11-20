@@ -20,40 +20,40 @@ point.z = point.z signz height; \
 
 struct sphere
 {
-    Vec3f center;
+    vec3f center;
     float radius;
 };
 struct cube
 {
-    Vec3f center;
+    vec3f center;
     float side;
 };
 struct polyhedron
 {
     int count;
-    Vec3f* verticies;
+    vec3f* verticies;
 };
 
 typedef struct collider_cube_t
 {
-    Vec3f center;
+    vec3f center;
     float side;
 } collider_cube_t;
 
 typedef struct collider_sphere_t
 {
-    Vec3f center;
+    vec3f center;
     float radius;
 } collider_sphere_t;
 
 typedef struct collider_cylinder_t
 {
-    Vec3f center;
+    vec3f center;
     float height;
     float radius;
 } collider_cylinder_t;
 
-int cuboid_collide(Vec3f center1, Vec3f sides1, Vec3f center2, Vec3f sides2)
+int cuboid_collide(vec3f center1, vec3f sides1, vec3f center2, vec3f sides2)
 {
     // check if centers are closer than sides size.
     for (int i=0; i < 3; i++)
@@ -84,7 +84,7 @@ void support_cube(void* obj, ccd_vec3_t* dir, ccd_vec3_t* vec)
 {
     struct collider_cube_t* cube = obj; 
     
-    Vec3f direction;
+    vec3f direction;
     ccdVec3Copy(&direction, dir);
     // if(direction.)
     ccdVec3Normalize(&direction);
@@ -104,14 +104,14 @@ void support_cylinder(void* obj, ccd_vec3_t* dir, ccd_vec3_t* vec)
 {
     struct collider_cylinder_t* cylinder = obj; 
     
-    Vec2f horizontal_dir;
+    vec2f horizontal_dir;
     horizontal_dir.x = dir->v[0]; 
     horizontal_dir.y = dir->v[1];
     // assert(horizontal_dir.x !=0.0);
     // assert(horizontal_dir.y !=0.0);
     if(horizontal_dir.x == 0 && horizontal_dir.y == 0)
     {
-        horizontal_dir = (Vec2f){1.0, 0};
+        horizontal_dir = (vec2f){1.0, 0};
     }
     ccdVec2Normalize(&horizontal_dir);
 
@@ -122,7 +122,7 @@ void support_cylinder(void* obj, ccd_vec3_t* dir, ccd_vec3_t* vec)
     ccdVec2Scale(&horizontal_dir, cylinder->radius);
     vertical_dir *= cylinder->height / 2.0;
 
-    Vec3f direction;
+    vec3f direction;
     direction.x = horizontal_dir.x;
     direction.y = horizontal_dir.y;
     direction.z = vertical_dir;
@@ -136,7 +136,7 @@ void support_sphere(void* obj, ccd_vec3_t* dir, ccd_vec3_t* vec)
 {   
     struct sphere* sphere = obj; 
 
-    Vec3f direction;
+    vec3f direction;
     ccdVec3Copy(&direction, dir);
     ccdVec3Normalize(&direction);
 
@@ -169,7 +169,7 @@ void support_polyhedron(void* obj, ccd_vec3_t* dir, ccd_vec3_t* vec)
 int main_1()
 {
     struct sphere sphere1 = {0};
-    Vec3f center = {1.6, 0.5, 0.5};
+    vec3f center = {1.6, 0.5, 0.5};
     sphere1.center = center;
     sphere1.radius = 1.0;
 
@@ -197,7 +197,7 @@ int main_1()
     int res = 0;
     int ITER = 100000;
     float start = (float)clock()/CLOCKS_PER_SEC;
-    Vec3f dir, sep;
+    vec3f dir, sep;
 
     res = ccdGJKSeparate(&sphere1, &polyhedron2, &ccd, &sep);
 
@@ -227,13 +227,13 @@ float round_away_from_zero(float x)
 int main_2()
 {
     struct collider_cube_t cube;
-    cube.center = (Vec3f){0.0,0.0,4.0};
+    cube.center = (vec3f){0.0,0.0,4.0};
     cube.side = 1.0;
     // struct collider_cube_t cube2;
-    // cube2.center = (Vec3f){0,0,0};
+    // cube2.center = (vec3f){0,0,0};
     // cube2.side = 2.0;
     struct collider_cylinder_t cylinder;
-    cylinder.center = (Vec3f){0.0,0.0,4.75};
+    cylinder.center = (vec3f){0.0,0.0,4.75};
     cylinder.height = 2.0;
     cylinder.radius = 0.5;
     struct collider_cylinder_t cylinder2;
@@ -254,7 +254,7 @@ int main_2()
     // int ITER = 100000;
     int ITER = 100000;
     float start = (float)clock()/CLOCKS_PER_SEC;
-    Vec3f sep = {0};
+    vec3f sep = {0};
     // double a;
     // float b = 0.0;
     // int bi = 4234;
