@@ -15,6 +15,7 @@
 #include <map/chunk_t.h>
 #include <physics/collision/collision_t.h>
 #include <HUD/hud_t.h>
+#include <network/network_t.h>
 
 #include <common/player.h>
 
@@ -50,6 +51,9 @@ typedef struct game_t
     projectile_manager_t projectile_manager;
     effect_manager_t effect_manager;
     hud_manager_t hud_manager;
+
+    //он упрлс
+    network_manager_t net_mngr;
     
     player_t player;
 

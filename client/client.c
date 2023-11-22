@@ -13,6 +13,7 @@
 #include <logic/mob/mob.h>
 #include <map/chunk.h>
 #include <physics/update/update.h>
+#include <network/network.h>
 
 void print_fps()
 {
@@ -61,6 +62,8 @@ int main()
 
     mob_create_manager(&game);
     hud_create_manager(&game);
+    net_create_manager(&game);
+    
 
 
     mob_t mob_that_is_player_for_now = {0};
@@ -78,6 +81,7 @@ int main()
         update_time(&game);
         update_player(&game);
         update_camera(&game);
+        net_update(&game);
                 
         //update mob but for now its player
         mob_t* player_mob = mob_find(1, 0, &game);
@@ -93,6 +97,7 @@ int main()
     hud_destroy_manager(&game);
     mob_destroy_manager(&game);
     chunk_destroy_manager(&game);
+    net_destroy_manager(&game);
 
     printf("MANAGERS_DESTROYED\n");
 

@@ -5,5 +5,9 @@
 
 typedef struct network_manager_t
 {
-    ENetHost client_host;
-};
+    ENetAddress serever_adress;
+    ENetEvent  event;
+    ENetHost* client_host;
+    ENetPeer  *server_peer;
+    ENetPacket  *packet;
+} network_manager_t;

@@ -23,7 +23,7 @@ vec2f v2scale(vec2f v, float scale)
 }
 float v2dot(vec2f a, vec2f b)
 {
-	float res;
+	float res = 0;
 	res += a.x * b.x;
 	res += a.y * b.y;
 	return res;
@@ -55,7 +55,7 @@ vec3f v3scale(vec3f v, float scale)
 }
 float v3dot(vec3f a, vec3f b)
 {
-	float res;
+	float res = 0;
 	res += a.x * b.x;
 	res += a.y * b.y;
 	res += a.z * b.z;
@@ -72,7 +72,7 @@ vec2d v2dscale(vec2d v, double scale)
 }
 double v2ddot(vec2d a, vec2d b)
 {
-	double res;
+	double res = 0;
 	res += a.x * b.x;
 	res += a.y * b.y;
 	return res;
@@ -111,7 +111,7 @@ vec3d v3dscale(vec3d v, double scale)
 }
 double v3ddot(vec3d a, vec3d b)
 {
-	double res;
+	double res = 0;
 	res += a.x * b.x;
 	res += a.y * b.y;
 	res += a.z * b.z;
