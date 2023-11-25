@@ -4,13 +4,10 @@ compiled := client/precompiled
 client := client
 
 client_include_flags := -Llibs -Iincludes -Iclient
-server_include_flags := -Llibs -Iincludes -Iserver
-client_flags := -o builds/client.exe $(client_include_flags) -fdiagnostics-color=always -g3 
-server_flags := -o builds/server.exe $(server_include_flags) -fdiagnostics-color=always
+client_flags := -o builds/client.exe $(client_include_flags) -fdiagnostics-color=always# -g3 
 special_flags := -pipe#-O2 -Wall 
 special_flags_optimized := -pipe -O0 #-march=native# -Wall 
 client_libs := -lglfw3 -lglew32s -lopengl32 -lgdi32 -lccd -lenet64 -lws2_32 -lwinmm
-server_libs := -lccd -lenet64 -lws2_32 -lwinmm
 # GCC = C:\msys64\mingw64\bin\gcc.exe
 
 client_obj := \
@@ -80,9 +77,6 @@ client_headers := \
 client_: $(client_obj) 
 	gcc $(client_flags) $(client_obj) $(client_libs) $(special_flags)
 
-server_:
-	gcc server/server.c $(server_flags) $(server_libs) $(special_flags)
-
 $(compiled)/vec.o: includes/vec.c $(client_headers)
 	gcc -c includes/vec.c -o $(compiled)/vec.o $(client_include_flags) $(client_libs)
 
@@ -138,17 +132,11 @@ import_: importer/import.c
 	gcc importer/import.c $(special_flags) -o builds/imorter.exe
 	builds/imorter.exe
 
-# uptodate: $(client_)
-
-run: client_ server_ $(client_obj) 
-	cd ./builds && \
-	server.exe && client.exe
-
-run_client: client_
+run: client_
 	cd ./builds && \
 	client.exe
 
-client_opt:
+run_opt:
 	gcc $(client_flags) $(client_src) $(client_libs) $(special_flags_optimized)
 	cd ./builds && \
-	builds/client.exe
+	client.exe

@@ -77,7 +77,12 @@
         "hud.h": "c",
         "hud_t.h": "c",
         "network.h": "c",
-        "enet.h": "c"
+        "enet.h": "c",
+        "librg.h": "c",
+        "sqlite3.h": "c",
+        "structs.h": "c",
+        "net.h": "c",
+        "net_t.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

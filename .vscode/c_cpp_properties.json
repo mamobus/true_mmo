@@ -4,6 +4,7 @@
             "name": "true_mmo",
             "includePath": [
                 "${workspaceFolder}/client",
+                "${workspaceFolder}/server",
                 "${workspaceFolder}/includes"
             ],
             "cStandard": "c11",

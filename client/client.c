@@ -62,6 +62,8 @@ int main()
 
     mob_create_manager(&game);
     hud_create_manager(&game);
+
+// #if defined(_WITH_SERVER)
     net_create_manager(&game);
     
 
