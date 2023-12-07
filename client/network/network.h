@@ -9,7 +9,7 @@ if info package, than just info type, size and finally data
 #include <vector.h>
 #include <enet/enet.h>
 #include <debug_defines.h>
-
+#include <logic/entity.h>
 
 //std libs
 #include <math.h>

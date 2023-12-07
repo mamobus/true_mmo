@@ -9,9 +9,7 @@
 #include <draw/camera/camera_t.h>
 #include <draw/window/window_t.h>
 #include <draw/textures/texture_manager_t.h>
-#include <logic/mob/mob_t.h>
-#include <logic/projectile/projectile_t.h>
-#include <logic/effect/effect_t.h>
+#include <logic/entity_t.h>
 #include <map/chunk_t.h>
 #include <physics/collision/collision_t.h>
 #include <HUD/hud_t.h>
@@ -44,12 +42,10 @@ typedef struct game_t
 
     chunk_manager_t chunk_manager;
 
-    texture_manager_t texture_manager;
+    // texture_manager_t texture_manager;
 
     float scale; //scales ONLY map & entities
-    mob_manager_t mob_manager;
-    projectile_manager_t projectile_manager;
-    effect_manager_t effect_manager;
+    entity_manager_t entity_manager;
     hud_manager_t hud_manager;
 
     //он упрлс

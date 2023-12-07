@@ -5,7 +5,11 @@
 #include <draw/load/load_texture.h>
 
 
-GLuint   load_texture(game_t* game, textures_e texture_enum);
+void tm_init();
 
+GLuint   load_texture(int type_id);
 //always returns zero
-GLuint unload_texture(game_t* game, textures_e texture_enum);
+GLuint unload_texture(GLuint texture);
+
+int get_mob_texture_id(int mob_type_id);
+int get_static_cosmetic_texture_id(int static_cosmetic_type_id);

@@ -6,7 +6,7 @@ void hud_create_manager(game_t* game)
 {
     game->hud_manager.do_widgets_stick = 1;
 
-    game->hud_manager.texture = load_texture(game, HUD_TEXTURE);
+    game->hud_manager.texture = load_texture(TEXTURE_HUD);
     glGenBuffers(1, &game->hud_manager.vbo);
 
     game->hud_manager.widgets = vector_create();

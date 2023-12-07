@@ -6,7 +6,7 @@ what do i need?
 
 check if collide
 
-find mobs / blocks in collider
+find entities / blocks in collider
 
 for given player, find where it will be in next frame (time)
 which is like trying to move Xf blocks and stop on hit

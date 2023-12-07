@@ -21,7 +21,7 @@ void setup_draw(game_t* game)
 	glBindVertexArray(game->VertexArrayID);
 
     //there i load things that are not that hard to create extra functions for that
-    game->tileset_textureID = loadTexture("../assets/tileset/spritesheet.png");
+    game->tileset_textureID = load_texture(TEXTURE_TILESET);
     game->uni.map_tileset = glGetUniformLocation(game->tile_progID, "my_tileset_texture");
     game->uni.hud_set     = glGetUniformLocation(game->hud_progID, "my_hud_texture");
     game->uni.camera_pos    = glGetUniformLocation(game->tile_progID, "camera_pos");
@@ -43,6 +43,7 @@ void setup_draw(game_t* game)
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     
     // glEnable(GL_POLYGON_SMOOTH);
+    // glclient
 
     glClearColor(0.19, 0.82, 0.69, 1.0);
 
@@ -68,10 +69,17 @@ void draw_chunk(game_t* game, int x, int y)
     glDrawArrays(GL_POINTS, 0, chunk.block_count);
 }
 
-void draw_mob_list(game_t* game, mob_list_t* mob_list)
+void draw_mob_list(game_t* game, entity_list_t* mob_list)
 {
+    // mob_typeinfo_t thistmobinfo = mobinfo[mob_list->type_id];
+    // glUniform2f(game->uni.in_world_size, (float)thistmobinfo.pixel_W/game->window.width*game->scale, (float)thistmobinfo.pixel_H/game->window.height*game->scale);
+    // glUniform2f(game->uni.in_textr_size, 1.f/thistmobinfo.texture_W, 1.f/thistmobinfo.texture_H);
+
+    glUniform2f(game->uni.in_world_size, (float)74/game->window.width*game->scale, (float)87/game->window.height*game->scale);
+    glUniform2f(game->uni.in_textr_size, 1.f/10, 1.f/10);
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mob_list->mob_sprite);
+    glBindTexture(GL_TEXTURE_2D, mob_list->sprite);
     glUniform1i(game->uni.map_tileset, 0);
 
     assert(mob_list->vbo != 0);
@@ -80,7 +88,43 @@ void draw_mob_list(game_t* game, mob_list_t* mob_list)
     glVertexAttribPointer(0, 3, GL_FLOAT, 0, 4*sizeof(float), 0*sizeof(float));
     glVertexAttribPointer(1, 1, GL_FLOAT, 0, 4*sizeof(float), 3*sizeof(float));
     
-    glDrawArrays(GL_POINTS, 0, vector_size(mob_list->draw_mobs));
+    glDrawArrays(GL_POINTS, 0, vector_size(mob_list->draw_queue));
+}
+
+void draw_cosmetic_listd(game_t* game, cosmetic_list_t* cosmetic_list)
+{
+    // mob_typeinfo_t thistmobinfo = mobinfo[mob_list->type_id];
+    // glUniform2f(game->uni.in_world_size, (float)thistmobinfo.pixel_W/game->window.width*game->scale, (float)thistmobinfo.pixel_H/game->window.height*game->scale);
+    // glUniform2f(game->uni.in_textr_size, 1.f/thistmobinfo.texture_W, 1.f/thistmobinfo.texture_H);
+    // printf("vbo %d sprite %d\n", cosmetic_list->vbo, cosmetic_list->sprite);
+    glUniform2f(game->uni.in_world_size, (float)35/game->window.width*game->scale, (float)47/game->window.height*game->scale);
+    glUniform2f(game->uni.in_textr_size, 1.f/15, 1.f/10);
+// print
+
+    glActiveTexture(GL_TEXTURE0);
+    assert(cosmetic_list->sprite > 0);
+    glBindTexture(GL_TEXTURE_2D, cosmetic_list->sprite);
+    glUniform1i(game->uni.map_tileset, 0);
+// print
+
+    assert(cosmetic_list->vbo > 0);
+    glBindBuffer(GL_ARRAY_BUFFER, cosmetic_list->vbo);
+// print
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, 0, 4*sizeof(float), 0*sizeof(float));
+    glVertexAttribPointer(1, 1, GL_FLOAT, 0, 4*sizeof(float), 3*sizeof(float));
+// print
+    
+    // printf
+    assert(cosmetic_list->draw_queue > 0);
+    assert(vector_size(cosmetic_list->draw_queue) > 0);
+
+    // glBindBuffer(GL_ARRAY_BUFFER, cosmetic_list->vbo);
+    // draw_entity_t cosmetic = {1,2,3,4};
+    // glBufferData(GL_ARRAY_BUFFER, vector_size(cosmetic_list->draw_queue) * sizeof(draw_entity_t), cosmetic_list->draw_queue, GL_DYNAMIC_DRAW);    
+
+    glDrawArrays(GL_POINTS, 0, vector_size(cosmetic_list->draw_queue));
+// print
 }
 
 void draw_hud(game_t* game)
@@ -106,7 +150,7 @@ void draw_map(game_t* game)
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, game->tileset_textureID);
-    glUniform1i(game->uni.map_tileset, 0);
+    glUniform1i(game->uni.map_tileset, 0); //cause GL_TEXTURE0
 
     glUniform3f(game->uni.camera_pos , (float)game->camera.position.x, (float)game->camera.position.y, (float)game->camera.position.z);
     glUniform2f(game->uni.in_world_size, 64.f/game->window.width*game->scale, 64.f/game->window.height*game->scale);
@@ -123,18 +167,27 @@ void draw_map(game_t* game)
     }
 }
 
-void draw_mobs(game_t* game)
+void draw_entities(game_t* game)
 {
-    glUniform2f(game->uni.in_world_size, 128.f/game->window.width*game->scale, 128.f/game->window.height*game->scale);
-    glUniform2f(game->uni.in_textr_size, 1.f/7, 1.f/7);
+
+    // get_mo
     // glUniform1f(game->uni.point_size, 128.0);
     // glUniform1f(game->uni.grid_size , 7.0);
 
-    mob_prepare_draw_data(game);
-    for (int i=0; i < vector_size(game->mob_manager); i++)
+    for (int i=0; i < vector_size(game->entity_manager.elist); i++)
     {
-
-        draw_mob_list(game, &game->mob_manager[i]);
+        // get_ty
+        draw_mob_list(game, &game->entity_manager.elist[i]);
+    }
+    // printf("drawing vector_size(game->entity_manager.cosmetic) %d\n", vector_size(game->entity_manager.cosmetic));
+    for (int i=0; i < vector_size(game->entity_manager.cosmetic); i++)
+    // for (int i=0; i < vector_size(      entity_manager.cosmetic); i++)
+    {
+        // get_ty
+        // printf("%d v%p vs%d %d %d\n", game->entity_manager.cosmetic[i].type_id, game->entity_manager.cosmetic[i].draw_queue, vector_size(game->entity_manager.cosmetic[i].draw_queue), game->entity_manager.cosmetic[i].sprite, game->entity_manager.cosmetic[i].vbo);
+        // printf("t rying to draw qeue with [0] %f %f %f_%f", game->entity_manager.cosmetic[i].draw_queue[0].pos.x, game->entity_manager.cosmetic[i].draw_queue[0].pos.y, game->entity_manager.cosmetic[i].draw_queue[0].pos.z, game->entity_manager.cosmetic[i].draw_queue[0].sprite_num);
+        draw_cosmetic_listd(game, &game->entity_manager.cosmetic[i]);
+        // printf("cosmetic queue drawn\n");
     }
 }
 
@@ -142,8 +195,11 @@ void draw(game_t* game)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glClear(GL_COLOR_BUFFER_BIT);
+    // glBindVertexArray(game->VertexArrayID);
+    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableClientState(GL_VERTEX_ARRAY);
 
     
     // glEnable(GL_DEPTH_TEST);
@@ -155,11 +211,13 @@ void draw(game_t* game)
     // glEnable(GL_DEPTH_TEST);
     glUseProgram(game->tile_progID);
     draw_map(game);
-    draw_mobs(game);
+    draw_entities(game);
     
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
+
+    // Sleep(1);
 } 
 
 void terminate_draw(game_t* game)

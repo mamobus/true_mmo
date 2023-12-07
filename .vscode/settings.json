@@ -82,7 +82,8 @@
         "sqlite3.h": "c",
         "structs.h": "c",
         "net.h": "c",
-        "net_t.h": "c"
+        "net_t.h": "c",
+        "moblist.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

@@ -9,7 +9,7 @@
 // #include <draw/load/load_texture.h>
 #include <draw/textures/texture_manager.h>
 #include <map/chunk.h>
-#include <logic/mob/mob.h>
+#include <logic/entity.h>
 #include <HUD/hud.h>
 
 #include <debug_defines.h>

@@ -21,7 +21,7 @@ client_obj := \
 	$(compiled)/load_texture.o \
 	$(compiled)/load_shaders.o \
 	$(compiled)/texture_manager.o \
-	$(compiled)/mob.o \
+	$(compiled)/entity.o \
 	$(compiled)/update.o \
 	$(compiled)/hud.o \
 	$(compiled)/vec.o \
@@ -40,7 +40,7 @@ client_src := \
 	client/draw/load/load_texture.c \
 	client/draw/textures/texture_manager.c \
 	client/draw/load/load_shaders.c \
-	client/logic/mob/mob.c \
+	client/logic/entity.c \
 	client/physics/update/update.c \
 	client/network/network.c \
 	includes/vec.c \
@@ -64,14 +64,15 @@ client_headers := \
 	client/draw/load/lodepng.h \
 	client/draw/load/load_texture.h \
 	client/draw/load/load_shaders.h \
-	client/logic/mob/mob.h \
-	client/logic/mob/mob_t.h \
+	client/logic/entity.h \
+	client/logic/entity_t.h \
 	client/physics/update/update.h \
 	client/network/network_t.h \
 	client/network/network.h \
 	includes/debug_defines.h \
 	includes/vec.h \
-	includes/vector.h
+	includes/vector.h \
+	client/moblist.h
 
 
 client_: $(client_obj) 
@@ -113,8 +114,8 @@ $(compiled)/texture_manager.o: client/draw/textures/texture_manager.c $(client_h
 $(compiled)/chunk.o: client/map/chunk.c $(client_headers)
 	gcc -c client/map/chunk.c -o $(compiled)/chunk.o $(client_include_flags) $(client_libs)
 
-$(compiled)/mob.o: client/logic/mob/mob.c $(client_headers)
-	gcc -c client/logic/mob/mob.c -o $(compiled)/mob.o $(client_include_flags) $(client_libs)
+$(compiled)/entity.o: client/logic/entity.c $(client_headers) client/logic/mob.c client/logic/player.c client/logic/cosmetic.c
+	gcc -c client/logic/entity.c -o $(compiled)/entity.o $(client_include_flags) $(client_libs)
 
 $(compiled)/network.o: client/network/network.c $(client_headers)
 	gcc -c client/network/network.c -o $(compiled)/network.o $(client_include_flags) $(client_libs)
@@ -136,7 +137,7 @@ run: client_
 	cd ./builds && \
 	client.exe
 
-run_opt:
+opt:
 	gcc $(client_flags) $(client_src) $(client_libs) $(special_flags_optimized)
 	cd ./builds && \
 	client.exe
