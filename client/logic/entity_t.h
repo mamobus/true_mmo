@@ -24,16 +24,6 @@ typedef struct entity_t
     entity_data_t data;
 } entity_t;
 
-typedef struct mob_typeinfo_t
-{
-    // char* name;
-    // texture;
-    // pixel_H, pixel_W, texture_H, texture_W, stand_frames, move_frames, attack_frames, cast_frames, death_frames
-    char pixel_H, pixel_W;
-    char texture_H, texture_W;
-    char stand_frames, move_frames, attack_frames, cast_frames, death_frames;
-} mob_typeinfo_t;
-
 typedef struct animinfo_t
 {
     int shift;

@@ -72,7 +72,9 @@ client_headers := \
 	includes/debug_defines.h \
 	includes/vec.h \
 	includes/vector.h \
-	client/moblist.h
+	client/_lists/moblist.h \
+	client/_lists/effectlist.h \
+	client/_lists/skillist.h 
 
 
 client_: $(client_obj) 
@@ -114,7 +116,7 @@ $(compiled)/texture_manager.o: client/draw/textures/texture_manager.c $(client_h
 $(compiled)/chunk.o: client/map/chunk.c $(client_headers)
 	gcc -c client/map/chunk.c -o $(compiled)/chunk.o $(client_include_flags) $(client_libs)
 
-$(compiled)/entity.o: client/logic/entity.c $(client_headers) client/logic/mob.c client/logic/player.c client/logic/cosmetic.c
+$(compiled)/entity.o: client/logic/entity.c $(client_headers) client/logic/mob.c client/logic/player_e.c client/logic/cosmetic.c
 	gcc -c client/logic/entity.c -o $(compiled)/entity.o $(client_include_flags) $(client_libs)
 
 $(compiled)/network.o: client/network/network.c $(client_headers)

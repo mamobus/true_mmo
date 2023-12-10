@@ -34,20 +34,11 @@ void net_destroy_manager(game_t* game)
 
     enet_deinitialize();
 }
-
-static void parse_mobs(game_t* game, ENetEvent* event)
+static void parse_ents(game_t* game, void* data)
 {
-    //so we have ents to parse
-    //lets do it 1 by 1
-    //if not listed then create it
-    //ill have to add timer to entities so they expire if not updated for long time
+    int size = *((int*)data);
 
-    int* data = event->packet->data;
-    entity2send_t* entities = &data[2];
-    int type = data[0];
-    int size = data[1];
-
-
+    entity2send_t* entities = data + sizeof(int);
 
     for(int i=0; i<size; i++)
     {
@@ -75,6 +66,34 @@ static void parse_mobs(game_t* game, ENetEvent* event)
             printf("mob added\n");
         }
     }
+}
+
+static void parse_data(game_t* game, int type, void* data)
+{
+    //so we have ents to parse
+    //lets do it 1 by 1
+    //if not listed then create it
+    //ill have to add timer to entities so they expire if not updated for long time
+
+    // entity2send_t* entities = &data[2];
+
+    switch (type)
+    {
+    case 1: //ents update
+        parse_ents(game, data);
+        break;
+    
+    // case 2: //ents update
+    //     parse_ents(game, data);
+    //     break;
+
+    // case 3: //ents update
+    //     parse_ents(game, data);
+    //     break;
+
+    default:
+        break;
+    }
 
 }
 
@@ -87,15 +106,15 @@ void net_update(game_t* game)
         {
         case ENET_EVENT_TYPE_RECEIVE:
             int type = ((int*)event.packet->data)[0];
-            int size = ((int*)event.packet->data)[1];
             // printf("recieved type %d size %d\n", type, size);
-            
-            parse_mobs(game, &event);
+            parse_data(game, type, (event.packet->data + sizeof(int)) );
             break;
+
         case ENET_EVENT_TYPE_DISCONNECT:
             printf("You have been disconnected.\n");
             break;
-        default:
+
+        default: 
             // printf("Tick tock\n");
             break;
         }

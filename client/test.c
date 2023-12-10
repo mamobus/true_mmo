@@ -274,6 +274,17 @@
 //     // printf("pos %f %f %f\n", pos.x, pos.y, pos.z);
 // }
 
+#define PI 3.14159265358979323846
+int f(double x, double y)
+{
+    double angle = atan2(y, x);
+    // double angle = atan2(y, x) + PI;
+    int steps = ((int)round(angle / (PI / 4)) % 8);
+    if (steps < 0) steps += 8;
+    return steps;
+}
+
+#define F(x, y) printf("%d <= %0.2lf %0.2lf\n", f(x, y), (double)x, (double)y)
 
 int main()
 {
@@ -282,13 +293,19 @@ int main()
     // main_3();
     // main_2();
 
+    F(1, 1);
+    F(0, 1);
+    F(1, 0);
+    F(0.7, 0.7);
+    F(-0.7, -0.7);
+
     // printf("%e\n", 1024);
     // printf("%o\n", 1024);
     // printf("%a\n", 1024);
     // printf("%g\n", 1024);
     // printf("%h\n", 1024);
     // printf("%x\n", 0x123f);
-    printf("%X\n", -1073741819);
+    // printf("%X\n", -1073741819);
     // printf("%b\n", 0x123f);
     // printf("%n\n", 1024);
 }

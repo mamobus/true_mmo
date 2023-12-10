@@ -31,7 +31,7 @@ typedef enum textures_e
 
     #define mob(type_id, name, texture, pixel_H, pixel_W, texture_H, texture_W, stand_frames, move_frames, attack_frames, cast_frames, death_frames, ...) \
     TEXTURE_MOB_##name=type_id,
-    #include <moblist.h>
+    #include <_lists/moblist.h>
 
 
     // TEXTURES_E_SIZE,

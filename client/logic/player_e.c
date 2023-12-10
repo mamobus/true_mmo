@@ -1,6 +1,64 @@
 #include "entity.h"
-
 #include "cosmetic.c"
+#include <math.h>
+
+
+#define PI 3.14159265358979323846
+int player_get_direction_bits (vec3d dir)
+{
+    int state = 0;
+
+    double x = dir.x;
+    double y = dir.y;
+
+    // double angle = atan2(y, x) + PI;
+    double angle = atan2(y, x);
+    int steps = ((int)round(angle / (PI / 4)) % 8);
+    // printf("%lf, %d\n", angle, steps);
+    if (steps < 0) steps += 8;
+
+    switch (steps)
+    {
+    case 0:
+        state = PLAYER_RIGHT_BIT;
+        printf("PLAYER_RIGHT_BIT\n");
+        break;
+    case 1:
+        state = PLAYER_RIGHT_BIT | PLAYER_UP_BIT;
+        printf("PLAYER_RIGHT_BIT | PLAYER_UP_BIT\n");
+        break;
+    case 2:
+        state = PLAYER_UP_BIT;
+        printf("PLAYER_UP_BIT\n");
+        break;
+    case 3:
+        state = PLAYER_LEFT_BIT | PLAYER_UP_BIT;
+        printf("PLAYER_LEFT_BIT | PLAYER_UP_BIT\n");
+        break;
+    case 4:
+        state = PLAYER_LEFT_BIT;
+        printf("PLAYER_LEFT_BIT\n");
+        break;
+    case 5:
+        state = PLAYER_LEFT_BIT | PLAYER_DOWN_BIT;
+        printf("PLAYER_LEFT_BIT | PLAYER_DOWN_BIT\n");
+        break;
+    case 6:
+        state = PLAYER_DOWN_BIT;
+        printf("PLAYER_DOWN_BIT\n");
+        break;
+    case 7:
+        state = PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT;
+        printf("PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT\n");
+        break;
+
+    default:
+        state = PLAYER_UP_BIT;
+        break;
+    }
+
+    return state;
+}
 
 animinfo_t get_player_animinfo(int state)
 {
@@ -237,7 +295,7 @@ void player_add2draw_query(entity_t* player, draw_entity_t** draw_queue, game_t*
 
     head.sprite_num = xshift;
 
-    cosmetic_queue_add(103, head, game);
+    // cosmetic_queue_add(103, head, game);
     //add head with type of head_id and shift defined by state to queue
 }
 
@@ -262,7 +320,7 @@ void player_update(entity_t* player, game_t* game)
         int shift = animinfo.shift;
         int animlen = animinfo.len;
 
-        // printf("%d %d %d\n", shift, animlen, sprite_num);
+        printf("%d %d %d\n", shift, animlen, sprite_num);
         
         if(state & MOB_RIGHT_BIT)
         {

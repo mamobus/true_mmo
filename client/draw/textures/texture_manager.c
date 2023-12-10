@@ -64,7 +64,7 @@ GLuint load_texture(int type)
     case mobtype_id: \
         file_name = texture; \
         break;
-    #include <moblist.h>
+    #include <_lists/moblist.h>
     
     default:
         file_name = NULL;

@@ -9,24 +9,13 @@ void _create_cosmetic_list(int type_id, draw_entity_t cosmetic, game_t* game)
     new_cosmetic_list.type_id = type_id;
     new_cosmetic_list.sprite = load_texture(type_id); // so its only one but its ok
 
-    // new_cosmetic_list.
-    // draw_entity_t test_cosmetic = {0};
-    // test_cosmetic.pos.x = 100;
-    // test_cosmetic.pos.y = 101;
-    // test_cosmetic.pos.z = 102;
-    // test_cosmetic.sprite_num = 2;
-    // printf("trying to add cosmetic %.1f %.1f %.1f %.1f\nINTO draw_queue of size %d\n", cosmetic.pos.x, cosmetic.pos.y, cosmetic.pos.z, cosmetic.sprite_num, vector_size(new_cosmetic_list.draw_queue));    
-    // vector_add(&new_cosmetic_list.draw_queue, test_cosmetic);
     new_cosmetic_list.draw_queue = vector_create();
     assert(new_cosmetic_list.draw_queue != NULL);
     
-    // printf("        added cosmetic %.1f %.1f %.1f %.1f\nINTO draw_queue of size %d\n", cosmetic.pos.x, cosmetic.pos.y, cosmetic.pos.z, cosmetic.sprite_num, vector_size(new_cosmetic_list.draw_queue));
-
 
     vector_add(&new_cosmetic_list.draw_queue, cosmetic);
     vector_add(&game->entity_manager.cosmetic, new_cosmetic_list); 
 
-    // vector_add(&game->entity_manager.cosmetic[vector_size(game->entity_manager.cosmetic)-1].draw_queue, cosmetic);
     //so we've added cosmetic list with new type to manager
 }
 

@@ -83,7 +83,12 @@
         "structs.h": "c",
         "net.h": "c",
         "net_t.h": "c",
-        "moblist.h": "c"
+        "moblist.h": "c",
+        "effectlist.h": "c",
+        "typeinfo": "c",
+        "window_t.h": "c",
+        "texture_manager_t.h": "c",
+        "chanmgr.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

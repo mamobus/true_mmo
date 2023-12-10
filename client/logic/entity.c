@@ -1,30 +1,13 @@
 #include "entity.h"
 
 #include "mob.c"
-#include "player.c"
+#include "player_e.c"
+#include "effect.c"
 
-
-mob_typeinfo_t mobinfo[10] = {0};
-void mob_info_init()
-{
-    // mobinfo[3
-    #define mob(type_id, name, texture, pixel_H, pixel_W, texture_H, texture_W, stand_frames, move_frames, attack_frames, cast_frames, death_frames, ...) \
-    mobinfo[type_id].p##ixel_H = pixel_H; \
-    mobinfo[type_id].p##ixel_W = pixel_W; \
-    mobinfo[type_id].t##exture_H = texture_H; \
-    mobinfo[type_id].t##exture_W = texture_W; \
-    mobinfo[type_id].s##tand_frames = stand_frames; \
-    mobinfo[type_id].m##ove_frames = move_frames; \
-    mobinfo[type_id].a##ttack_frames = attack_frames; \
-    mobinfo[type_id].c##ast_frames = cast_frames; \
-    mobinfo[type_id].d##eath_frames = death_frames; \
-    // printf("%d %d %d %d\n", pixel_H, texture_W, stand_frames, move_frames);
-    #include <moblist.h>
-}
 
 void entity_create_manager(game_t* game)
 {
-    mob_info_init();
+    // mob_info_init();
     game->entity_manager.elist = vector_create();
     game->entity_manager.cosmetic = vector_create();
 }
@@ -178,9 +161,9 @@ int get_entity_global_type(int type_id)
          if(type_id >=0    & type_id <= 100 ) global_type=777; //iternal use
     else if(type_id > 100  & type_id <= 1000) global_type=1; //player / cosmetc
     // else if(type_id > 1000 & type_id <= 2000) global_type=2; //mob
-    else if(type_id > 1000 & type_id <= 2000) global_type=3; //mob
-    else if(type_id > 2000 & type_id <= 3000) global_type=4; //effect
-    else if(type_id > 3000 & type_id <= 4000) global_type=5; //projectile
+    else if(type_id > 1000 & type_id <= 2000) global_type=2; //mob
+    else if(type_id > 2000 & type_id <= 3000) global_type=3; //effect
+    else if(type_id > 3000 & type_id <= 4000) global_type=4; //projectile
 
     return global_type;
 }
@@ -209,11 +192,16 @@ void entities_prepare_for_drawing(game_t* game)
                 // player_add2draw_query()
                 break;
 
+            case 2:
+                mob_update(&entity_manager->elist[i].entities[j], game, entity_manager->elist[i].type_id);
+                mob_add2draw_query(&entity_manager->elist[i].entities[j], &entity_manager->elist[i].draw_queue);
+                break;
+
             case 3:
                 mob_update(&entity_manager->elist[i].entities[j], game, entity_manager->elist[i].type_id);
                 mob_add2draw_query(&entity_manager->elist[i].entities[j], &entity_manager->elist[i].draw_queue);
                 break;
-            
+
             default:
                 break;
             }

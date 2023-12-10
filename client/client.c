@@ -86,6 +86,7 @@ int main()
     entity_t player = {0};
     player.id = 1;
     player.state = PLAYER_MOVE_BIT | PLAYER_LEFT_BIT | PLAYER_DOWN_BIT;
+    game.player.state = PLAYER_MOVE_BIT;
     // player.state = MOB_MOVE_BIT | MOB_LEFT_BIT;
     // player.
 
@@ -106,9 +107,12 @@ int main()
         // net_update(&game);
                 
         //update mob but for now its player
-        entity_t* player_mob = entity_find(1, 101, &game);
-        // printf("%d ", player_mob->sprite_num);
-        player_mob->pos = game.player.pos;
+        entity_t* player_ent = entity_find(1, 101, &game);
+        game.player.state = PLAYER_MOVE_BIT | player_get_direction_bits(game.player.dir);
+        printf("state %X\n", game.player.state);
+        // printf("%d ", player_ent->sprite_num);
+        player_ent->pos   = game.player.pos;
+        player_ent->state = game.player.state;
         // if()
 
         entities_prepare_for_drawing(&game);
