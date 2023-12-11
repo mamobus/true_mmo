@@ -29,7 +29,7 @@ void setup_draw(game_t* game)
     game->uni.in_textr_size = glGetUniformLocation(game->tile_progID, "in_textr_size");
     // game->uni.grid_size        = glGetUniformLocation(game->tile_progID, "grid_size");
 
-    game->scale = 2.0f;
+    game->scale = 4.0f;
 
     printf("winsize %d %d\n", game->window.height, game->window.width);
 

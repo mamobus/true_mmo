@@ -286,6 +286,8 @@ int f(double x, double y)
 
 #define F(x, y) printf("%d <= %0.2lf %0.2lf\n", f(x, y), (double)x, (double)y)
 
+// #define TEST(x) printf(##x); x;
+
 int main()
 {
     // main_1();
@@ -293,11 +295,14 @@ int main()
     // main_3();
     // main_2();
 
-    F(1, 1);
-    F(0, 1);
-    F(1, 0);
-    F(0.7, 0.7);
-    F(-0.7, -0.7);
+    // F(1, 1);
+    // F(0, 1);
+    // F(1, 0);
+    // F(0.7, 0.7);
+    // F(-0.7, -0.7);
+
+    // TEST(a==a)
+    printf("%X %X", (0x2 | 0x30), (0x7 == 0x7 | 0x30));
 
     // printf("%e\n", 1024);
     // printf("%o\n", 1024);

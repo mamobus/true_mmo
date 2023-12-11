@@ -92,6 +92,8 @@ int main()
 
     CALL(entity_add(player, 101, &game));
 
+    // game.scale = 4.0;
+
     // GLFW_KEY_LAST
 
     while(!glfwWindowShouldClose(game.window.pointer) && glfwGetKey(game.window.pointer, GLFW_KEY_ESCAPE) != GLFW_PRESS)
@@ -109,7 +111,19 @@ int main()
         //update mob but for now its player
         entity_t* player_ent = entity_find(1, 101, &game);
         game.player.state = PLAYER_MOVE_BIT | player_get_direction_bits(game.player.dir);
-        printf("state %X\n", game.player.state);
+
+        // static int pstate = 0;
+        // if (pstate != game.player.state)
+        // {
+        //     printf("state %X\n\n", game.player.state);
+        //     pstate = game.player.state;
+        // }
+        // static int pframe = 0;
+        // if (pframe != player_ent->sprite_num)
+        // {
+        //     printf("frame %d\n", player_ent->sprite_num);
+        //     pframe = player_ent->sprite_num;
+        // }
         // printf("%d ", player_ent->sprite_num);
         player_ent->pos   = game.player.pos;
         player_ent->state = game.player.state;
