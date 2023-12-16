@@ -58,6 +58,7 @@ void setup_draw(game_t* game)
     glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(vertex2), verts_for_simples_texture, GL_STATIC_DRAW);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, game->window.width, game->window.height, 0, GL_RGBA, GL_FLOAT, NULL);
 
+
         glGenBuffers(1, &game->RT.ssbo);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
         //4 * 4 * 1
@@ -67,6 +68,11 @@ void setup_draw(game_t* game)
             2,3,4,5,
             3,4,5,6,
             0,5,6,0,
+            
+            1,0,0,2,
+            0,1,0,1,
+            1,0,5,0,
+            4,0,0,3,
         };
         glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ssbo_chunk), &ssbo_chunk, GL_STATIC_DRAW);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo);
@@ -253,6 +259,8 @@ void raytrace(game_t* game)
     // glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
     // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, game->tileset_textureID);
 
     glDispatchCompute(game->window.width, game->window.height, 1); //run raytracer
     // to make soimage has finished before read

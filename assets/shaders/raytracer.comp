@@ -1,15 +1,17 @@
 #version 430 core
 
 layout(binding = 0, rgba32f) uniform image2D framebuffer;
+layout(binding = 3) uniform sampler2D spritesheet_texture; 
+// uniform sampler2D spritesheet_texture;
 
 layout(std430, binding = 1) buffer blocks_ssbo
 {
-	int blocks[16];
+	int blocks[32];
 };
 
 uniform float time;
 
-#define MAX_DEPTH 4
+#define MAX_DEPTH 5
 #define PI 3.1415926535
 #define FAR_DISTANCE 100000.0
 
@@ -55,8 +57,7 @@ vec3 RandomHemispherePoint(vec2 rand)
     return vec3(
         cos(phi) * sinTheta,
         sin(phi) * sinTheta,
-        cosTheta
-    );
+                   cosTheta);
 }
 
 vec3 NormalOrientedHemispherePoint(vec2 rand, vec3 n)
@@ -75,18 +76,24 @@ int GetBlock(in ivec3 voxel)
 	if (v.y < 0) return 0;
 	if (v.y > 3) return 0;
 	if (v.z < 0) return 0;
-	if (v.z > 1) return 0;
+	if (v.z > 2) return 0;
 	block = blocks[voxel.x + voxel.y*4 + voxel.z*16];
 
 	return block;
 }
 
-Material GetBlockMat(in int block)
+Material GetBlockMat(in int block, vec2 collision_point_projection)
 {
 	Material mat;
 
-	mat.emmitance = vec3(0.12, 0.1, 0.35) + vec3(0.05) * block;
-	mat.reflectance = vec3(0.2);
+	// mat.emmitance = vec3(0.12, 0.1, 0.35) * sin(collision_point_projection.x) + vec3(0.05) * block  *sin(collision_point_projection.y);
+	vec2 uv_leftop;
+	uv_leftop.x = fract(0 / 11.0);
+    uv_leftop.y = floor(0 / 11.0) / 11.0;
+	vec2 uv = uv_leftop + vec2(0.5 / 11.0) - collision_point_projection / 22.0;
+	
+	mat.emmitance = texture(spritesheet_texture, uv).xyz;
+	mat.reflectance = vec3(0.5);
 	mat.roughness = 0.33;
 	mat.opacity = 0.5;
 		
@@ -112,6 +119,17 @@ void initTvals(out vec3 tMax, out vec3 tDelta, out ivec3 blockPos, in vec3 rayOr
 	tMax.z = max(block_corner1.z, block_corner2.z); //1 of theese will be negative so max is just to get positive
 
 	tDelta = 1.0 / abs(rayDirection); //how many dir vectors needeed to move 1.0 across each axys
+}
+
+vec2 GetBlockPointProjection(vec3 block_point)
+{
+	vec2 projection;
+
+	// projection.x = 0.8660254038*block_point.x - 0.8660254038*block_point.y;
+	projection.x = block_point.x - block_point.y;
+	projection.y = -0.5*block_point.x - 0.5*block_point.y + block_point.z;
+// 0.615479709 
+	return projection;
 }
 
 bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out vec3 normal, out Material material)
@@ -161,10 +179,13 @@ bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out ve
 		current_block = GetBlock(block_pos);
 
 		iterations++;
-		if(iterations > 8) return false;
+		if(iterations > 12) return false;
 	};
 
-	material = GetBlockMat(current_block);
+	vec3 relative_collision_point = (rayOrigin + rayDirection*fraction) - (vec3(block_pos) + vec3(0.5)); 
+	vec2 collision_point_projection = GetBlockPointProjection(relative_collision_point);
+
+	material = GetBlockMat(current_block, collision_point_projection);
 
 	return true;
 }
@@ -212,13 +233,13 @@ vec3 TraceRay(in vec3 rayOrigin, in vec3 rayDirection)
         }
         else
         {	
-			float global_light_participance = dot(global_light, rayDirection);
-			if (global_light_participance > 0)
-			{
-				accumulated_light += global_light_participance * vec3(0.1) * accumulated_reflection;
-			}
-			accumulated_light += vec3(0.01) * accumulated_reflection;
-			accumulated_light += vec3(0.2);
+			// float global_light_participance = dot(global_light, rayDirection);
+			// if (global_light_participance > 0)
+			// {
+			// 	accumulated_light += global_light_participance * vec3(0.1) * accumulated_reflection;
+			// }
+			// accumulated_light += vec3(0.01) * accumulated_reflection;
+			// accumulated_light += vec3(0.2);
             break;
         }
     }
@@ -251,8 +272,22 @@ void main(void)
 	vec3 pos_on_map = rotateAxis(vec3(pos,0), vec3(0,0,1), -PI/4);
 
 	// vec3 ray_dir    = normalize(vec3(0.612375, 0.612375, -0.50000));
-	vec3 ray_dir    = normalize(vec3(0.612375, 0.612375, -0.50000));
-	vec3 ray_origin = -vec3(0.612375, 0.612375, -0.50000) * 2 + vec3((pos_on_map.xy - vec2(0.55,-0.3))*10, 0);
+	vec3 ray_dir = normalize(vec3(-0.612375, -0.612375, -0.50000));
+	// vec3 ray_dir = normalize(vec3(-0.5, -0.5, -0.5));
+
+	vec3 horizline = normalize(vec3(1,-1,0));
+	vec3 vertiline = normalize(cross(ray_dir, horizline));
+	//they define plane of rendeting
+	vec3 camera_unit_x = horizline / 2;
+	vec3 camera_unit_y = vertiline / 2;
+	
+	vec3 camera_pos = vec3(0.612375, 0.612375, 0.5) * 7;
+	// vec3 camera_pos = vec3(0.5, 0.5, 0.5) * 5;
+
+	float view_width  = size.x / 32.0; //in blocks
+	float view_height = size.y / 32.0; //in blocks
+
+	vec3 ray_origin = camera_pos + camera_unit_x*(pos.x-0.5)*view_width + camera_unit_y*(pos.y-0.5)*view_height;
 
 	vec4 color = vec4(TraceRay(ray_origin, ray_dir), 1);
 

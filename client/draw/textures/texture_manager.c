@@ -50,7 +50,8 @@ GLuint load_texture(int type)
         break;
 
     case TEXTURE_TILESET: //MAP
-        file_name = "../assets/tileset/spritesheet.png";
+        // file_name = "../assets/tileset/spritesheet.png";
+        file_name = "../assets/tileset/rtset.png";
         break;
 
     case TEXTURE_PLAYER: //heads 
