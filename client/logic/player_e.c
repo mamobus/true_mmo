@@ -4,15 +4,15 @@
 
 
 #define PI 3.14159265358979323846
-int player_get_direction_bits (vec3d dir)
+void player_set_direction_bits (player_t* player)
 {
-    int state = 0;
+    int newdirbits = 0;
 
     // double x = +dir.x - dir.y / 2; //x down-right
-    double x = +dir.x - dir.y / 2; //x down-right
-    double y = -dir.x - dir.y / 2; //x down-left
-    x = -1.0;
-    y = 0.0;
+    double x = +player->dir.x - player->dir.y / 2; //x down-right
+    double y = -player->dir.x - player->dir.y / 2; //x down-left
+    // x = -1.0;
+    // y = 0.0;
     // double angle = atan2(y, x) + PI;
     double angle = atan2(y, x);
     int steps = ((int)round(angle / (PI / 4)) % 8);
@@ -22,44 +22,51 @@ int player_get_direction_bits (vec3d dir)
     switch (steps)
     {
     case 0:
-        state = PLAYER_RIGHT_BIT;
+        newdirbits = PLAYER_RIGHT_BIT;
         // printf("PLAYER_RIGHT_BIT\n");
         break;
     case 1:
-        state = PLAYER_RIGHT_BIT | PLAYER_UP_BIT;
+        newdirbits = PLAYER_RIGHT_BIT | PLAYER_UP_BIT;
         // printf("PLAYER_RIGHT_BIT | PLAYER_UP_BIT\n");
         break;
     case 2:
-        state = PLAYER_UP_BIT;
+        newdirbits = PLAYER_UP_BIT;
         // printf("PLAYER_UP_BIT\n");
         break;
     case 3:
-        state = PLAYER_LEFT_BIT | PLAYER_UP_BIT;
+        newdirbits = PLAYER_LEFT_BIT | PLAYER_UP_BIT;
         // printf("PLAYER_LEFT_BIT | PLAYER_UP_BIT\n");
         break;
     case 4:
-        state = PLAYER_LEFT_BIT;
+        newdirbits = PLAYER_LEFT_BIT;
         // printf("PLAYER_LEFT_BIT\n");
         break;
     case 5:
-        state = PLAYER_LEFT_BIT | PLAYER_DOWN_BIT;
+        newdirbits = PLAYER_LEFT_BIT | PLAYER_DOWN_BIT;
         // printf("PLAYER_LEFT_BIT | PLAYER_DOWN_BIT\n");
         break;
     case 6:
-        state = PLAYER_DOWN_BIT;
+        newdirbits = PLAYER_DOWN_BIT;
         // printf("PLAYER_DOWN_BIT\n");
         break;
     case 7:
-        state = PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT;
+        newdirbits = PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT;
         // printf("PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT\n");
         break;
 
     default:
-        state = PLAYER_UP_BIT;
+        newdirbits = PLAYER_UP_BIT;
         break;
     }
 
-    return state;
+    // int olddirbits = player->state & PLAYER_DIRECTION_BITMASK;
+
+    // if(olddirbits != newdirbits)
+    // {
+    //     player.
+    // }
+    player->state = (player->state&PLAYER_ACTION_BITMASK) | (newdirbits);
+
 }
 
 animinfo_t get_player_animinfo(int state)
@@ -144,14 +151,14 @@ animinfo_t get_player_animinfo(int state)
         } 
         else if((player_direction == (PLAYER_LEFT_BIT  | PLAYER_DOWN_BIT)) or (player_direction == (PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT)))
         {
-            shift = 22; printf("%X, %X, %X\n",player_direction, PLAYER_LEFT_BIT | PLAYER_DOWN_BIT, PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT);
-            printf("%X, %X, %X\n",player_direction == (PLAYER_LEFT_BIT | PLAYER_DOWN_BIT), player_direction == (PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT), (player_direction == (PLAYER_LEFT_BIT  | PLAYER_DOWN_BIT)) or (player_direction == (PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT)));
+            shift = 22; //printf("%X, %X, %X\n",player_direction, PLAYER_LEFT_BIT | PLAYER_DOWN_BIT, PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT);
+            //printf("%X, %X, %X\n",player_direction == (PLAYER_LEFT_BIT | PLAYER_DOWN_BIT), player_direction == (PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT), (player_direction == (PLAYER_LEFT_BIT  | PLAYER_DOWN_BIT)) or (player_direction == (PLAYER_RIGHT_BIT | PLAYER_DOWN_BIT)));
         }
         else if((player_direction == PLAYER_LEFT_BIT) or (player_direction == PLAYER_RIGHT_BIT)){
             shift = 30;
         }
-        else if((player_direction == PLAYER_UP_BIT | PLAYER_LEFT_BIT)
-             or (player_direction == PLAYER_UP_BIT | PLAYER_RIGHT_BIT)){
+        else if((player_direction == (PLAYER_UP_BIT | PLAYER_LEFT_BIT))
+             or (player_direction == (PLAYER_UP_BIT | PLAYER_RIGHT_BIT))){
             shift = 38;
         }
         else if(player_direction == PLAYER_UP_BIT){
@@ -252,6 +259,33 @@ animinfo_t get_player_animinfo(int state)
     return info;
 }
 
+static int get_head_shift(int state)
+{
+    int shift = 0;
+    
+    if(state & PLAYER_DOWN_BIT)
+    {
+             if(state & PLAYER_LEFT_BIT ) shift = +1;
+        else if(state & PLAYER_RIGHT_BIT) shift = -1;
+        else shift = 0;
+    }
+    else if(state & PLAYER_UP_BIT)
+    {
+             if(state & PLAYER_LEFT_BIT ) shift = +3;
+        else if(state & PLAYER_RIGHT_BIT) shift = -3;
+        else shift = 4;  
+    }
+    else if(state & PLAYER_LEFT_BIT)
+    {
+        shift = 2;
+    }
+    else if(state & PLAYER_RIGHT_BIT)
+    {
+        shift = -2;
+    }
+
+    return shift;
+}
 
 void player_add2draw_query(entity_t* player, draw_entity_t** draw_queue, game_t* game)
 {
@@ -266,39 +300,40 @@ void player_add2draw_query(entity_t* player, draw_entity_t** draw_queue, game_t*
     //player head
     draw_entity_t head = {0};
     int head_type = player->data.a;
-    int xshift, yshift;
-    // head.
-    yshift = 0;
-    switch (player->state & PLAYER_DIRECTION_BITMASK)
-    {
-    case PLAYER_DOWN_BIT:
-        xshift = 0;
-        break;
-    case PLAYER_DOWN_BIT | PLAYER_LEFT_BIT:
-        xshift = 1;
-        break;
-    case PLAYER_LEFT_BIT:
-        xshift = 2;
-        break;
-    case PLAYER_LEFT_BIT | PLAYER_UP_BIT:
-        xshift = 3;
-        break;
-    case PLAYER_UP_BIT:
-        xshift = 4;
-        break;
+    // int xshift, yshift;
+    // // head.
+    // yshift = 0;
+    // switch (player->state & PLAYER_DIRECTION_BITMASK)
+    // {
+    // case PLAYER_DOWN_BIT:
+    //     xshift = 0;
+    //     break;
+    // case PLAYER_DOWN_BIT | PLAYER_LEFT_BIT:
+    //     xshift = 1;
+    //     break;
+    // case PLAYER_LEFT_BIT:
+    //     xshift = 2;
+    //     break;
+    // case PLAYER_LEFT_BIT | PLAYER_UP_BIT:
+    //     xshift = 3;
+    //     break;
+    // case PLAYER_UP_BIT:
+    //     xshift = 4;
+    //     break;
     
-    default:
-        xshift = 0;
-        break;
-    }
+    // default:
+    //     xshift = 0;
+    //     break;
+    // }
 
     head.pos.x = player->pos.x;
     head.pos.y = player->pos.y;
     head.pos.z = player->pos.z + 1.21;
 
-    head.sprite_num = xshift;
+    head.sprite_num = (float) get_head_shift(player->state & PLAYER_DIRECTION_BITMASK);
+    // printf("head sprite_num %d\n", head.sprite_num);
 
-    // cosmetic_queue_add(103, head, game);
+    cosmetic_queue_add(103, head, game);
     //add head with type of head_id and shift defined by state to queue
 }
 
@@ -310,8 +345,9 @@ void player_update(entity_t* player, game_t* game)
     //update current animation frametime
     double current_time = glfwGetTime();
     //do we need to update frame?
-    if(current_time - player->last_frame_time > PLAYER_ANIMATION_FRAME_TIME)
+    if((current_time - player->last_frame_time > PLAYER_ANIMATION_FRAME_TIME) or (player->oldstate != player->state))
     {
+        player->oldstate = player->state;
         //then we need to switch our animation frame
         player->last_frame_time = current_time;
 
@@ -323,9 +359,9 @@ void player_update(entity_t* player, game_t* game)
         int shift = animinfo.shift;
         int animlen = animinfo.len;
 
-        printf("%d %d %d\n", shift, animlen, sprite_num);
+        // printf("%d %d %d\n", shift, animlen, sprite_num);
         
-        if(state & MOB_RIGHT_BIT)
+        if(state & PLAYER_RIGHT_BIT)
         {
             sprite_num = -((abs(sprite_num) + 1) % animlen + shift);
         }

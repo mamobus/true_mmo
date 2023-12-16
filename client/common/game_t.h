@@ -17,6 +17,17 @@
 
 #include <common/player.h>
 
+typedef struct 
+{
+    GLuint raytracer_progID; 
+    GLuint framebuffer, uni_framebuffer;
+    int width, height;
+    GLuint uni_width, uni_height, uni_time;
+    GLuint vbo; //6 verts to render final texture
+    // int voxel_height;
+    // int voxels;// 16*16
+    GLuint ssbo, uni_ssbo;
+} raytracer;
 
 typedef struct uniforms_t
 {
@@ -33,6 +44,9 @@ typedef struct game_t
 {
     GLuint tile_progID; 
     GLuint hud_progID; 
+
+    raytracer RT;
+
     GLuint tileset_textureID;
     GLuint VertexArrayID;
     uniforms_t uni;

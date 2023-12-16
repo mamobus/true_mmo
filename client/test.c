@@ -288,8 +288,32 @@ int f(double x, double y)
 
 // #define TEST(x) printf(##x); x;
 
+struct vec3
+{
+    float x,y,z;
+};
+
+struct material
+{
+    struct vec3 emmitance;   //for each color
+    struct vec3 reflectance; //for each color
+    float roughness;
+    float opacity;
+};
+
+struct block_t
+{
+	struct material mat;
+};
+
+float rf()
+{
+    return ((float) rand()) / RAND_MAX;
+}
+
 int main()
 {
+    srand(3);
     // main_1();
     // main_2();
     // main_3();
@@ -303,6 +327,22 @@ int main()
 
     // TEST(a==a)
     printf("%X %X", (0x2 | 0x30), (0x7 == 0x7 | 0x30));
+
+    for (int i=0; i < 2; i++)
+    {
+        // printf("{");
+        for (int j=0; j < 2; j++)
+        {
+            // printf("{");
+            for (int k=0; k < 2; k++)
+            {
+                printf("{{%.2f, %.2f, %.2f}, {%.2f, %.2f, %.2f}, %.2f, %.2f}, ", rf(),rf(),rf(),  rf(),rf(),rf(),  rf(), rf());
+                printf("vec3(%.2f, %.2f, %.2f)\n", rf(),rf(),rf());
+            }
+            // printf("},\n");
+        }
+        // printf("},\n");
+    }
 
     // printf("%e\n", 1024);
     // printf("%o\n", 1024);

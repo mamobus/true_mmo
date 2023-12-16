@@ -215,17 +215,7 @@ void entities_prepare_for_drawing(game_t* game)
 
     for(int i=0; i < vector_size(entity_manager->cosmetic); i++)
     {
-        // printf("vector_size(entity_manager.cosmetic[i].draw_queue) %d\n", vector_size(entity_manager->cosmetic[i].draw_queue));
-        // for(int j=0; j < vector_size(entity_manager.cosmetic[i].draw_queue); j++)
-        // {
-        //     draw_entity_t draw_mob = entity_manager.cosmetic[i].draw_queue[j];
-            // printf("buffering %.1f %.1f %.1f %.1f\n", draw_mob.pos.x, draw_mob.pos.y, draw_mob.pos.z, draw_mob.sprite_num);
-        // }
         glBindBuffer(GL_ARRAY_BUFFER, entity_manager->cosmetic[i].vbo);
         glBufferData(GL_ARRAY_BUFFER, vector_size(entity_manager->cosmetic[i].draw_queue) * sizeof(draw_entity_t), entity_manager->cosmetic[i].draw_queue, GL_DYNAMIC_DRAW);
-        //  draw_entity_t cosmetic = {1,2,3,4};
-        // glBufferData(GL_ARRAY_BUFFER, 1 * sizeof(draw_entity_t), &cosmetic, GL_DYNAMIC_DRAW);    
-   // glBufferData(GL_ARRAY_BUFFER, vector_size(            cosmetic_list->draw_queue) * sizeof(draw_entity_t), cosmetic_list->draw_queue, GL_DYNAMIC_DRAW);    
     }
-    // printf("buffering ended\n\n");
 }

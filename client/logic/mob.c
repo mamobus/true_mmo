@@ -74,20 +74,24 @@ animinfo_t get_mob_animinfo(int type, int state)
     switch (action)
     {
     case MOB_STAND_BIT:
-        len = info.stand_frames; 
-        shift = 0;
+        len = info.stand_frames;
+            if (state & MOB_DOWN_BIT) shift = 0;
+            else shift = info.stand_frames;
         break;
     case MOB_MOVE_BIT:
         len = info.move_frames; 
-        shift = info.stand_frames*2;
+            if (state & MOB_DOWN_BIT) shift = info.stand_frames*2;
+            else shift = info.stand_frames*2 + info.move_frames;
         break;
     case MOB_ATTACK_BIT:
         len = info.attack_frames; 
-        shift = info.stand_frames*2 + info.move_frames*2;
+            if (state & MOB_DOWN_BIT) shift = info.stand_frames*2 + info.move_frames*2;
+            else shift = info.stand_frames*2 + info.move_frames*2 + info.attack_frames;
         break;
     case MOB_CAST_BIT:
         len = info.cast_frames; 
-        shift = info.stand_frames*2 + info.move_frames*2 + info.attack_frames*2;
+            if (state & MOB_DOWN_BIT) shift = info.stand_frames*2 + info.move_frames*2 + info.attack_frames*2;
+            else shift = info.stand_frames*2 + info.move_frames*2 + info.attack_frames*2 +info.cast_frames;
         break; 
 
     default:
@@ -118,21 +122,19 @@ void mob_update(entity_t* mob, game_t* game, int type_id)
         int sprite_num = mob->sprite_num;
 
         animinfo_t animinfo = get_mob_animinfo(type_id, mob->state);
+
         int shift = animinfo.shift;
         int animlen = animinfo.len;
 
         // printf("%d %d %d\n", shift, animlen, sprite_num);
         
-        if(state & MOB_LEFT_BIT)
+        if(state & MOB_RIGHT_BIT)
         {
-            // printf("STATE LEFT BIT\n");
-            if (state & MOB_DOWN_BIT) sprite_num = +((abs(sprite_num) + 1) % animlen + shift);
-            else                      sprite_num = +((abs(sprite_num) + 1) % animlen + shift+animlen);
+            sprite_num = -((abs(sprite_num) + 1) % animlen + shift);
         }
-        else if(state & MOB_RIGHT_BIT)
+        else
         {
-            if (state & MOB_DOWN_BIT) sprite_num = -((abs(sprite_num) + 1) % animlen + shift);
-            else                      sprite_num = -((abs(sprite_num) + 1) % animlen + shift+animlen);
+            sprite_num = +((abs(sprite_num) + 1) % animlen + shift);
         }
 
         mob->sprite_num = sprite_num;

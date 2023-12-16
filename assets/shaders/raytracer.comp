@@ -1,0 +1,260 @@
+#version 430 core
+
+layout(binding = 0, rgba32f) uniform image2D framebuffer;
+
+layout(std430, binding = 1) buffer blocks_ssbo
+{
+	int blocks[16];
+};
+
+uniform float time;
+
+#define MAX_DEPTH 4
+#define PI 3.1415926535
+#define FAR_DISTANCE 100000.0
+
+vec3 global_light;
+vec2 randvec;
+
+struct Material
+{
+    vec3 emmitance;   //for each color
+    vec3 reflectance; //for each color
+    float roughness;
+    float opacity;
+};
+
+struct Block{
+	Material mat;
+	vec3 center;
+};
+
+float RandomNoise(vec2 co)
+{
+	randvec.y += 3.3;
+	randvec.x /= 2.1 + randvec.y;
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+vec2 Random2D()
+{
+	return normalize(vec2(RandomNoise(randvec), RandomNoise(randvec)));
+}
+
+vec3 Random3D()
+{
+	return normalize(vec3(RandomNoise(randvec), RandomNoise(randvec), RandomNoise(randvec)));
+}
+
+
+vec3 RandomHemispherePoint(vec2 rand)
+{
+    float cosTheta = sqrt(1.0 - rand.x);
+    float sinTheta = sqrt(rand.x);
+    float phi = 2.0 * PI * rand.y;
+    return vec3(
+        cos(phi) * sinTheta,
+        sin(phi) * sinTheta,
+        cosTheta
+    );
+}
+
+vec3 NormalOrientedHemispherePoint(vec2 rand, vec3 n)
+{
+    vec3 v = RandomHemispherePoint(rand);
+    return dot(v, n) < 0.0 ? -v : v;
+}
+
+int GetBlock(in ivec3 voxel)
+{
+	int block;
+	ivec3 v = voxel;
+
+	if (v.x < 0) return 0;
+	if (v.x > 3) return 0;
+	if (v.y < 0) return 0;
+	if (v.y > 3) return 0;
+	if (v.z < 0) return 0;
+	if (v.z > 1) return 0;
+	block = blocks[voxel.x + voxel.y*4 + voxel.z*16];
+
+	return block;
+}
+
+Material GetBlockMat(in int block)
+{
+	Material mat;
+
+	mat.emmitance = vec3(0.12, 0.1, 0.35) + vec3(0.05) * block;
+	mat.reflectance = vec3(0.2);
+	mat.roughness = 0.33;
+	mat.opacity = 0.5;
+		
+	return mat;
+}
+
+void initTvals(out vec3 tMax, out vec3 tDelta, out ivec3 blockPos, in vec3 rayOrigin, in vec3 rayDirection)
+{
+	vec3 block_corner1 = floor(rayOrigin); //not real center
+	vec3 block_corner2 = block_corner1 + vec3(1.0); //now real center
+
+	blockPos = ivec3(block_corner1); //round origin to block pos
+
+	block_corner1 -= rayOrigin; //now corners are relative vectors
+	block_corner2 -= rayOrigin;
+
+	block_corner1 /= rayDirection; //now corners are in relative direction vectors
+	block_corner2 /= rayDirection;
+
+	//now we have 2 corners. lest compute max_fractions for each directon to hit block side
+	tMax.x = max(block_corner1.x, block_corner2.x); //1 of theese will be negative so max is just to get positive
+	tMax.y = max(block_corner1.y, block_corner2.y); //1 of theese will be negative so max is just to get positive
+	tMax.z = max(block_corner1.z, block_corner2.z); //1 of theese will be negative so max is just to get positive
+
+	tDelta = 1.0 / abs(rayDirection); //how many dir vectors needeed to move 1.0 across each axys
+}
+
+bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out vec3 normal, out Material material)
+{	
+	ivec3 steps;
+	steps.x = (rayDirection.x < 0) ? -1 : +1;
+	steps.y = (rayDirection.y < 0) ? -1 : +1;
+	steps.z = (rayDirection.z < 0) ? -1 : +1;
+
+		vec3 tMax = vec3(0);
+		vec3 tDelta = vec3(0);
+	ivec3 block_pos = ivec3(0);
+	initTvals(tMax, tDelta, block_pos, rayOrigin, rayDirection);
+
+	int current_block = 0;
+	int iterations = 0;
+	while (current_block == 0) {
+		if(tMax.x < tMax.y) {
+			if(tMax.x < tMax.z){
+				block_pos.x += steps.x; 
+				// if (voxel.x > 3 || voxel.x < 0) return false;
+				fraction = tMax.x;
+				tMax.x += tDelta.x;
+				normal = vec3(-1.0,0,0) * float(steps.x);
+			} else {
+				block_pos.z += steps.z;
+				// if (voxel.z != 0) return false;
+				fraction = tMax.z;
+				tMax.z += tDelta.z;
+				normal = vec3(0,0,-1.0) * float(steps.z);
+			}
+		} else {
+			if(tMax.y < tMax.z){
+				block_pos.y += steps.y;
+				// if (voxel.y > 3 || voxel.y < 0) return false;
+				fraction = tMax.y;
+				tMax.y += tDelta.y;
+				normal = vec3(0,-1.0,0) * float(steps.y);
+			} else {
+				block_pos.z += steps.z;
+				// if (voxel.z != 0) return false;
+				fraction = tMax.z;
+				tMax.z += tDelta.z;
+				normal = vec3(0,0,-1.0) * float(steps.z);
+			}
+		}
+		current_block = GetBlock(block_pos);
+
+		iterations++;
+		if(iterations > 8) return false;
+	};
+
+	material = GetBlockMat(current_block);
+
+	return true;
+}
+
+vec3 TraceRay(in vec3 rayOrigin, in vec3 rayDirection)
+{
+	vec3 accumulated_light      = vec3(0.0);
+	vec3 accumulated_reflection = vec3(1.0);
+
+	float fraction;
+	vec3 normal;
+	Material material;
+    
+    for (int i = 0; i < MAX_DEPTH; i++)
+    {
+
+        bool hit = CastRay(rayOrigin, rayDirection, fraction, normal, material);
+
+        if (hit)
+        {
+			vec3 newRayOrigin = rayOrigin + (fraction*rayDirection);
+
+			vec3 hemisphereDistributedDirection = NormalOrientedHemispherePoint(Random2D(), normal);
+			vec3 randomVec = normalize(2.0 * Random3D() - 1.0);
+
+            vec3 tangent = cross(randomVec, normal);
+            vec3 bitangent = cross(normal, tangent);
+            mat3 transform = mat3(tangent, bitangent, normal);
+            
+            vec3 newRayDirection = transform * hemisphereDistributedDirection;
+                
+            vec3 idealReflection = reflect(rayDirection, normal);
+            newRayDirection = normalize(mix(newRayDirection, idealReflection, material.roughness));
+            // newRayDirection = idealReflection;
+
+            newRayOrigin += normal * 0.001;
+
+            rayDirection = newRayDirection;
+            rayOrigin = newRayOrigin;
+
+			accumulated_light += accumulated_reflection * material.emmitance;
+			accumulated_reflection *= material.reflectance;
+
+			// break;
+        }
+        else
+        {	
+			float global_light_participance = dot(global_light, rayDirection);
+			if (global_light_participance > 0)
+			{
+				accumulated_light += global_light_participance * vec3(0.1) * accumulated_reflection;
+			}
+			accumulated_light += vec3(0.01) * accumulated_reflection;
+			accumulated_light += vec3(0.2);
+            break;
+        }
+    }
+
+    return accumulated_light;
+}
+
+layout (local_size_x = 4, local_size_y = 4) in;
+
+vec3 rotateAxis(vec3 p, vec3 axis, float angle) {
+return mix(dot(axis, p)*axis, p, cos(angle)) + cross(axis,p)*sin(angle);
+}
+
+void main(void) 
+{
+	global_light = normalize(vec3(1,-1,+10));
+
+	ivec2 pix = ivec2(gl_GlobalInvocationID.xy);
+	ivec2 size = imageSize(framebuffer);
+	if (pix.x >= size.x || pix.y >= size.y) {
+		return;
+	}
+
+	vec2 pos = vec2(pix) / vec2(size.x - 1, size.y - 1);
+
+	randvec = pos / time;
+	randvec.x = RandomNoise(randvec);
+	randvec.y = RandomNoise(randvec);
+
+	vec3 pos_on_map = rotateAxis(vec3(pos,0), vec3(0,0,1), -PI/4);
+
+	// vec3 ray_dir    = normalize(vec3(0.612375, 0.612375, -0.50000));
+	vec3 ray_dir    = normalize(vec3(0.612375, 0.612375, -0.50000));
+	vec3 ray_origin = -vec3(0.612375, 0.612375, -0.50000) * 2 + vec3((pos_on_map.xy - vec2(0.55,-0.3))*10, 0);
+
+	vec4 color = vec4(TraceRay(ray_origin, ray_dir), 1);
+
+	imageStore(framebuffer, pix, color);
+}

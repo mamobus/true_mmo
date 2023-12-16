@@ -110,7 +110,8 @@ int main()
                 
         //update mob but for now its player
         entity_t* player_ent = entity_find(1, 101, &game);
-        game.player.state = PLAYER_MOVE_BIT | player_get_direction_bits(game.player.dir);
+        player_set_direction_bits(&game.player);
+        
 
         // static int pstate = 0;
         // if (pstate != game.player.state)

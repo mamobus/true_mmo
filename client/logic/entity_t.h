@@ -16,6 +16,7 @@ typedef struct entity_t
     vec3d vel;
 
     double last_frame_time;
+    int oldstate;
     int state; // stores bits
     int sprite_num; // for drawing    
     

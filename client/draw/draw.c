@@ -11,19 +11,75 @@ do{ \
     printf(#param " %u\n", _param); \
 } while(0) 
 
+void GLAPIENTRY
+MessageCallback( GLenum source,
+                 GLenum type,
+                 GLuint id,
+                 GLenum severity,
+                 GLsizei length,
+                 const GLchar* message,
+                 const void* userParam )
+{
+    if(type == GL_DEBUG_TYPE_ERROR) fprintf(stderr, "GL ERROR type = 0x%x, severity = 0x%x, message = %s\n", type, severity, message);
+//   fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),type, severity, message );
+}
+
 void setup_draw(game_t* game)
 {
     assert(glewInit() == 0);
 
     game->tile_progID = load_shaders_geom("../assets/shaders/vertex.glsl", "../assets/shaders/geometry.glsl", "../assets/shaders/fragment.glsl");
     game->hud_progID = load_shaders("../assets/shaders/hud_vertex.glsl", /*"../assets/shaders/geometry.glsl",*/ "../assets/shaders/hud_fragment.glsl");
+
+    //RAY TRACER LOADING
+    //RT RT RT RT RT RT RT RT
+    game->RT.raytracer_progID = load_shader_raytracer("../assets/shaders/raytracer.comp");
+    game->RT.uni_framebuffer = glGetUniformLocation(game->RT.raytracer_progID, "framebuffer" );
+    game->RT.uni_width   = glGetUniformLocation(game->RT.raytracer_progID, "width" );
+    game->RT.uni_height  = glGetUniformLocation(game->RT.raytracer_progID, "height");
+    game->RT.uni_time    = glGetUniformLocation(game->RT.raytracer_progID, "time");
+    // game->RT.uni_ssbo    = glGetUniformLocation(game->RT.raytracer_progID, "blocks_ssbo");
+        glGenTextures(1, &game->RT.framebuffer);
+        glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glGenBuffers(1, &game->RT.vbo);
+    const vertex2 verts_for_simples_texture [6] = {
+        {{-1,-1}, {+0,+0}},
+        {{-1,+1}, {+0,+1}},
+        {{+1,+1}, {+1,+1}},
+        {{-1,-1}, {+0,+0}},
+        {{+1,+1}, {+1,+1}},
+        {{+1,-1}, {+1,+0}},
+    };
+    glBindBuffer(GL_ARRAY_BUFFER, game->RT.vbo);
+    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(vertex2), verts_for_simples_texture, GL_STATIC_DRAW);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, game->window.width, game->window.height, 0, GL_RGBA, GL_FLOAT, NULL);
+
+        glGenBuffers(1, &game->RT.ssbo);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
+        //4 * 4 * 1
+        const int ssbo_chunk[] = 
+        {
+            1,2,0,4,
+            2,3,4,5,
+            3,4,5,6,
+            0,5,6,0,
+        };
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ssbo_chunk), &ssbo_chunk, GL_STATIC_DRAW);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo);
+
+
+
     glGenVertexArrays(1, &game->VertexArrayID);
 	glBindVertexArray(game->VertexArrayID);
 
     //there i load things that are not that hard to create extra functions for that
     game->tileset_textureID = load_texture(TEXTURE_TILESET);
-    game->uni.map_tileset = glGetUniformLocation(game->tile_progID, "my_tileset_texture");
-    game->uni.hud_set     = glGetUniformLocation(game->hud_progID, "my_hud_texture");
+    game->uni.map_tileset = glGetUniformLocation(game->tile_progID, "spritesheet_texture");
+    game->uni.hud_set     = glGetUniformLocation(game->hud_progID, "hud_texture");
     game->uni.camera_pos    = glGetUniformLocation(game->tile_progID, "camera_pos");
     game->uni.in_world_size = glGetUniformLocation(game->tile_progID, "in_world_size");
     game->uni.in_textr_size = glGetUniformLocation(game->tile_progID, "in_textr_size");
@@ -51,8 +107,13 @@ void setup_draw(game_t* game)
     // print_opengl_param(GL_POINT_SIZE);
     // print_opengl_param(GL_MAX_TEXTURE_BUFFER_SIZE);
 
+    // During init, enable debug output
+    glEnable              ( GL_DEBUG_OUTPUT );
+    glDebugMessageCallback( MessageCallback, 0 );
+
     printf("setup finished\n");
 }
+
 
 void draw_chunk(game_t* game, int x, int y)
 {
@@ -169,26 +230,61 @@ void draw_map(game_t* game)
 
 void draw_entities(game_t* game)
 {
-
-    // get_mo
-    // glUniform1f(game->uni.point_size, 128.0);
-    // glUniform1f(game->uni.grid_size , 7.0);
-
     for (int i=0; i < vector_size(game->entity_manager.elist); i++)
     {
-        // get_ty
         draw_mob_list(game, &game->entity_manager.elist[i]);
     }
-    // printf("drawing vector_size(game->entity_manager.cosmetic) %d\n", vector_size(game->entity_manager.cosmetic));
     for (int i=0; i < vector_size(game->entity_manager.cosmetic); i++)
-    // for (int i=0; i < vector_size(      entity_manager.cosmetic); i++)
     {
-        // get_ty
-        // printf("%d v%p vs%d %d %d\n", game->entity_manager.cosmetic[i].type_id, game->entity_manager.cosmetic[i].draw_queue, vector_size(game->entity_manager.cosmetic[i].draw_queue), game->entity_manager.cosmetic[i].sprite, game->entity_manager.cosmetic[i].vbo);
-        // printf("t rying to draw qeue with [0] %f %f %f_%f", game->entity_manager.cosmetic[i].draw_queue[0].pos.x, game->entity_manager.cosmetic[i].draw_queue[0].pos.y, game->entity_manager.cosmetic[i].draw_queue[0].pos.z, game->entity_manager.cosmetic[i].draw_queue[0].sprite_num);
         draw_cosmetic_listd(game, &game->entity_manager.cosmetic[i]);
-        // printf("cosmetic queue drawn\n");
     }
+}
+
+void raytrace(game_t* game)
+{
+    //raytrace to texture
+    glUseProgram(game->RT.raytracer_progID);
+    glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer); //not real framebuffer tho
+    glBindImageTexture(0, game->RT.framebuffer, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
+    glUniform1i(game->RT.uni_framebuffer, 0); //cause GL_TEXTURE0 but does not change tho
+    glUniform1f(game->RT.uni_time, (float)glfwGetTime()); //cause GL_TEXTURE0 but does not change tho
+
+    // glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
+    // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo);
+
+    glDispatchCompute(game->window.width, game->window.height, 1); //run raytracer
+    // to make soimage has finished before read
+    // glBindImageTexture(0, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    // glBindImageTexture(0, );
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+    //draw texture
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer); //not real framebuffer tho
+    // glBindImageTexture(0, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+
+    glUseProgram(game->hud_progID);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer);
+    glUniform1i(game->uni.hud_set, 0); //cause GL_TEXTURE0
+
+glEnableVertexAttribArray(0);
+glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, game->RT.vbo);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, 0, sizeof(float)*4, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, 0, sizeof(float)*4, sizeof(float)*2);
+    // glBindBuffer(GL_ARRAY_BUFFER, game->hud_manager.vbo_pos);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6); //one quad with raytraced texture
+
+glDisableVertexAttribArray(0);
+glDisableVertexAttribArray(1);
 }
 
 void draw(game_t* game)
@@ -196,26 +292,26 @@ void draw(game_t* game)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glClear(GL_COLOR_BUFFER_BIT);
     // glBindVertexArray(game->VertexArrayID);
-    glEnableClientState(GL_VERTEX_ARRAY);
+    
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glEnableClientState(GL_VERTEX_ARRAY);
 
     
     // glEnable(GL_DEPTH_TEST);
     // glDisable(GL_DEPTH_TEST);
     glUseProgram(game->hud_progID);
-    draw_hud(game);
+    // draw_hud(game);
 
 
     // glEnable(GL_DEPTH_TEST);
     glUseProgram(game->tile_progID);
     draw_map(game);
-    draw_entities(game);
-    
+    // draw_entities(game);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
+
+    raytrace(game);
 
     // Sleep(1);
 } 

@@ -5,7 +5,7 @@
 
 #define print(...) printf(__VA_ARGS__)
 
-#define CHUNK_SIZE 8
+#define CHUNK_SIZE 16
 
 // copy_chunk_to_chunkfile(int i, int j, FILE* chunkfile);
 // copy_chunk_to_chunkmap (int i, int j, FILE* chunkmap );

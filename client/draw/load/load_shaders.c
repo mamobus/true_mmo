@@ -147,3 +147,40 @@ GLuint load_shaders(const char * vertex_file_path, /*const char * geometry_file_
 
     return programID;
 }
+
+GLuint load_shader_raytracer(const char * raytracer_file_path)
+{
+    // Создаем шейдерные объекты вершинного и фрагментного шейдеров
+    GLuint raytracerShaderID = glCreateShader(GL_COMPUTE_SHADER);
+    
+    // Читаем код шейдеров из файла
+    char *raytracerShaderCode = get_shader_code(raytracer_file_path);
+
+    compile_and_check(raytracerShaderID  , raytracerShaderCode  );
+    // printf("%s\nNEW\n%s\nEND\n", vertexShaderCode, fragmentShaderCode);
+
+    // Связываем вершинный и фрагментный шейдеры в программу шейдеров
+    GLuint programID = glCreateProgram();
+    glAttachShader(programID, raytracerShaderID);
+    glLinkProgram(programID);
+
+
+    GLint result = GL_FALSE;
+    int infoLogLength;
+    // Проверяем результат связывания программы шейдеров
+    glGetProgramiv(programID, GL_LINK_STATUS, &result);
+    glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
+    if(infoLogLength > 0) {
+        char *programErrorMessage = (char*)malloc(infoLogLength + 1);
+        glGetProgramInfoLog(programID, infoLogLength, NULL, programErrorMessage);
+        printf("%s\n", programErrorMessage);
+        free(programErrorMessage);
+    }
+
+    // Освобождаем ресурсы
+    if(raytracerShaderCode   != NULL)
+        free(raytracerShaderCode);
+    glDeleteShader(raytracerShaderID  );
+
+    return programID;
+}

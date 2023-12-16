@@ -88,7 +88,9 @@
         "typeinfo": "c",
         "window_t.h": "c",
         "texture_manager_t.h": "c",
-        "chanmgr.h": "c"
+        "chanmgr.h": "c",
+        "compare": "c",
+        "ratio": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

@@ -74,4 +74,4 @@ entity_t* entity_find(        int id, int type_id, game_t* game);
 
 void entities_prepare_for_drawing(game_t* game);
 
-int player_get_direction_bits (vec3d dir);
+void player_set_direction_bits (player_t* player);

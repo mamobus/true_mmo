@@ -9,7 +9,7 @@ in GS_OUT
 
 out vec4 fragColor;
 
-uniform sampler2D my_tileset_texture;
+uniform sampler2D spritesheet_texture;
 
 
 float random (vec2 st) {
@@ -29,7 +29,7 @@ void main() {
     //     }
     // }
     
-    fragColor = texture(my_tileset_texture, fs_in.tileset_uv);
+    fragColor = texture(spritesheet_texture, fs_in.tileset_uv);
 
     if (fragColor.w < 0.5)
     {
