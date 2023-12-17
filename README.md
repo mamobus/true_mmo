@@ -17,7 +17,9 @@ use -jN flag, where n is ~number of threads you have
 
 Is there? You cant really play mmo without server. And i didnt implement any yet
 
-##Features
+## Features
+
 Realtime raytracing* (even if you dont have RT cores)
 *I am just too lazy for complicated light calculations so i stick to raytracing*
+
 *Path tracing
