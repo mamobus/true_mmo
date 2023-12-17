@@ -26,11 +26,22 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 665.5,
-                "y": 135
+                "x": 432.5,
+                "y": 190
             }
         },
         "new_map.tmj#stolen_tileset": {
+            "scaleInDock": 1
+        },
+        "rtmap.tmj": {
+            "scale": 2,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 384,
+                "y": 209
+            }
+        },
+        "rtmap.tmj#rtset": {
             "scaleInDock": 1
         },
         "tileset.tmj": {
@@ -64,6 +75,7 @@
     ],
     "project": "untiled.tiled-project",
     "recentFiles": [
+        "rtmap.tmj",
         "map.tmj",
         "new_map.tmj",
         "tileset.tmj",

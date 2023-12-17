@@ -21,11 +21,12 @@ typedef struct
 {
     GLuint raytracer_progID; 
     GLuint framebuffer, uni_framebuffer;
-    int width, height;
     GLuint uni_width, uni_height, uni_time;
     GLuint vbo; //6 verts to render final texture
     // int voxel_height;
     // int voxels;// 16*16
+    int width, height;
+    int* data;
     GLuint ssbo, uni_ssbo;
 } raytracer;
 

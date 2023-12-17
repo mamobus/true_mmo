@@ -1,19 +1,29 @@
 #version 430 core
 
-layout(binding = 0, rgba32f) uniform image2D framebuffer;
+
+precision highp int;
+precision highp float;
+// precision highp vec3;
+
+layout(binding = 0, rgba32f) uniform volatile image2D framebuffer;
 layout(binding = 3) uniform sampler2D spritesheet_texture; 
 // uniform sampler2D spritesheet_texture;
 
-layout(std430, binding = 1) buffer blocks_ssbo
+layout(std430, binding = 1) readonly volatile buffer blocks_ssbo
+// layout(std430, binding = 1) buffer blocks_ssbo
 {
-	int blocks[32];
+	lowp int blocks[20*30*4];
 };
 
 uniform float time;
 
-#define MAX_DEPTH 5
+#define MAX_DEPTH 4
 #define PI 3.1415926535
 #define FAR_DISTANCE 100000.0
+
+#define WIDTH  30
+#define LENGTH 20
+#define HEIGHT 4
 
 vec3 global_light;
 vec2 randvec;
@@ -69,15 +79,13 @@ vec3 NormalOrientedHemispherePoint(vec2 rand, vec3 n)
 int GetBlock(in ivec3 voxel)
 {
 	int block;
-	ivec3 v = voxel;
+	// ivec3 v = voxel;
 
-	if (v.x < 0) return 0;
-	if (v.x > 3) return 0;
-	if (v.y < 0) return 0;
-	if (v.y > 3) return 0;
-	if (v.z < 0) return 0;
-	if (v.z > 2) return 0;
-	block = blocks[voxel.x + voxel.y*4 + voxel.z*16];
+	if (voxel.x < 0 || voxel.x >= WIDTH ) return 0;
+	if (voxel.y < 0 || voxel.y >= LENGTH) return 0;
+	if (voxel.z < 0 || voxel.z >= HEIGHT) return 0;
+
+	block = blocks[voxel.x + voxel.y*WIDTH + voxel.z*WIDTH*LENGTH];
 
 	return block;
 }
@@ -86,15 +94,20 @@ Material GetBlockMat(in int block, vec2 collision_point_projection)
 {
 	Material mat;
 
+
 	// mat.emmitance = vec3(0.12, 0.1, 0.35) * sin(collision_point_projection.x) + vec3(0.05) * block  *sin(collision_point_projection.y);
 	vec2 uv_leftop;
-	uv_leftop.x = fract(0 / 11.0);
-    uv_leftop.y = floor(0 / 11.0) / 11.0;
+	int block_tile_num = block - 1;
+	uv_leftop.x = fract(block_tile_num / 11.0);
+    uv_leftop.y = floor(block_tile_num / 11.0) / 11.0;
 	vec2 uv = uv_leftop + vec2(0.5 / 11.0) - collision_point_projection / 22.0;
 	
-	mat.emmitance = texture(spritesheet_texture, uv).xyz;
-	mat.reflectance = vec3(0.5);
-	mat.roughness = 0.33;
+	mat.reflectance = texture(spritesheet_texture, uv).xyz; //color
+	mat.emmitance = vec3(0.01);
+
+	if (block == 2 || block == 4) mat.emmitance = texture(spritesheet_texture, uv).xyz + vec3(0.1);
+
+	mat.roughness = 0.8;
 	mat.opacity = 0.5;
 		
 	return mat;
@@ -179,7 +192,7 @@ bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out ve
 		current_block = GetBlock(block_pos);
 
 		iterations++;
-		if(iterations > 12) return false;
+		if(iterations > 36) return false;
 	};
 
 	vec3 relative_collision_point = (rayOrigin + rayDirection*fraction) - (vec3(block_pos) + vec3(0.5)); 
@@ -233,21 +246,21 @@ vec3 TraceRay(in vec3 rayOrigin, in vec3 rayDirection)
         }
         else
         {	
-			// float global_light_participance = dot(global_light, rayDirection);
-			// if (global_light_participance > 0)
-			// {
-			// 	accumulated_light += global_light_participance * vec3(0.1) * accumulated_reflection;
-			// }
-			// accumulated_light += vec3(0.01) * accumulated_reflection;
 			// accumulated_light += vec3(0.2);
             break;
         }
     }
+			float global_light_participance = dot(global_light, rayDirection);
+			if (global_light_participance > 0)
+			{
+				accumulated_light += global_light_participance * vec3(0.2) * accumulated_reflection;
+			}
+			accumulated_light += vec3(0.2) * accumulated_reflection;
 
     return accumulated_light;
 }
 
-layout (local_size_x = 4, local_size_y = 4) in;
+layout (local_size_x = 8, local_size_y = 4) in;
 
 vec3 rotateAxis(vec3 p, vec3 axis, float angle) {
 return mix(dot(axis, p)*axis, p, cos(angle)) + cross(axis,p)*sin(angle);
@@ -255,7 +268,7 @@ return mix(dot(axis, p)*axis, p, cos(angle)) + cross(axis,p)*sin(angle);
 
 void main(void) 
 {
-	global_light = normalize(vec3(1,-1,+10));
+	global_light = normalize(vec3(-0.612375, -0.612375, -0.50000));
 
 	ivec2 pix = ivec2(gl_GlobalInvocationID.xy);
 	ivec2 size = imageSize(framebuffer);
@@ -281,7 +294,7 @@ void main(void)
 	vec3 camera_unit_x = horizline / 2;
 	vec3 camera_unit_y = vertiline / 2;
 	
-	vec3 camera_pos = vec3(0.612375, 0.612375, 0.5) * 7;
+	vec3 camera_pos = vec3(0.612375, 0.612375, 0.5) * 20;
 	// vec3 camera_pos = vec3(0.5, 0.5, 0.5) * 5;
 
 	float view_width  = size.x / 32.0; //in blocks
@@ -290,6 +303,17 @@ void main(void)
 	vec3 ray_origin = camera_pos + camera_unit_x*(pos.x-0.5)*view_width + camera_unit_y*(pos.y-0.5)*view_height;
 
 	vec4 color = vec4(TraceRay(ray_origin, ray_dir), 1);
+	// vec4 color1 = vec4(TraceRay(ray_origin, ray_dir), 1);
+	// vec4 color2 = vec4(TraceRay(ray_origin, ray_dir), 1);
+	// vec4 color3 = vec4(TraceRay(ray_origin, ray_dir), 1);
 
-	imageStore(framebuffer, pix, color);
+	// vec4 color12 = mix(color1 , color2, 0.5);
+	// vec4 color   = mix(color12, color3, 0.33);
+	// vec4 color = vec4(sin(pos.x), sin(pos.y), sin(pos.x * pos.y), 1);
+	vec4 old_color = imageLoad(framebuffer, pix);
+	
+	vec4 new_color = mix(old_color, color, 0.01);
+	// vec4 new_color = color;
+
+	imageStore(framebuffer, pix, new_color);
 }

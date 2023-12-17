@@ -59,7 +59,7 @@ int main()
 
     create_window(&game);
     // Sleep(1000);
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     setup_draw(&game);
 
