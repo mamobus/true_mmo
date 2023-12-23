@@ -1,6 +1,5 @@
 #version 430 core
 
-
 precision highp int;
 precision highp float;
 // precision highp vec3;
@@ -10,24 +9,25 @@ layout(binding = 1, rgba32f) uniform volatile image2D normalbuffer;
 layout(binding = 0) uniform sampler2D tSet_ReflectNtransparancy; 
 layout(binding = 1) uniform sampler2D tSet_EmmitNsmooth; 
 // uniform sampler2D spritesheet_texture;
-
-layout(std430, binding = 0) buffer blocks_ssbo
-// layout(std430, binding = 1) buffer blocks_ssbo
-{
-	int blocks[30*30*5];
-};
-
 uniform vec3 cameraposr;
 uniform float time;
 
 #define MAX_DEPTH 4
+#define NUM_SAMPLES 3
 #define PI 3.1415926535
 #define FAR_DISTANCE 100000.0
 #define nIN 1.0
 #define nOUT 1.0
 #define WIDTH 30
 #define LENGTH 30
-#define HEIGHT 5
+#define HEIGHT 6
+
+layout(std430, binding = 0) buffer blocks_ssbo
+// layout(std430, binding = 1) buffer blocks_ssbo
+{
+	int blocks[WIDTH*LENGTH*HEIGHT];
+};
+
 
 vec3 global_light;
 vec2 randvec;
@@ -47,9 +47,10 @@ struct Block{
 
 float RandomNoise(vec2 co)
 {
-	randvec.y += 3.3;
-	randvec.x /= 2.1 + randvec.y;
-    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+    float res = fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+	randvec.x = randvec.y;
+	randvec.y = res;
+	return res;
 }
 
 float RandomFloat_0to1()
@@ -105,29 +106,23 @@ Material GetBlockMat(in int block, vec2 collision_point_projection)
 	Material mat;
 
 
-	// mat.emmitance = vec3(0.12, 0.1, 0.35) * sin(collision_point_projection.x) + vec3(0.05) * block  *sin(collision_point_projection.y);
 	vec2 uv_leftop;
 	int block_tile_num = block - 1;
+
+	// uv_leftop.x = fract(block_tile_num / 18.0);
+    // uv_leftop.y = floor(block_tile_num / 18.0) / 65.0;
+	// vec2 uv = uv_leftop + vec2(0.5 / 18.0, 0.5 / 65.0) - collision_point_projection / vec2(18.0, 65.0) / 3;
+
 	uv_leftop.x = fract(block_tile_num / 32.0);
     uv_leftop.y = floor(block_tile_num / 32.0) / 32.0;
-	vec2 uv = uv_leftop + vec2(0.5 / 32.0) - collision_point_projection / 64.0;
+	vec2 uv = uv_leftop + vec2(0.5 / 32.0) - collision_point_projection / vec2(32.0, 32.0) / 2;
 	
-
-	// mat.emmitance = vec3(0.01);
-	// if (block == 2 || block == 4 || block == 1) mat.emmitance = texture(spritesheet_texture, uv).xyz;
-
-	// mat.reflectance = texture(spritesheet_texture, uv).xyz; //color
-	// mat.smoothness = 0.666;
-	// if(block == 31 || block == 2 || block == 4) mat.smoothness = 1.0;
-	// mat.transparancy = 1.0-texture(spritesheet_texture, uv).w;
 
 	mat.reflectance  = texture(tSet_ReflectNtransparancy, uv).xyz;
 	mat.transparancy = 1.0 - texture(tSet_ReflectNtransparancy, uv).w;
-	// mat.transparancy = texture(tSet_ReflectNtransparancy, uv).w;
 
 	mat.emmitance  = texture(tSet_EmmitNsmooth, uv).xyz;
 	mat.smoothness = texture(tSet_EmmitNsmooth, uv).w;
-	// mat.smoothness = 1.0;
 		
 	return mat;
 }
@@ -135,7 +130,7 @@ Material GetBlockMat(in int block, vec2 collision_point_projection)
 bool isInsideScene(inout vec3 rayOrigin)
 {
 	vec3 corner_1 = vec3(0 ,0 ,0);
-	vec3 corner_2 = vec3(30,30,5);
+	vec3 corner_2 = vec3(WIDTH,LENGTH,HEIGHT);
 
 	vec3 s = step(corner_1, rayOrigin) - step(corner_2, rayOrigin); //if we are inside of the box
 
@@ -147,7 +142,7 @@ bool isInsideScene(inout vec3 rayOrigin)
 bool doesIntersectWithScene(inout vec3 rayOrigin, in vec3 rayDirection, out float fraction)
 {
 	vec3 corner_1 = vec3(0 ,0 ,0);
-	vec3 corner_2 = vec3(30,30,5);
+	vec3 corner_2 = vec3(WIDTH,LENGTH,HEIGHT);
 
 	vec3 planes_1 = (corner_1-rayOrigin) / rayDirection;
 	vec3 planes_2 = (corner_2-rayOrigin) / rayDirection;
@@ -180,7 +175,7 @@ bool initTvals(out vec3 tMax, out vec3 tDelta, out ivec3 blockPos, in vec3 rayOr
 		float fraction_to_get_to_scene = 0.0;
 		if (!doesIntersectWithScene(rayOrigin, rayDirection, fraction_to_get_to_scene)) return false;
 		else {
-			effective_origin = rayOrigin + rayDirection * (fraction_to_get_to_scene - 0.001);  
+			effective_origin = rayOrigin + rayDirection * (fraction_to_get_to_scene - 0.0001);  
 			fraction = fraction_to_get_to_scene;
 		}
 
@@ -201,8 +196,8 @@ bool initTvals(out vec3 tMax, out vec3 tDelta, out ivec3 blockPos, in vec3 rayOr
 
 	//now we have 2 corners. lest compute max_fractions for each directon to hit block side
 	tMax.x = max(block_corner1.x, block_corner2.x); //1 of theese will be negative so max is just to get positive
-	tMax.y = max(block_corner1.y, block_corner2.y); //1 of theese will be negative so max is just to get positive
-	tMax.z = max(block_corner1.z, block_corner2.z); //1 of theese will be negative so max is just to get positive
+	tMax.y = max(block_corner1.y, block_corner2.y);
+	tMax.z = max(block_corner1.z, block_corner2.z);
 
 	tDelta = 1.0 / abs(rayDirection); //how many dir vectors needeed to move 1.0 across each axys
 
@@ -213,22 +208,9 @@ vec2 GetBlockPointProjection(vec3 block_point)
 {
 	vec2 projection;
 
-	// vec3 ray_dir    = normalize(vec3(-0.612375, -0.612375, -0.50000));
-	// // vec3 ray_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
-
-	// vec3 horizline = normalize(vec3(1,-1,0));
-	// vec3 vertiline = normalize(cross(ray_dir, horizline));
-	// //they define plane of rendeting
-
-    // vec3 screenpPojectionForCamera = block_point - ray_dir * dot(ray_dir, block_point);
-    // vec2 screenshift;
-    // projection.x = dot(screenpPojectionForCamera, horizline);
-    // projection.y = dot(screenpPojectionForCamera, vertiline);
-
-	// projection.x = 0.8660254038*block_point.x - 0.8660254038*block_point.y;
 	projection.x = block_point.x - block_point.y;
-	projection.y = -0.51*block_point.x - 0.51*block_point.y + block_point.z;
-// 0.615479709 
+	projection.y = -0.5*block_point.x - 0.5*block_point.y + block_point.z;
+
 	return projection;
 }
 
@@ -259,17 +241,17 @@ void CollideInsideBlock(in vec3 rayOrigin, in vec3 rayDirection, out float fract
 		}
 		else{ //z is the lowest
 			fraction = fractionsForAxis.z;
-			normal = vec3(1.0,0,0) * float(steps.z);
+			normal = vec3(0,0,1.0) * float(steps.z);
 		}
 	} else{
 		if(fractionsForAxis.y < fractionsForAxis.z){
 			//y is the lowest
 			fraction = fractionsForAxis.y;
-			normal = vec3(1.0,0,0) * float(steps.y);
+			normal = vec3(0,1.0,0) * float(steps.y);
 		}
 		else{ //z is the lowest
 			fraction = fractionsForAxis.z;
-			normal = vec3(1.0,0,0) * float(steps.z);
+			normal = vec3(0,0,1.0) * float(steps.z);
 		}
 	}
 }
@@ -284,11 +266,11 @@ bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out ve
 		vec3 tMax = vec3(0);
 		vec3 tDelta = vec3(0);
 	ivec3 block_pos = ivec3(0);
-	float extra_fraction;
+	float extra_fraction = 0.0;
 	if(!initTvals(tMax, tDelta, block_pos, rayOrigin, rayDirection, extra_fraction)) return false; //does not intersect with scene
 
-	// int current_block = GetBlock(block_pos);
-	int current_block = 0;
+	int current_block = GetBlock(block_pos);
+	// current_block = 0;
 
 	if(current_block != 0)
 	{
@@ -329,7 +311,7 @@ bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out ve
 		current_block = GetBlock(block_pos);
 
 		iterations++;
-		if(iterations > 48) return false;
+		if(iterations > 64) return false;
 	};
 
 	fraction += extra_fraction;
@@ -341,17 +323,18 @@ bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out ve
 	material = GetBlockMat(current_block, collision_point_projection);
 
 	//if blocks view
-	vec3 viewvec = collision_point - cameraposr;
-	if (dot(normalize(viewvec), rayDirection) < -0.85 && dot(collision_point, cameraposr + vec3(1, 1, 1) * 15.0) > 0.05)
-	{
-		// if(material.transparancy < 0.5)
-		// {
-		// material.transparancy /= 10.0;
-		material.transparancy = 0.88;
-		material.smoothness   = 1.0;
-		material.emmitance   = vec3(0);
-		// }
-	}
+	// vec3 viewvec = collision_point - cameraposr;ы
+	// if (dot(normalize(viewvec), rayDirection) < -0.9)
+	// {
+	// 	// if(material.transparancy < 0.5)
+	// 	// {
+	// 	// material.transparancy /= 10.0;
+	// 	material.transparancy = 1.0;
+	// 	material.smoothness   = 1.0;
+	// 	material.emmitance   = vec3(0);
+	// 	material.reflectance   = vec3(1);
+	// 	// }
+	// }
 
 	return true;
 }
@@ -382,6 +365,7 @@ bool IsRefracted(in vec3 rayDirection, in vec3 normal, in float transparancy)
 {
 	float fresnel = FresnelSchlick(rayDirection, normal);
 	float rand = RandomFloat_0to1();
+	// return (transparancy > rand);
 	return (transparancy > rand) && (fresnel < rand);// && transparancy == 0.0;
 }
 
@@ -414,17 +398,13 @@ vec3 TraceRay(in vec3 rayOrigin, in vec3 rayDirection, out vec4 normal_out)
             
             vec3 newRayDirection = transform * hemisphereDistributedDirection;
                 
-            // vec3 idealReflection = reflect(rayDirection, normal);
-            // newRayDirection = normalize(mix(newRayDirection, idealReflection, material.smoothness));
-            // newRayDirection = idealReflection;
-
-
 
 			bool refracted = IsRefracted(rayDirection, normal, material.transparancy);
             if (refracted)
             {
                 vec3 idealRefraction = IdealRefract(rayDirection, normal, nIN, nOUT);
                 newRayDirection = normalize(mix(-newRayDirection, idealRefraction, material.smoothness));
+                // newRayDirection = normalize(mix(idealRefraction, -newRayDirection, material.smoothness));
                 newRayOrigin += normal * (dot(newRayDirection, normal) < 0.0 ? -0.001 : 0.001);
             }
             else
@@ -443,6 +423,7 @@ vec3 TraceRay(in vec3 rayOrigin, in vec3 rayDirection, out vec4 normal_out)
             rayDirection = newRayDirection;
             rayOrigin = newRayOrigin;
 
+			accumulated_light += vec3(1) * 0.2 * accumulated_reflection;
 			if(i == 0)
 			{
 				normal_out.xyz = normal;
@@ -459,18 +440,17 @@ vec3 TraceRay(in vec3 rayOrigin, in vec3 rayDirection, out vec4 normal_out)
 	float global_light_participance = -dot(global_light, rayDirection);
 	if (global_light_participance > 0.9){
 		// accumulated_light += vec3(0.97,0.95,0.9) * accumulated_reflection;
-		// accumulated_light += global_light_participance*1.4*vec3(0.97,0.95,0.8) * accumulated_reflection;
-		accumulated_light += global_light_participance*1.4*vec3(0.97,0.95,0.8) * accumulated_reflection;
+		accumulated_light += vec3(0.99, 0.98, 0.83) * accumulated_reflection;
 	}
-	else if (global_light_participance > 0.1){
-		// accumulated_light += vec3(0.97,0.95,0.9) * accumulated_reflection;
-		accumulated_light += global_light_participance*vec3(0.3,0.35,0.37) * accumulated_reflection;
-	}
+	// else if (global_light_participance > 0.1){
+	// 	// accumulated_light += vec3(0.97,0.95,0.9) * accumulated_reflection;
+	// 	accumulated_light += global_light_participance*vec3(0.3,0.3,0.3) * accumulated_reflection;
+	// }
 
     return accumulated_light;
 }
 
-layout (local_size_x = 16, local_size_y = 8) in;
+layout (local_size_x = 8, local_size_y = 8) in;
 
 vec3 rotateAxis(vec3 p, vec3 axis, float angle) {
 return mix(dot(axis, p)*axis, p, cos(angle)) + cross(axis,p)*sin(angle);
@@ -494,14 +474,13 @@ void main(void)
 	//shift pos
 
 	randvec = pos / time;
-	randvec.x = RandomNoise(randvec);
-	randvec.y = RandomNoise(randvec);
+	// randvec.x = RandomNoise(randvec);
+	// randvec.y = RandomNoise(randvec);
 
-	vec2 posShift = 0.32 * (Random2D() - vec2(0.5)) / vec2(size);
-	pos += posShift;
 	// vec3 pos_on_map = rotateAxis(vec3(pos,0), vec3(0,0,1), -PI/4);
 
 	vec3 ray_dir    = normalize(vec3(-0.612375, -0.612375, -0.5));
+	vec3 camera_relative_position = vec3(1, 1, 1) * 15.0;
 	// vec3 ray_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
 	// vec3 ray_dir = normalize(vec3(-1, -1, -1));
 
@@ -511,16 +490,23 @@ void main(void)
 	vec3 camera_unit_x = horizline / 2;
 	vec3 camera_unit_y = vertiline / 2;
 	
-	vec3 camera_pos = vec3(1, 1, 1) * 15.0 + cameraposr;
+	vec3 camera_pos = camera_relative_position + cameraposr;
 	// vec3 camera_pos = vec3(0.5, 0.5, 0.5) * 5;
 
 	float view_width  = size.x / 32.0; //in blocks
 	float view_height = size.y / 32.0; //in blocks
 
-	vec3 ray_origin = camera_pos + camera_unit_x*(pos.x-0.5)*view_width + camera_unit_y*(pos.y-0.5)*view_height;
-	//if alpha is zero than non-hit, else hit
 	vec4 normal;
-	vec4 color = vec4(TraceRay(ray_origin, ray_dir, normal), 1);
+	vec4 color = vec4(0);
+	for (int samplei=0; samplei < NUM_SAMPLES; samplei++)
+	{
+		vec2 posShift = 0.16 * (Random2D() - vec2(0.5)) / vec2(size);
+		vec2 newpos = pos + posShift;
+		vec3 ray_origin = camera_pos + camera_unit_x*(newpos.x-0.5)*view_width + camera_unit_y*(newpos.y-0.5)*view_height;
+		color += vec4(TraceRay(ray_origin, ray_dir, normal), 1) / NUM_SAMPLES;
+	}
+
+	//if alpha is zero than non-hit, else hit
 
 
 	imageStore(framebuffer, pix, color);

@@ -205,6 +205,26 @@ void entities_prepare_for_drawing(game_t* game)
             default:
                 break;
             }
+
+
+            	vec3d ray_dir    = v3dnorm((vec3d){-0.612375, -0.612375, -0.5});
+                // vec3 ray_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
+                vec3d camera_relative_position = v3dscale((vec3d){1, 1, 1}, 15.0);
+
+                vec3d horizline = v3dnorm((vec3d){1,-1,0});
+                vec3d vertiline = v3dnorm(v3dcross(ray_dir, horizline));
+                //they define plane of rendeting
+                
+                vec3d position = entity_manager->elist[i].entities[j].pos;
+
+                float view_width  = 1920 / 32.0; //in block_diags
+                float view_height = 1080 / 32.0; //in blocks
+
+                //proj = pos - ray_dir * dot(ray_dir, pos)
+                vec3d screenPojection = v3dsub(position, v3dscale(ray_dir, v3ddot(ray_dir, position)));
+                vec2d screenshift;
+                screenshift.x = v3ddot(screenPojection, horizline);
+                screenshift.y = v3ddot(screenPojection, vertiline);
         }
         
         glBindBuffer(GL_ARRAY_BUFFER, entity_manager->elist[i].vbo);

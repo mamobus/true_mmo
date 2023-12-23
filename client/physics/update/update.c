@@ -115,8 +115,8 @@ void support_cylinder(void* obj, vec3d* dir, vec3d* vec)
     }
     horizontal_dir = v2dnorm(horizontal_dir);
 
-    horizontal_dir.x = round((horizontal_dir.x * 9.0)) / 9.0;
-    horizontal_dir.y = round((horizontal_dir.y * 9.0)) / 9.0;
+    horizontal_dir.x = round((horizontal_dir.x * 11.81)) / 11.81;
+    horizontal_dir.y = round((horizontal_dir.y * 11.81)) / 11.81;
 
     double vertical_dir = round_to1d(dir->z);
 
@@ -250,7 +250,7 @@ void update_player_for_time(game_t* game, double time)
             
             ccd.support1 = (void*)support_cube;
             ccd.support2 = (void*)support_cylinder;
-            ccd.max_iterations = 420;
+            ccd.max_iterations = 42;
 
             vec3d separator = {0};
             //if player and block collide

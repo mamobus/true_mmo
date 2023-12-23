@@ -1,0 +1,112 @@
+#version 430 core
+
+
+precision highp int;
+precision highp float;
+// precision highp vec3;
+
+// layout(binding = 0) uniform sampler2D framebuffer;
+layout(binding = 0, rgba32f) uniform image2D framebuffer;
+layout(binding = 1, rgba32f) uniform image2D normalbuffer;
+layout(binding = 2, rgba32f) uniform image2D new_denoised_framebuffer;
+layout(binding = 3, rgba32f) uniform image2D old_denoised_framebuffer;
+// uniform sampler2D spritesheet_texture;
+
+// uniform sampler2D framebuffer;
+
+uniform vec3 camerashift;
+uniform float time;
+
+// #define PI 3.1415926535
+// #define DENOISING_RADIUS 2
+
+vec4 sampleOldFramebuffer(vec2 uvCoords)
+{
+    // Convert UV coords to pixel coords
+    vec2 imageSize = imageSize(old_denoised_framebuffer);
+    vec2 pixelCoords = uvCoords * (imageSize - 1.0);
+
+    // Use floor and ceil to get coordinates of the surrounding pixels
+    ivec2 p0 = ivec2(floor(pixelCoords));
+    ivec2 p1 = ivec2(ceil (pixelCoords));
+
+    // Calculate the fractional part
+    vec2 f = fract(pixelCoords);
+
+    // Get the colors of the surrounding pixels
+    vec4 c00 = imageLoad(old_denoised_framebuffer, p0);
+    vec4 c10 = imageLoad(old_denoised_framebuffer, ivec2(p1.x, p0.y));
+    vec4 c01 = imageLoad(old_denoised_framebuffer, ivec2(p0.x, p1.y));
+    vec4 c11 = imageLoad(old_denoised_framebuffer, p1);
+
+    // Linearly interpolate between the colors
+    vec4 c0    = mix(c00, c10, f.x);
+    vec4 c1    = mix(c01, c11, f.x);
+    vec4 color = mix(c0 , c1 , f.y);
+
+    return color;
+}
+
+layout (local_size_x = 8, local_size_y = 8) in;
+
+void main(void) 
+{
+	ivec2 pix = ivec2(gl_GlobalInvocationID.xy);
+	ivec2 size = imageSize(framebuffer);
+	// ivec2 size = textureSize(framebuffer, 0);
+	if (pix.x >= size.x || pix.y >= size.y) {
+		return;
+	}
+    vec2 pos = vec2(pix) / vec2(size.x - 1, size.y - 1);
+
+    // vec3 normal = imageLoad(normalbuffer, pix).xyz;
+    // vec3 pixel_color = imageLoad(framebuffer, pix).xyz;
+    // vec3 summary_color = vec3(0);
+    // float blur_value = 0;
+    // for (int xx = -DENOISING_RADIUS; xx <= DENOISING_RADIUS; xx++)
+    // {
+    //     for (int yy = -DENOISING_RADIUS; yy <= DENOISING_RADIUS; yy++)
+    //     {   
+    //         ivec2 current_pixel = pix + ivec2(xx,yy);
+    //         vec3 current_pixel_color = imageLoad(framebuffer, current_pixel).xyz;
+
+    //         // name_blur meand blut because difference in name
+    //         float position_blur = exp(-sqrt(float(xx*xx + yy*yy)));
+
+    //         vec3 current_normal = imageLoad(normalbuffer, current_pixel).xyz;
+    //         float normal_blur = exp(-length(current_normal - normal));
+
+    //         float color_blur = exp(-length(current_pixel_color - pixel_color) - length(pixel_color) - length(current_pixel_color));
+            
+    //         summary_color += normal_blur * position_blur * color_blur * current_pixel_color;
+    //         blur_value    += normal_blur * position_blur * color_blur;
+    //     }
+    // }
+    
+	vec3 ray_dir    = normalize(vec3(-0.612375, -0.612375, -0.5));
+	// vec3 ray_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
+
+	vec3 horizline = normalize(vec3(1,-1,0));
+	vec3 vertiline = normalize(cross(ray_dir, horizline));
+	//they define plane of rendeting
+	
+	vec3 camera_shift = camerashift;
+
+	float view_width  = size.x / 32.0; //in block_diags
+	float view_height = size.y / 32.0; //in blocks
+
+    vec3 screenpPojectionForCamera = camera_shift - ray_dir * dot(ray_dir, camera_shift);
+    vec2 screenshift;
+    screenshift.x = dot(screenpPojectionForCamera, horizline);
+    screenshift.y = dot(screenpPojectionForCamera, vertiline);
+
+    vec2 image_shift = screenshift / vec2(view_width, view_height) * 2.0; 
+
+
+    vec4 new_color     = imageLoad(framebuffer, pix);
+    // vec4 new_color     = vec4(summary_color / blur_value, 1.0);
+    vec4 old_color = sampleOldFramebuffer(pos + image_shift);
+    vec4 final_color = mix(old_color, new_color, 0.10);
+
+	imageStore(new_denoised_framebuffer, pix, final_color);
+}

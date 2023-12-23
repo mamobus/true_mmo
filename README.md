@@ -2,20 +2,22 @@
 
 yeah, im just making perfect MMORPG in my view
 
-*but im not a designer so its 3d game with  2d pixel-art sprites*
+*but im not a designer so its 3d game with  2d pixel-art sprites that are defenetly not stolen*
 
 ## Installation
 
-create folder ./builds and ./client/precompiled
-Use makefile to compile&run.
+
+Use makefile to init, compile and run.
 
 ```bash
+make init
 make run
 ```
-use -jN flag, where n is ~number of threads you have
+use -jN flag for faster compilation, where n is ~number of threads you have
+
 ## Usage
 
-Is there? You cant really play mmo without server. And i didnt implement any yet
+Is there? You cant really play mmo without server. And i didnt host any yet
 
 ## Features
 

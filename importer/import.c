@@ -13,8 +13,11 @@
 int main()
 {
     // char* cute_map_file = "assets/map/map.tmj";
-    char* cute_map_file = "assets/map/new_map.tmj";
+    // char* cute_map_file = "assets/map/new_map.tmj";
+    char* cute_map_file = "assets/map/rtmap.tmj";
 
+
+    FILE* rayworld_file   = fopen("assets/map/ray_file", "wb");
     FILE* chunk_file   = fopen("assets/map/chunk_file", "wb");
     FILE* manager_file = fopen("assets/map/chunk_manager", "wb");
 
@@ -49,8 +52,18 @@ int main()
     //     }
     //     print("\n");
     // }
+    int layer_count = 0;
+    cute_tiled_layer_t* curlayer = cute_map->layers;;
+    while(curlayer != NULL)
+    {
+        layer_count++;
+        curlayer = curlayer->next;
+    }
     print("\nchunks_height %d chunks_width %d\n", chunks_height, chunks_width);
     assert(fwrite(&chunks_height, sizeof(int), 1, manager_file)==1);
+    assert(fwrite(&cute_map->height, sizeof(int), 1, rayworld_file)==1);
+    assert(fwrite(&cute_map->width, sizeof(int), 1, rayworld_file)==1);
+    assert(fwrite(&layer_count, sizeof(int), 1, rayworld_file)==1);
     // fprintf(manager_file, "%d ", chunks_height);
     // int pos = ftell(manager_file);
     // fseek(manager_file, 0, SEEK_SET);
@@ -80,21 +93,21 @@ int main()
                 {
                     for(int line = chunk_line*CHUNK_SIZE; line < (chunk_line + 1)*CHUNK_SIZE && line < height; line++)
                     {   
-                        if (data[line*width + column] == 0)
+                        if (data[line*width + column] != 0)
                         {
-                            continue;
+                            x = (float)column;
+                            y = (float)line;
+                            z = (float) (-layer->offsety / 12.0);
+                            val = (float)data[line*width + column] - 1;
+                            // print("x %2.1f y %2.1f z %2.1f\n", x, y, z);
+                            // print("data[line*width + column] %f\n", val);
+                            fwrite(&x  , sizeof(float), 1, chunk_file);
+                            fwrite(&y  , sizeof(float), 1, chunk_file);
+                            fwrite(&z  , sizeof(float), 1, chunk_file);
+                            fwrite(&val, sizeof(float), 1, chunk_file);
+                            tiles_in_chunk++;
                         }
-                        x = (float)column;
-                        y = (float)line;
-                        z = (float) (-layer->offsety / 16.0);
-                        val = (float)data[line*width + column] - 1;
-                        // print("x %2.1f y %2.1f z %2.1f\n", x, y, z);
-                        // print("data[line*width + column] %f\n", val);
-                        fwrite(&x  , sizeof(float), 1, chunk_file);
-                        fwrite(&y  , sizeof(float), 1, chunk_file);
-                        fwrite(&z  , sizeof(float), 1, chunk_file);
-                        fwrite(&val, sizeof(float), 1, chunk_file);
-                        tiles_in_chunk++;
+
                     }
                 }
             }
@@ -105,6 +118,20 @@ int main()
     fclose(chunk_file);
     fclose(manager_file);
 
+    for (cute_tiled_layer_t* layer = &cute_map->layers[0]; layer != NULL; layer = layer->next)
+    {
+        //copy layer data from current layer to rayfile
+        data = layer->data;
+        for(int column = 0; column < cute_map->width; column++)
+        {
+            for(int line = 0; line < cute_map->height; line++)
+            {   
+                //but to rayfile write always
+                assert(fwrite(&data[column*width + line], sizeof(int), 1, rayworld_file)==1);
+            }
+        }
+    }
+    fclose(rayworld_file);
     cute_tiled_free_map(cute_map);
 
     // manager_file = fopen("assets/map/chunk_manager", "rb");

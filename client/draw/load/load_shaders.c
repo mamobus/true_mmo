@@ -184,3 +184,37 @@ GLuint load_shader_raytracer(const char * raytracer_file_path)
 
     return programID;
 }
+
+// Function to compile shaders from source with specified #defines
+// GLuint compileShaderWithDefines(GLenum shaderType, const char* source, const char* defines) {
+//     GLuint shader = glCreateShader(shaderType);
+
+//     // Form the final shader source with the specified #defines
+//     const GLchar* finalSource[3] = {
+//         defines,                // #defines
+//         "#line 1\n",             // To ensure correct line numbers in compiler errors
+//         source                  // Shader source
+//     };
+
+//     glShaderSource(shader, 3, finalSource, NULL);
+//     glCompileShader(shader);
+
+//     // Check compilation status
+//     GLint compileStatus;
+//     glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
+//     if (compileStatus != GL_TRUE) {
+//         // Print the compilation error
+//         GLint infoLogLength;
+//         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+//         GLchar* infoLog = (GLchar*)malloc(infoLogLength);
+//         glGetShaderInfoLog(shader, infoLogLength, NULL, infoLog);
+//         printf("Shader compilation error:\n%s\n", infoLog);
+//         free(infoLog);
+
+//         // Cleanup and return 0 (failure)
+//         glDeleteShader(shader);
+//         return 0;
+//     }
+
+//     return shader;
+// }

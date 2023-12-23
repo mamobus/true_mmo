@@ -33,18 +33,19 @@ void setup_draw(game_t* game)
 
     //RAY TRACER LOADING
     //RT RT RT RT RT RT RT RT
-    game->RT.raytracer_progID = load_shader_raytracer("../assets/shaders/raytracer.comp");
-    game->RT.uni_framebuffer = glGetUniformLocation(game->RT.raytracer_progID, "framebuffer" );
-    game->RT.uni_width   = glGetUniformLocation(game->RT.raytracer_progID, "width" );
-    game->RT.uni_height  = glGetUniformLocation(game->RT.raytracer_progID, "height");
+    game->RT.raytracer_progID = load_shader_raytracer("../assets/shaders/OptimizedRaytracer.comp");
+    // game->RT.raytracer_progID = load_shader_raytracer("../assets/shaders/raytracer.comp");
+    game->RT.denoiser_progID  = load_shader_raytracer("../assets/shaders/denoiser.comp");
+    game->RT.uni_camerapos_raytrace   = glGetUniformLocation(game->RT.raytracer_progID, "cameraposr");
+    game->RT.uni_camerashift_denoise    = glGetUniformLocation(game->RT.denoiser_progID, "camerashift");
+    // game->RT.uni_width   = glGetUniformLocation(game->RT.raytracer_progID, "width" );
+    // game->RT.uni_height  = glGetUniformLocation(game->RT.raytracer_progID, "height");
     game->RT.uni_time    = glGetUniformLocation(game->RT.raytracer_progID, "time");
-    // game->RT.uni_ssbo    = glGetUniformLocation(game->RT.raytracer_progID, "blocks_ssbo");
-        glGenTextures(1, &game->RT.framebuffer);
-        glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer);
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            //generating all frame-size buffers (color, denoised final frame, normals) that used for raytracing
+            game->RT.framebuffer   = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
+            game->RT.framebuffer_1 = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
+            game->RT.normalbuffer  = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
+            game->RT.framebuffer_2 = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
     glGenBuffers(1, &game->RT.vbo);
     const vertex2 verts_for_simples_texture [6] = {
         {{-1,-1}, {+0,+0}},
@@ -56,103 +57,34 @@ void setup_draw(game_t* game)
     };
     glBindBuffer(GL_ARRAY_BUFFER, game->RT.vbo);
     glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(vertex2), verts_for_simples_texture, GL_STATIC_DRAW);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, game->window.width, game->window.height, 0, GL_RGBA, GL_FLOAT, NULL);
 
 
         glGenBuffers(1, &game->RT.ssbo);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
         //4 * 4 * 1
-        const int ssbo_chunk[] = 
-        {
-            6, 6, 6, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 3, 3, 3, 3, 4, 4, 4, 10, 11, 11, 11, 3, 3, 3, 3, 3, 3,
-            6, 9, 9, 9, 4, 7, 7, 3, 4, 3, 8, 8, 9, 9, 9, 3, 4, 4, 3, 3, 3, 11, 11, 11, 11, 11, 3, 3, 3, 3,
-            8, 9, 9, 9, 3, 7, 9, 9, 4, 8, 8, 3, 8, 3, 3, 9, 9, 4, 4, 4, 4, 11, 11, 11, 4, 11, 11, 11, 3, 3,
-            8, 8, 4, 8, 9, 9, 9, 40, 40, 9, 9, 9, 9, 8, 3, 3, 3, 9, 9, 9, 9, 9, 11, 4, 4, 10, 11, 11, 3, 3,
-            8, 8, 8, 8, 8, 9, 8, 8, 40, 40, 40, 40, 9, 9, 41, 41, 3, 3, 19, 19, 19, 9, 9, 11, 11, 11, 11, 11, 10, 3,
-            8, 8, 7, 7, 8, 9, 7, 7, 7, 40, 40, 40, 8, 41, 41, 41, 41, 41, 19, 19, 19, 9, 9, 11, 11, 11, 11, 11, 4, 4,
-            8, 8, 8, 8, 40, 9, 7, 7, 7, 9, 9, 40, 40, 41, 41, 9, 41, 41, 41, 41, 41, 19, 19, 11, 11, 4, 11, 11, 3, 3,
-            3, 8, 7, 7, 40, 40, 9, 9, 4, 8, 9, 19, 19, 8, 41, 7, 9, 8, 4, 7, 41, 41, 9, 9, 11, 4, 8, 11, 3, 3,
-            3, 9, 9, 9, 9, 40, 9, 9, 9, 9, 9, 19, 19, 19, 41, 4, 9, 3, 8, 7, 3, 41, 41, 19, 11, 8, 8, 11, 3, 3,
-            9, 9, 8, 7, 4, 40, 40, 7, 3, 9, 9, 19, 19, 20, 41, 41, 9, 5, 8, 7, 4, 7, 41, 19, 11, 8, 8, 11, 3, 3,
-            9, 7, 8, 7, 4, 40, 40, 40, 7, 9, 22, 22, 40, 20, 20, 20, 41, 7, 8, 4, 7, 41, 41, 19, 19, 8, 8, 11, 3, 3,
-            9, 7, 8, 7, 4, 8, 40, 40, 7, 9, 22, 40, 40, 40, 40, 20, 41, 41, 5, 8, 41, 41, 41, 19, 19, 8, 4, 11, 8, 8,
-            9, 7, 8, 7, 7, 9, 9, 8, 21, 22, 40, 40, 40, 40, 40, 40, 8, 41, 41, 41, 41, 21, 21, 19, 8, 8, 8, 11, 8, 3,
-            9, 9, 24, 24, 24, 24, 9, 9, 21, 21, 22, 40, 40, 40, 40, 40, 11, 11, 11, 21, 21, 21, 21, 21, 8, 8, 8, 11, 11, 3,
-            7, 9, 24, 24, 24, 24, 24, 9, 9, 22, 22, 40, 40, 40, 40, 11, 11, 8, 9, 9, 11, 21, 21, 11, 8, 8, 8, 5, 11, 3,
-            3, 7, 9, 24, 24, 24, 24, 24, 9, 9, 9, 7, 9, 9, 9, 9, 8, 8, 9, 9, 8, 11, 11, 11, 8, 8, 8, 5, 11, 3,
-            3, 7, 7, 24, 24, 24, 24, 24, 8, 8, 9, 9, 7, 8, 8, 9, 8, 9, 9, 9, 3, 8, 11, 11, 8, 8, 3, 5, 11, 11,
-            3, 7, 7, 8, 9, 9, 8, 7, 4, 8, 8, 9, 9, 9, 7, 9, 9, 9, 8, 9, 8, 8, 8, 11, 11, 8, 8, 5, 3, 11,
-            3, 7, 7, 7, 8, 7, 8, 7, 7, 3, 8, 8, 3, 9, 9, 9, 9, 5, 9, 9, 8, 3, 5, 5, 11, 11, 11, 11, 11, 11,
-            3, 7, 7, 7, 8, 8, 8, 3, 7, 7, 4, 7, 3, 6, 6, 6, 9, 9, 9, 5, 4, 8, 8, 8, 4, 3, 3, 11, 8, 8,
 
-            2, 2, 10, 10, 10, 10, 10, 10, 10, 4, 4, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 2, 2,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 30, 30, 28, 30, 33, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 28, 32, 32, 33, 30, 30, 33, 0, 0, 0, 0, 0, 0, 0, 5,
-            4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 32, 32, 28, 30, 30, 33, 0, 0, 0, 0, 0, 0, 0, 4,
-            4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 32, 30, 30, 33, 0, 0, 0, 0, 0, 0, 0, 4,
-            10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4,
-            9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            6, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            10, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            2, 2, 7, 10, 10, 10, 7, 7, 7, 7, 7, 10, 10, 10, 7, 7, 7, 7, 7, 7, 10, 10, 7, 4, 4, 4, 7, 7, 2, 2,
+        FILE* rayfile = fopen("../assets/map/ray_file", "rb");
+        int L, W, H;
+        fread(&L, sizeof(int), 1, rayfile);
+        fread(&W, sizeof(int), 1, rayfile);
+        fread(&H, sizeof(int), 1, rayfile);
+        printf("%d %d %d\n", L, W, H);
 
-            2, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 33, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33, 0, 33, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            2, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2,
+        int* ssbo_chunk = calloc(L*W*H, sizeof(int));
 
-            2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2,
-        };
-        
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ssbo_chunk), &ssbo_chunk, GL_STATIC_DRAW);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo);
+        fread(ssbo_chunk, sizeof(int), L*W*H, rayfile);
 
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ssbo_chunk[0]) * L*W*H, ssbo_chunk, GL_STATIC_DRAW);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, game->RT.ssbo);
 
+    // game->RT.tSet_ReflectNopacity = loadTexture("../assets/tileset/rt_24ref.png");
+    // game->RT.tSet_EmmitNsmooth    = loadTexture("../assets/tileset/rt_24emm.png");
+    game->RT.tSet_ReflectNopacity = loadTexture("../assets/tileset/rt_reflectance.png");
+    game->RT.tSet_EmmitNsmooth    = loadTexture("../assets/tileset/rt_emmitance.png");
+    // glBindTexture(GL_TEXTURE_2D, game->RT.tSet_EmmitNsmooth);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // game->RT.tSet_ReflectNopacity
 
     glGenVertexArrays(1, &game->VertexArrayID);
 	glBindVertexArray(game->VertexArrayID);
@@ -291,7 +223,7 @@ void draw_map(game_t* game)
 
     glUniform3f(game->uni.camera_pos , (float)game->camera.position.x, (float)game->camera.position.y, (float)game->camera.position.z);
     glUniform2f(game->uni.in_world_size, 64.f/game->window.width*game->scale, 64.f/game->window.height*game->scale);
-    glUniform2f(game->uni.in_textr_size, 1.f/11, 1.f/11);
+    glUniform2f(game->uni.in_textr_size, 1.f/32, 1.f/32);
 
 
     for (int y=0; y < game->chunk_manager.height; y++)
@@ -320,33 +252,56 @@ void raytrace(game_t* game)
 {
     //raytrace to texture
     glUseProgram(game->RT.raytracer_progID);
-    glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer); //not real framebuffer tho
-    glBindImageTexture(0, game->RT.framebuffer, 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
-    glUniform1i(game->RT.uni_framebuffer, 0); //cause GL_TEXTURE0 but does not change tho
     glUniform1f(game->RT.uni_time, (float)glfwGetTime()); //cause GL_TEXTURE0 but does not change tho
 
-    // glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
-    // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo);
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, game->tileset_textureID);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    //block id data
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, game->RT.ssbo);
 
-    glDispatchCompute(game->window.width, game->window.height, 1); //run raytracer
-    // to make soimage has finished before read
-    // glBindImageTexture(0, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
-    // glBindImageTexture(0, );
+    //Textures to get data about how blocks look like
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, game->RT.tSet_ReflectNopacity);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, game->RT.tSet_EmmitNsmooth);
+    //uniform camera pos
+    glUniform3f(game->RT.uni_camerapos_raytrace, game->camera.position.x, game->camera.position.y, game->camera.position.z);
 
-    //draw texture
-
-    // glBindImageTexture(0, 0, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
-	// glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    glBindImageTexture(0, game->RT.framebuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    glBindImageTexture(1, game->RT.normalbuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    glDispatchCompute(game->window.width / 8, game->window.height / 8, 1); //run raytracer
 
 
+    glUseProgram(game->RT.denoiser_progID);
+    glUniform3f(game->RT.uni_camerashift_denoise, game->camera.shift.x, game->camera.shift.y, game->camera.shift.z);
+
+    //just raytraced
+    glBindImageTexture(1, game->RT.normalbuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    static bool current_order = 1;
+    if(current_order)
+    {
+        glBindImageTexture(2, game->RT.framebuffer_1, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+        glBindImageTexture(3, game->RT.framebuffer_2, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    }
+    else
+    {
+        glBindImageTexture(2, game->RT.framebuffer_2, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+        glBindImageTexture(3, game->RT.framebuffer_1, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    }
+    
+
+    // glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    glDispatchCompute(game->window.width / 8, game->window.height / 8, 1); //run raytracer
+    // glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    // to make so image has finished before read
+
+    //draw raytraced and denoised to texture data as quad
     glUseProgram(game->hud_progID);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer);
+    if(current_order){
+        glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer_1);
+    } else {
+        glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer_2);
+    }
+    current_order = !current_order;
     glUniform1i(game->uni.hud_set, 0); //cause GL_TEXTURE0
 
 glEnableVertexAttribArray(0);
@@ -380,13 +335,16 @@ void draw(game_t* game)
 
 
     // glEnable(GL_DEPTH_TEST);
-    // glUseProgram(game->tile_progID);
+    glUseProgram(game->tile_progID);
+    
+    draw_entities(game);
     // draw_map(game);
-    // draw_entities(game);
 
     // glDisableVertexAttribArray(0);
     // glDisableVertexAttribArray(1);
 
+
+    
     raytrace(game);
 
     // Sleep(1);

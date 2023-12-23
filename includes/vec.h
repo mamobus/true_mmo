@@ -59,3 +59,4 @@ vec3d v3dsub(vec3d a, vec3d b);
 vec3d v3dscale(vec3d v, double scale);
 double v3ddot(vec3d a, vec3d b);
 vec3d v3dnorm(vec3d v);
+vec3d v3dcross(vec3d a, vec3d b);

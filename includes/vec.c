@@ -129,3 +129,11 @@ vec3d v3dnorm(vec3d v)
 	vec3d res = v3dscale(v, scale);
 	return res;
 }
+
+vec3d v3dcross(vec3d a, vec3d b) {
+   vec3d res = {0};
+   res.x = a.y*b.z - a.z*b.y;
+   res.y = a.z*b.x - a.x*b.z;
+   res.z = a.x*b.y - a.y*b.x;
+   return res;
+}

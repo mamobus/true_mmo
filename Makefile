@@ -133,11 +133,17 @@ builds/imorter.exe:
 # full:
 import_: importer/import.c
 	gcc importer/import.c $(special_flags) -o builds/imorter.exe
-	builds/imorter.exe
+	"./builds/imorter.exe"
+
 
 run: client_
 	cd ./builds && \
 	client.exe
+
+init:
+	mkdir builds
+	cd ./client && \
+	mkdir precompiled
 
 opt:
 	gcc $(client_flags) $(client_src) $(client_libs) $(special_flags_optimized)

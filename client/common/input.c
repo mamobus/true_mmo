@@ -22,6 +22,10 @@ void add_dir(vec3d dir)
     game.player.dir.x += dir.x;
     game.player.dir.y += dir.y;
     game.player.dir.z += dir.z;
+
+    // game.player.pos.x += dir.x * 0.0;
+    // game.player.pos.y += dir.y * 0.0;
+    // game.player.pos.z += dir.z * 0.0;
 }
 void sub_dir(vec3d dir)
 {
@@ -80,6 +84,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS){
+        // game.player.pos.z += 5.0;
         game.player.vel.z = +3.33;
     }
     if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE){

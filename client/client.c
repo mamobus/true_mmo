@@ -55,7 +55,7 @@ game_t game = {0};
 
 int main()
 {
-    game.player.pos.z = 1;
+    game.player.pos.z = 4;
 
     create_window(&game);
     // Sleep(1000);
@@ -126,8 +126,8 @@ int main()
         //     pframe = player_ent->sprite_num;
         // }
         // printf("%d ", player_ent->sprite_num);
-        player_ent->pos   = game.player.pos;
-        player_ent->state = game.player.state;
+        // player_ent->pos   = game.player.pos;
+        // player_ent->state = game.player.state;
         // if()
 
         entities_prepare_for_drawing(&game);
