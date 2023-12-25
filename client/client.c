@@ -56,6 +56,8 @@ game_t game = {0};
 int main()
 {
     game.player.pos.z = 4;
+    game.player.pos.x = 9;
+    game.player.pos.y = 9;
 
     create_window(&game);
     // Sleep(1000);
@@ -86,7 +88,7 @@ int main()
     entity_t player = {0};
     player.id = 1;
     player.state = PLAYER_MOVE_BIT | PLAYER_LEFT_BIT | PLAYER_DOWN_BIT;
-    game.player.state = PLAYER_MOVE_BIT;
+    game.player.state = PLAYER_MOVE_BIT | PLAYER_LEFT_BIT | PLAYER_DOWN_BIT;
     // player.state = MOB_MOVE_BIT | MOB_LEFT_BIT;
     // player.
 
@@ -111,6 +113,7 @@ int main()
         //update mob but for now its player
         entity_t* player_ent = entity_find(1, 101, &game);
         player_set_direction_bits(&game.player);
+        // player_set_action_bits(&game.player);
         
 
         // static int pstate = 0;
@@ -126,8 +129,8 @@ int main()
         //     pframe = player_ent->sprite_num;
         // }
         // printf("%d ", player_ent->sprite_num);
-        // player_ent->pos   = game.player.pos;
-        // player_ent->state = game.player.state;
+        player_ent->pos   = game.player.pos;
+        player_ent->state = game.player.state;
         // if()
 
         entities_prepare_for_drawing(&game);

@@ -14,21 +14,36 @@ uniform vec3 camera_pos;
 uniform vec2 in_world_size;
 uniform vec2 in_textr_size;
 
-mat3 transform = mat3(
-    +1.0, -0.5,  -1.0,
-    -1.0, -0.5,  -1.0,
-    +0.0, +1.0,  +0.0
-);
+// mat3 transform = mat3(
+//     +1.0, -0.5,  -1.0,
+//     -1.0, -0.5,  -1.0,
+//     +0.0, +1.0,  +0.0
+// );
 
 
 void main(){
 
-    //apply camera and use matrix 
-    vec3 clip_coords    = transform * (vertex_coords - camera_pos);
-         clip_coords.xy = clip_coords.xy * in_world_size.xy / 2;
-    
+    //apply camera and use matrix
+	vec3 ray_dir    = normalize(vec3(-0.612375, -0.612375, -0.5));
+	// vec3 ray_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
+
+	vec3 horizline = normalize(vec3(1,-1,0));
+	vec3 vertiline = normalize(cross(ray_dir, horizline));
+	//they define plane of rendeting
+	
+	float view_width  = 1920 / 32.0; //in block_diags
+	float view_height = 1080 / 32.0; //in blocks
+
+    vec3 vertexRelativeToCameraPos = vertex_coords - camera_pos;
+    // vec3 vertexRelativeToCameraPos = vertex_coords - ray_dir * dot(ray_dir, vertex_coords);
+    vec3 clip_coords;
+    clip_coords.x = dot(vertexRelativeToCameraPos, horizline) / view_width  / 3;
+    clip_coords.y = dot(vertexRelativeToCameraPos, vertiline) / view_height / 3;
+    clip_coords.z = dot(vertexRelativeToCameraPos, ray_dir) / 3;
     //for propper sorting
-    clip_coords.z /= 1000;
+
+    // vec3 clip_coords    = transform * (vertex_coords - camera_pos);
+    //      clip_coords.xy = clip_coords.xy * in_world_size.xy / 2;
 
 
     vs_out.height_diff = vertex_coords.z - camera_pos.z;

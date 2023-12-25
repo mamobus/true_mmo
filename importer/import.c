@@ -97,7 +97,8 @@ int main()
                         {
                             x = (float)column;
                             y = (float)line;
-                            z = (float) (-layer->offsety / 12.0);
+                            // z = (float) (-layer->offsety / 12.0);
+                            z = (float) (-layer->offsety / 16.0);
                             val = (float)data[line*width + column] - 1;
                             // print("x %2.1f y %2.1f z %2.1f\n", x, y, z);
                             // print("data[line*width + column] %f\n", val);

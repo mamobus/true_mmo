@@ -7,6 +7,7 @@
 void player_set_direction_bits (player_t* player)
 {
     int newdirbits = 0;
+    int olddirbits = (player->state) & (PLAYER_DIRECTION_BITMASK);
 
     // double x = +dir.x - dir.y / 2; //x down-right
     double x = +player->dir.x - player->dir.y / 2; //x down-right
@@ -65,9 +66,16 @@ void player_set_direction_bits (player_t* player)
     // {
     //     player.
     // }
-    player->state = (player->state&PLAYER_ACTION_BITMASK) | (newdirbits);
-
+    if(fabs(player->dir.x*player->dir.x + player->dir.y*player->dir.y) < 0.01)
+    {
+        player->state = (PLAYER_IDLE_BIT) | (olddirbits);
+    }
+    else{
+        player->state = (PLAYER_MOVE_BIT) | (newdirbits);
+    }
 }
+
+
 
 animinfo_t get_player_animinfo(int state)
 {
@@ -328,7 +336,7 @@ void player_add2draw_query(entity_t* player, draw_entity_t** draw_queue, game_t*
 
     head.pos.x = player->pos.x;
     head.pos.y = player->pos.y;
-    head.pos.z = player->pos.z + 1.21;
+    head.pos.z = player->pos.z + 12.0;
 
     head.sprite_num = (float) get_head_shift(player->state & PLAYER_DIRECTION_BITMASK);
     // printf("head sprite_num %d\n", head.sprite_num);

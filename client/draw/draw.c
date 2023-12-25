@@ -40,13 +40,13 @@ void setup_draw(game_t* game)
     game->RT.uni_camerashift_denoise    = glGetUniformLocation(game->RT.denoiser_progID, "camerashift");
     // game->RT.uni_width   = glGetUniformLocation(game->RT.raytracer_progID, "width" );
     // game->RT.uni_height  = glGetUniformLocation(game->RT.raytracer_progID, "height");
-    game->RT.uni_time    = glGetUniformLocation(game->RT.raytracer_progID, "time");
+    game->RT.uni_time     = glGetUniformLocation(game->RT.raytracer_progID, "time");
+    game->RT.uni_count    = glGetUniformLocation(game->RT.raytracer_progID, "count");
             //generating all frame-size buffers (color, denoised final frame, normals) that used for raytracing
             game->RT.framebuffer   = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
             game->RT.framebuffer_1 = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
             game->RT.normalbuffer  = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
             game->RT.framebuffer_2 = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
-    glGenBuffers(1, &game->RT.vbo);
     const vertex2 verts_for_simples_texture [6] = {
         {{-1,-1}, {+0,+0}},
         {{-1,+1}, {+0,+1}},
@@ -55,9 +55,11 @@ void setup_draw(game_t* game)
         {{+1,+1}, {+1,+1}},
         {{+1,-1}, {+1,+0}},
     };
+    glGenBuffers(1, &game->RT.vbo);
     glBindBuffer(GL_ARRAY_BUFFER, game->RT.vbo);
     glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(vertex2), verts_for_simples_texture, GL_STATIC_DRAW);
 
+    glGenBuffers(1, &game->RT.ssbo_for_distances_from_camera);
 
         glGenBuffers(1, &game->RT.ssbo);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
@@ -68,7 +70,7 @@ void setup_draw(game_t* game)
         fread(&L, sizeof(int), 1, rayfile);
         fread(&W, sizeof(int), 1, rayfile);
         fread(&H, sizeof(int), 1, rayfile);
-        printf("%d %d %d\n", L, W, H);
+        printf("L:%d W:%d H:%d\n", L, W, H);
 
         int* ssbo_chunk = calloc(L*W*H, sizeof(int));
 
@@ -238,6 +240,7 @@ void draw_map(game_t* game)
 
 void draw_entities(game_t* game)
 {
+    glUniform3f(game->uni.camera_pos , (float)game->camera.position.x, (float)game->camera.position.y, (float)game->camera.position.z);
     for (int i=0; i < vector_size(game->entity_manager.elist); i++)
     {
         draw_mob_list(game, &game->entity_manager.elist[i]);
@@ -253,9 +256,11 @@ void raytrace(game_t* game)
     //raytrace to texture
     glUseProgram(game->RT.raytracer_progID);
     glUniform1f(game->RT.uni_time, (float)glfwGetTime()); //cause GL_TEXTURE0 but does not change tho
+    glUniform1i(game->RT.uni_count, vector_size(game->entity_manager.distances_from_camera)); //cause GL_TEXTURE0 but does not change tho
 
     //block id data
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, game->RT.ssbo);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo_for_distances_from_camera);
 
     //Textures to get data about how blocks look like
     glActiveTexture(GL_TEXTURE0);
@@ -263,34 +268,42 @@ void raytrace(game_t* game)
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, game->RT.tSet_EmmitNsmooth);
     //uniform camera pos
+
     glUniform3f(game->RT.uni_camerapos_raytrace, game->camera.position.x, game->camera.position.y, game->camera.position.z);
 
     glBindImageTexture(0, game->RT.framebuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     glBindImageTexture(1, game->RT.normalbuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     glDispatchCompute(game->window.width / 8, game->window.height / 8, 1); //run raytracer
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 
     glUseProgram(game->RT.denoiser_progID);
     glUniform3f(game->RT.uni_camerashift_denoise, game->camera.shift.x, game->camera.shift.y, game->camera.shift.z);
 
     //just raytraced
-    glBindImageTexture(1, game->RT.normalbuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    // glBindImageTexture(1, game->RT.normalbuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
     static bool current_order = 1;
     if(current_order)
     {
         glBindImageTexture(2, game->RT.framebuffer_1, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         glBindImageTexture(3, game->RT.framebuffer_2, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
     else
     {
         glBindImageTexture(2, game->RT.framebuffer_2, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         glBindImageTexture(3, game->RT.framebuffer_1, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
     
 
-    // glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     glDispatchCompute(game->window.width / 8, game->window.height / 8, 1); //run raytracer
-    // glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     // to make so image has finished before read
 
     //draw raytraced and denoised to texture data as quad
@@ -298,8 +311,10 @@ void raytrace(game_t* game)
     glActiveTexture(GL_TEXTURE0);
     if(current_order){
         glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer_1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     } else {
         glBindTexture(GL_TEXTURE_2D, game->RT.framebuffer_2);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
     current_order = !current_order;
     glUniform1i(game->uni.hud_set, 0); //cause GL_TEXTURE0
@@ -324,8 +339,11 @@ void draw(game_t* game)
     // glClear(GL_COLOR_BUFFER_BIT);
     // glBindVertexArray(game->VertexArrayID);
     
-    // glEnableVertexAttribArray(0);
-    // glEnableVertexAttribArray(1);
+    raytrace(game);
+
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
     
     // glEnable(GL_DEPTH_TEST);
@@ -340,12 +358,11 @@ void draw(game_t* game)
     draw_entities(game);
     // draw_map(game);
 
-    // glDisableVertexAttribArray(0);
-    // glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
 
 
     
-    raytrace(game);
 
     // Sleep(1);
 } 

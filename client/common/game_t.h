@@ -25,13 +25,13 @@ typedef struct
     GLuint framebuffer_1;
     GLuint normalbuffer;
     GLuint framebuffer_2;
-    GLuint uni_time;
+    GLuint uni_time, uni_count;
     GLuint uni_camerapos_raytrace;
     GLuint uni_camerashift_denoise;
     GLuint vbo; //6 verts to render final texture
     GLuint tSet_ReflectNopacity, tSet_EmmitNsmooth;
 
-    GLuint FBO, drawn_ents;
+    GLuint FBO, ssbo_for_distances_from_camera, drawn_ents;
     
     // int voxel_height;
     // int voxels;// 16*16

@@ -217,7 +217,7 @@ void update_player_for_time(game_t* game, double time)
     // player_b.side = 1.0;
 
     collider_cylinder_t player = {0};
-    player.center = game->player.pos;
+    player.center = v3dadd(game->player.pos, (vec3d){0,0,0});
     player.height = 2.0;
     player.radius = 0.33;
 
@@ -275,6 +275,7 @@ void update_player_for_time(game_t* game, double time)
                     //then clearly should push player upwards
 
                     separator = (vec3d){0,0,height_diff}; // then separator is just pushing player up
+                    game->player.vel.z = 0;
                 }
                 
                 if(separator.x > 0.05 or separator.y > 0.05 or separator.z > 0.05)
@@ -294,7 +295,7 @@ void update_player_for_time(game_t* game, double time)
                 // {
                 //    f("SEP %.2f %.2f %.2f\n", separator.x, separator.y, separator.z);
                 // }
-                player.center = game->player.pos;
+                player.center = v3dadd(game->player.pos, (vec3d){0,0,0});
 // print
             }
         }

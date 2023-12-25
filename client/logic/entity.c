@@ -10,6 +10,7 @@ void entity_create_manager(game_t* game)
     // mob_info_init();
     game->entity_manager.elist = vector_create();
     game->entity_manager.cosmetic = vector_create();
+    game->entity_manager.distances_from_camera = vector_create();
 }
 
 void entity_destroy_manager(game_t* game)
@@ -174,6 +175,7 @@ void entities_prepare_for_drawing(game_t* game)
 
     //so now ents can re-add their cosmetic for drawing if it still exists
     cosmetic_queue_clear(game);
+    vector_erase(&entity_manager->distances_from_camera, 0, vector_size(entity_manager->distances_from_camera));
 
     for(int i=0; i < vector_size(entity_manager->elist); i++)
     {
@@ -189,7 +191,6 @@ void entities_prepare_for_drawing(game_t* game)
             case 1:
                 player_update(&entity_manager->elist[i].entities[j], game);
                 player_add2draw_query(&entity_manager->elist[i].entities[j], &entity_manager->elist[i].draw_queue, game);
-                // player_add2draw_query()
                 break;
 
             case 2:
@@ -209,29 +210,35 @@ void entities_prepare_for_drawing(game_t* game)
 
             	vec3d ray_dir    = v3dnorm((vec3d){-0.612375, -0.612375, -0.5});
                 // vec3 ray_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
-                vec3d camera_relative_position = v3dscale((vec3d){1, 1, 1}, 15.0);
+                vec3d camera_pos = game->camera.position;
+                vec3d entity_pos = entity_manager->elist[i].entities[j].pos;
 
-                vec3d horizline = v3dnorm((vec3d){1,-1,0});
-                vec3d vertiline = v3dnorm(v3dcross(ray_dir, horizline));
+                vec3d relative_ent_pos = v3dsub(entity_pos, camera_pos);
+
+                double distance_from_camera_plane = v3ddot(ray_dir, relative_ent_pos);
+
+                vector_add(&entity_manager->distances_from_camera, (float) distance_from_camera_plane);
+                // vec3d horizline = v3dnorm((vec3d){1,-1,0});
+                // vec3d vertiline = v3dnorm(v3dcross(ray_dir, horizline));
                 //they define plane of rendeting
                 
-                vec3d position = entity_manager->elist[i].entities[j].pos;
-
-                float view_width  = 1920 / 32.0; //in block_diags
-                float view_height = 1080 / 32.0; //in blocks
+                // float view_width  = 1920 / 32.0; //in block_diags
+                // float view_height = 1080 / 32.0; //in blocks
 
                 //proj = pos - ray_dir * dot(ray_dir, pos)
-                vec3d screenPojection = v3dsub(position, v3dscale(ray_dir, v3ddot(ray_dir, position)));
-                vec2d screenshift;
-                screenshift.x = v3ddot(screenPojection, horizline);
-                screenshift.y = v3ddot(screenPojection, vertiline);
+                // vec3d screenPojection = v3dsub(entity_pos, v3dscale(ray_dir, v3ddot(ray_dir, entity_pos)));
+                // vec2d screenshift;
+                // screenshift.x = v3ddot(screenPojection, horizline);
+                // screenshift.y = v3ddot(screenPojection, vertiline);
         }
         
         glBindBuffer(GL_ARRAY_BUFFER, entity_manager->elist[i].vbo);
-        glBufferData(GL_ARRAY_BUFFER, vector_size(entity_manager->elist[i].draw_queue) * sizeof(draw_entity_t), entity_manager->elist[i].draw_queue, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vector_size(entity_manager->elist[i].draw_queue)*sizeof(draw_entity_t), entity_manager->elist[i].draw_queue, GL_DYNAMIC_DRAW);
     }
 
     // printf("buffering started\n");
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, game->RT.ssbo_for_distances_from_camera);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, vector_size(entity_manager->distances_from_camera) * sizeof(float), entity_manager->distances_from_camera, GL_DYNAMIC_DRAW);
 
     for(int i=0; i < vector_size(entity_manager->cosmetic); i++)
     {

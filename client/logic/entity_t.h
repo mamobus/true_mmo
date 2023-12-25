@@ -74,6 +74,8 @@ typedef struct entity_manager_t
     //things that are drawn on top of entity sprite, such as visual effects, armor or emotion emojis
     cosmetic_list_t* cosmetic;
 
+    float* distances_from_camera;
+
     GLuint vbo;
     draw_entity_t test;
 } entity_manager_t;
