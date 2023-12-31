@@ -41,8 +41,15 @@ void setup_draw(game_t* game)
     // game->RT.uni_width   = glGetUniformLocation(game->RT.raytracer_progID, "width" );
     // game->RT.uni_height  = glGetUniformLocation(game->RT.raytracer_progID, "height");
     game->RT.uni_time     = glGetUniformLocation(game->RT.raytracer_progID, "time");
-    game->RT.uni_count    = glGetUniformLocation(game->RT.raytracer_progID, "count");
-            //generating all frame-size buffers (color, denoised final frame, normals) that used for raytracing
+    game->RT.uni_count    = glGetUniformLocation(game->RT.raytracer_progID, "Ecount");
+    //generating all frame-size buffers (color, denoised final frames, normals, fbo for entities) that used for raytracing
+    glGenFramebuffers(1, &game->RT.FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, game->RT.FBO);
+    game->RT.drawn_ents    = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA, GL_UNSIGNED_BYTE); //texture for framebuffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, game->RT.drawn_ents, 0);
+    // glBindBuffer(GL_ARRAY_BUFFER, game->RT.FBO);
+    // glBindFramebuffer()
+    // gldraw
             game->RT.framebuffer   = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
             game->RT.framebuffer_1 = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
             game->RT.normalbuffer  = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
@@ -81,8 +88,10 @@ void setup_draw(game_t* game)
 
     // game->RT.tSet_ReflectNopacity = loadTexture("../assets/tileset/rt_24ref.png");
     // game->RT.tSet_EmmitNsmooth    = loadTexture("../assets/tileset/rt_24emm.png");
-    game->RT.tSet_ReflectNopacity = loadTexture("../assets/tileset/rt_reflectance.png");
-    game->RT.tSet_EmmitNsmooth    = loadTexture("../assets/tileset/rt_emmitance.png");
+    // game->RT.tSet_ReflectNopacity = loadTexture("../assets/tileset/rt_reflectance.png");
+    // game->RT.tSet_EmmitNsmooth    = loadTexture("../assets/tileset/rt_emmitance.png");
+    game->RT.tSet_ReflectNopacity = loadTexture("../assets/tileset/rt_reflectance_plain.png");
+    game->RT.tSet_EmmitNsmooth    = loadTexture("../assets/tileset/rt_emmitance_plain.png");
     // glBindTexture(GL_TEXTURE_2D, game->RT.tSet_EmmitNsmooth);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -116,7 +125,7 @@ void setup_draw(game_t* game)
     // glEnable(GL_POLYGON_SMOOTH);
     // glclient
 
-    glClearColor(0.19, 0.82, 0.69, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
 
     // print_opengl_param(GL_MAX_TEXTURE_SIZE);
     // print_opengl_param(GL_POINT_SIZE);
@@ -257,7 +266,7 @@ void raytrace(game_t* game)
     glUseProgram(game->RT.raytracer_progID);
     glUniform1f(game->RT.uni_time, (float)glfwGetTime()); //cause GL_TEXTURE0 but does not change tho
     glUniform1i(game->RT.uni_count, vector_size(game->entity_manager.distances_from_camera)); //cause GL_TEXTURE0 but does not change tho
-
+    // assert(vector_size(game->entity_manager.distances_from_camera) != 0);
     //block id data
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, game->RT.ssbo);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo_for_distances_from_camera);
@@ -267,6 +276,10 @@ void raytrace(game_t* game)
     glBindTexture(GL_TEXTURE_2D, game->RT.tSet_ReflectNopacity);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, game->RT.tSet_EmmitNsmooth);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, game->RT.drawn_ents);
+    // layout(binding = 2) uniform sampler2D drawn_ents_frame; 
+
     //uniform camera pos
 
     glUniform3f(game->RT.uni_camerapos_raytrace, game->camera.position.x, game->camera.position.y, game->camera.position.z);
@@ -339,7 +352,6 @@ void draw(game_t* game)
     // glClear(GL_COLOR_BUFFER_BIT);
     // glBindVertexArray(game->VertexArrayID);
     
-    raytrace(game);
 
 
     glEnableVertexAttribArray(0);
@@ -355,7 +367,10 @@ void draw(game_t* game)
     // glEnable(GL_DEPTH_TEST);
     glUseProgram(game->tile_progID);
     
+    glBindFramebuffer(GL_FRAMEBUFFER, game->RT.FBO);
+    glClear(GL_COLOR_BUFFER_BIT);
     draw_entities(game);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // draw_map(game);
 
     glDisableVertexAttribArray(0);
@@ -364,6 +379,7 @@ void draw(game_t* game)
 
     
 
+    raytrace(game);
     // Sleep(1);
 } 
 

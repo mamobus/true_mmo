@@ -14,6 +14,7 @@ int main()
 {
     // char* cute_map_file = "assets/map/map.tmj";
     // char* cute_map_file = "assets/map/new_map.tmj";
+    // char* cute_map_file = "assets/map/rtmap1tmj.tmj";
     char* cute_map_file = "assets/map/rtmap.tmj";
 
 

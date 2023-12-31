@@ -24,7 +24,7 @@ uniform vec2 in_textr_size;
 void main(){
 
     //apply camera and use matrix
-	vec3 ray_dir    = normalize(vec3(-0.612375, -0.612375, -0.5));
+	vec3 ray_dir    = normalize(vec3(-0.612375, -0.612375, 0));
 	// vec3 ray_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
 
 	vec3 horizline = normalize(vec3(1,-1,0));

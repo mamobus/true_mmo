@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "rtmap.tmj",
+    "activeFile": "rtmap1tmj.tmj",
     "expandedProjectPaths": [
         "."
     ],
@@ -12,12 +12,15 @@
         "": {
             "scaleInDock": 1
         },
+        "#rt_reflectance": {
+            "scaleInDock": 1
+        },
         "map.tmj": {
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 748,
-                "y": 342.6666666666667
+                "x": 747.3333333333333,
+                "y": 150
             }
         },
         "map.tmj#tileset": {
@@ -27,19 +30,19 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 496,
-                "y": 231.75
+                "x": 495.5,
+                "y": 231
             }
         },
         "new_map.tmj#stolen_tileset": {
             "scaleInDock": 1
         },
         "rtmap.tmj": {
-            "scale": 3,
-            "selectedLayer": 0,
+            "scale": 1,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 479.83333333333326,
-                "y": 207.83333333333331
+                "x": 581,
+                "y": 131
             }
         },
         "rtmap.tmj#rt24": {
@@ -51,12 +54,24 @@
         "rtmap.tmj#rtset": {
             "scaleInDock": 1
         },
+        "rtmap1tmj.tmj": {
+            "scale": 1.5,
+            "selectedLayer": 8,
+            "viewCenter": {
+                "x": 340.66666666666663,
+                "y": 228.66666666666669
+            }
+        },
+        "rtmap1tmj.tmj#rt_reflectance": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "rtmap24.tmj": {
             "scale": 0.75,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 359.33333333333326,
-                "y": 150
+                "x": 357.3333333333333,
+                "y": 148
             }
         },
         "rtmap24.tmj#rt24": {
@@ -87,19 +102,23 @@
     "map.height": 30,
     "map.lastUsedFormat": "json",
     "map.orientation": null,
-    "map.tileHeight": 12,
-    "map.tileWidth": 24,
+    "map.tileHeight": 16,
+    "map.tileWidth": 32,
     "mapScene.enableWorlds": true,
     "openFiles": [
         "rtmap.tmj",
-        "rtmap24.tmj"
+        "rtmap24.tmj",
+        "rtmap1tmj.tmj",
+        "map.tmj",
+        "new_map.tmj"
     ],
     "project": "untiled.tiled-project",
     "recentFiles": [
-        "rtmap24.tmj",
         "rtmap.tmj",
-        "map.tmj",
+        "rtmap24.tmj",
         "new_map.tmj",
+        "map.tmj",
+        "rtmap1tmj.tmj",
         "tileset.tmj",
         "untitled.tmj"
     ],

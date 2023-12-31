@@ -4,6 +4,8 @@
 #include "player_e.c"
 #include "effect.c"
 
+#define OneTimePrintfVec(v) static int v##sb=0; do {if(v##sb == 0) {v##sb = 1; printf("%s: %.2lf %.2lf %.2lf\n", #v, v.x, v.y, v.z);}} while(0)
+#define OneTimePrintf(v) static int v##sb=0; do {if(v##sb == 0) {v##sb = 1; printf("%s: %.2lf\n", #v, v);}} while(0)
 
 void entity_create_manager(game_t* game)
 {
@@ -208,25 +210,32 @@ void entities_prepare_for_drawing(game_t* game)
             }
 
 
-            	vec3d ray_dir    = v3dnorm((vec3d){-0.612375, -0.612375, -0.5});
-                // vec3 ray_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
+            	vec3d camera_dir    = v3dnorm((vec3d){-0.612375, -0.612375, -0.0});
+                // vec3 camera_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
                 vec3d camera_pos = game->camera.position;
                 vec3d entity_pos = entity_manager->elist[i].entities[j].pos;
 
                 vec3d relative_ent_pos = v3dsub(entity_pos, camera_pos);
 
-                double distance_from_camera_plane = v3ddot(ray_dir, relative_ent_pos);
+                double distance_from_camera_plane = v3ddot(camera_dir, relative_ent_pos);
 
                 vector_add(&entity_manager->distances_from_camera, (float) distance_from_camera_plane);
+
+                OneTimePrintfVec(camera_dir);
+                OneTimePrintfVec(camera_pos);
+                OneTimePrintfVec(entity_pos);
+                OneTimePrintfVec(relative_ent_pos);
+                OneTimePrintf(distance_from_camera_plane);
+                
                 // vec3d horizline = v3dnorm((vec3d){1,-1,0});
-                // vec3d vertiline = v3dnorm(v3dcross(ray_dir, horizline));
+                // vec3d vertiline = v3dnorm(v3dcross(camera_dir, horizline));
                 //they define plane of rendeting
                 
                 // float view_width  = 1920 / 32.0; //in block_diags
                 // float view_height = 1080 / 32.0; //in blocks
 
-                //proj = pos - ray_dir * dot(ray_dir, pos)
-                // vec3d screenPojection = v3dsub(entity_pos, v3dscale(ray_dir, v3ddot(ray_dir, entity_pos)));
+                //proj = pos - camera_dir * dot(camera_dir, pos)
+                // vec3d screenPojection = v3dsub(entity_pos, v3dscale(camera_dir, v3ddot(camera_dir, entity_pos)));
                 // vec2d screenshift;
                 // screenshift.x = v3ddot(screenPojection, horizline);
                 // screenshift.y = v3ddot(screenPojection, vertiline);
