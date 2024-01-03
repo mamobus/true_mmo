@@ -120,7 +120,12 @@ int main()
     fclose(chunk_file);
     fclose(manager_file);
 
-    for (cute_tiled_layer_t* layer = &cute_map->layers[0]; layer != NULL; layer = layer->next)
+    int* blocks = calloc(width*height*layer_count, sizeof(int));
+    int* SDF    = calloc(width*height*layer_count, sizeof(int));
+
+    //not efficient order of operations but who cares
+    int current_layer_num = 0;
+    for (cute_tiled_layer_t* layer = &cute_map->layers[0]; layer != NULL; layer = layer->next, current_layer_num++)
     {
         //copy layer data from current layer to rayfile
         data = layer->data;
@@ -129,10 +134,37 @@ int main()
             for(int line = 0; line < cute_map->height; line++)
             {   
                 //but to rayfile write always
-                assert(fwrite(&data[column*width + line], sizeof(int), 1, rayworld_file)==1);
+                float f_voxel = (float) (data[column*width + line] - 1);
+                assert(fwrite(&f_voxel, sizeof(float), 1, rayworld_file)==1);
+                
+                // blocks[current_layer_num * width*height + column*width + line] = data[column*width + line];
+                // SDF[current_layer_num * width*height + column*width + line] = 1;
             }
         }
     }
+
+    for (int layer_num = 0; layer_num != layer_count; layer_num++)
+    {
+        //copy layer data from current layer to rayfile
+        // data = layer->data;
+        for(int column = 0; column < width; column++)
+        {
+            for(int line = 0; line < height; line++)
+            {   
+                //but to rayfile write always
+                float f_sdf = (float) (1);
+                assert(fwrite(&f_sdf, sizeof(float), 1, rayworld_file)==1);
+            }
+        }
+    }
+
+    //so whole world is in grid. Lets calcute SDF!
+
+
+
+
+
+
     fclose(rayworld_file);
     cute_tiled_free_map(cute_map);
 

@@ -68,8 +68,6 @@ void setup_draw(game_t* game)
 
     glGenBuffers(1, &game->RT.ssbo_for_distances_from_camera);
 
-        glGenBuffers(1, &game->RT.ssbo);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
         //4 * 4 * 1
 
         FILE* rayfile = fopen("../assets/map/ray_file", "rb");
@@ -79,12 +77,20 @@ void setup_draw(game_t* game)
         fread(&H, sizeof(int), 1, rayfile);
         printf("L:%d W:%d H:%d\n", L, W, H);
 
-        int* ssbo_chunk = calloc(L*W*H, sizeof(int));
+        float* ssbo_chunks = calloc(L*W*H, sizeof(float));
+        float*  sdf_chunks = calloc(L*W*H, sizeof(float));
 
-        fread(ssbo_chunk, sizeof(int), L*W*H, rayfile);
+        fread(ssbo_chunks, sizeof(float), L*W*H, rayfile);
+        fread(sdf_chunks , sizeof(float), L*W*H, rayfile);
 
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ssbo_chunk[0]) * L*W*H, ssbo_chunk, GL_STATIC_DRAW);
+            glGenBuffers(1, &game->RT.ssbo);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(ssbo_chunks[0]) * L*W*H, ssbo_chunks, GL_STATIC_DRAW);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, game->RT.ssbo);
+            glGenBuffers(1, &game->RT.sdf);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.sdf);
+        glBufferData(GL_SHADER_STORAGE_BUFFER,  sizeof(sdf_chunks[0]) * L*W*H, sdf_chunks , GL_STATIC_DRAW);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, game->RT.sdf);
 
     // game->RT.tSet_ReflectNopacity = loadTexture("../assets/tileset/rt_24ref.png");
     // game->RT.tSet_EmmitNsmooth    = loadTexture("../assets/tileset/rt_24emm.png");
@@ -270,6 +276,7 @@ void raytrace(game_t* game)
     //block id data
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, game->RT.ssbo);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, game->RT.ssbo_for_distances_from_camera);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, game->RT.sdf);
 
     //Textures to get data about how blocks look like
     glActiveTexture(GL_TEXTURE0);
@@ -288,7 +295,7 @@ void raytrace(game_t* game)
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     glBindImageTexture(1, game->RT.normalbuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    glDispatchCompute(game->window.width / 8, game->window.height / 8, 1); //run raytracer
+    glDispatchCompute((game->window.width+1) / 8, (game->window.height+1) / 8, 1); //run raytracer
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 
@@ -315,7 +322,7 @@ void raytrace(game_t* game)
     
 
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    glDispatchCompute(game->window.width / 8, game->window.height / 8, 1); //run raytracer
+    glDispatchCompute((game->window.width+1) / 16, (game->window.height+1) / 8, 1); //run raytracer
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     // to make so image has finished before read
 

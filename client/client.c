@@ -33,7 +33,7 @@ void print_fps()
     frames++;
     if (stop-start > 1.0) //every 4 seconds
     {
-        // printf("FPS=%.2lf MSPF=%lf\n", ((double)frames)/(stop-start), 1000*(stop-start)/((double)frames));
+        printf("FPS=%.2lf MSPF=%lf\n", ((double)frames)/(stop-start), 1000*(stop-start)/((double)frames));
         // printf("vel %.2lf %.2lf %.2lf\n", game.player.vel.x, game.player.vel.y, game.player.vel.z);
         // printf("pos %.2lf %.2lf %.2lf\n", game.player.pos.x, game.player.pos.y, game.player.pos.z);
         // printf("acl %.2lf %.2lf %.2lf\n", game.player.acl.x, game.player.acl.y, game.player.acl.z);

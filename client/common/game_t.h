@@ -37,7 +37,7 @@ typedef struct
     // int voxels;// 16*16
     // int width, height;
     int* data;
-    GLuint ssbo, uni_ssbo;
+    GLuint sdf, ssbo, uni_ssbo;
 } raytracer;
 
 typedef struct uniforms_t
