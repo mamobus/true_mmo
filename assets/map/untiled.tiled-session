@@ -19,8 +19,8 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 747.3333333333333,
-                "y": 150
+                "x": 511.66666666666663,
+                "y": 129
             }
         },
         "map.tmj#tileset": {
@@ -30,8 +30,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 495.5,
-                "y": 231
+                "x": 496,
+                "y": 231.75
             }
         },
         "new_map.tmj#stolen_tileset": {
@@ -41,8 +41,8 @@
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 581,
-                "y": 131
+                "x": 479.5,
+                "y": 207.5
             }
         },
         "rtmap.tmj#rt24": {
@@ -56,10 +56,10 @@
         },
         "rtmap1tmj.tmj": {
             "scale": 1.5,
-            "selectedLayer": 8,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 340.66666666666663,
-                "y": 228.66666666666669
+                "x": 339.3333333333333,
+                "y": 227.3333333333333
             }
         },
         "rtmap1tmj.tmj#rt_reflectance": {
@@ -67,11 +67,11 @@
             "scaleInEditor": 1
         },
         "rtmap24.tmj": {
-            "scale": 0.75,
+            "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 357.3333333333333,
-                "y": 148
+                "x": 376,
+                "y": 437.3333333333333
             }
         },
         "rtmap24.tmj#rt24": {

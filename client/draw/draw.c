@@ -80,8 +80,8 @@ void setup_draw(game_t* game)
         float* ssbo_chunks = calloc(L*W*H, sizeof(float));
         float*  sdf_chunks = calloc(L*W*H, sizeof(float));
 
-        fread(ssbo_chunks, sizeof(float), L*W*H, rayfile);
-        fread(sdf_chunks , sizeof(float), L*W*H, rayfile);
+        assert(fread(ssbo_chunks, sizeof(float), L*W*H, rayfile) == L*W*H);
+        assert(fread(sdf_chunks , sizeof(float), L*W*H, rayfile) == L*W*H);
 
             glGenBuffers(1, &game->RT.ssbo);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER,  game->RT.ssbo);
@@ -322,7 +322,7 @@ void raytrace(game_t* game)
     
 
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    glDispatchCompute((game->window.width+1) / 16, (game->window.height+1) / 8, 1); //run raytracer
+    glDispatchCompute((game->window.width+1) / 8, (game->window.height+1) / 8, 1); //run raytracer
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     // to make so image has finished before read
 

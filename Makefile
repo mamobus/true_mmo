@@ -129,7 +129,7 @@ $(compiled)/vector.o: includes/vector.c $(client_headers)
 	gcc -c includes/vector.c -o $(compiled)/vector.o $(client_include_flags) $(client_libs)
 
 builds/imorter.exe: 
-	gcc importer/import.c $(special_flags_optimized) -o builds/imorter.exe
+	gcc importer/import.c $(special_flags_optimized) -o builds/imorter.exe -O3
 # full:
 import_: importer/import.c
 	gcc importer/import.c $(special_flags) -o builds/imorter.exe
