@@ -12,6 +12,7 @@ precision highp float;
 
 layout(binding = 0, rgba32f) uniform volatile image2D framebuffer;
 layout(binding = 1, rgba32f) uniform volatile image2D normalbuffer;
+layout(binding = 4, rgba32f) uniform volatile image2D albedobuffer;
 layout(binding = 0) uniform sampler2D tSet_ReflectNtransparancy; 
 layout(binding = 1) uniform sampler2D tSet_EmmitNsmooth; 
 layout(binding = 2) uniform sampler2D drawn_ents_frame; 
@@ -44,14 +45,6 @@ layout(std430, binding = 2) buffer buf_sdf //its not signed tho
 {
 	float arrSDFs[WIDTH*LENGTH*HEIGHT];
 };
-//constant defines
-#define STEP_IS_X 1
-#define STEP_IS_Y 2
-#define STEP_IS_Z 4
-
-// #define FSTEP_IS_X 2.0
-// #define FSTEP_IS_Y 4.0
-// #define FSTEP_IS_Z 8.0
 
 vec3 global_light;
 vec2 randvec;
@@ -144,13 +137,19 @@ float GetBlock(in vec3 voxel)
 
 	ivec3 ivoxel = ivec3(voxel);
 
-	if (ivoxel.x < 0 || ivoxel.x >= WIDTH ) return 0;
-	if (ivoxel.y < 0 || ivoxel.y >= LENGTH) return 0;
-	if (ivoxel.z < 0 || ivoxel.z >= HEIGHT) return 0;
+	// if (ivoxel.x < 0 || ivoxel.x >= WIDTH ) return 0;
+	// if (ivoxel.y < 0 || ivoxel.y >= LENGTH) return 0;
+	// if (ivoxel.z < 0 || ivoxel.z >= HEIGHT) return 0;
+
+	float is_inside = float(
+		ivoxel.x >= 0 && ivoxel.x <= WIDTH  &&
+		ivoxel.y >= 0 && ivoxel.y <= LENGTH &&	
+		ivoxel.z >= 0 && ivoxel.z <= HEIGHT	
+	);
 
 	block = blocks[ivoxel.x + ivoxel.y*WIDTH + ivoxel.z*(WIDTH*LENGTH)];
 
-	return block;
+	return block*is_inside;
 }
 
 float get_SDF(vec3 voxel)
@@ -159,13 +158,18 @@ float get_SDF(vec3 voxel)
 
 	ivec3 ivoxel = ivec3(voxel);
 
-	if (ivoxel.x < 0 || ivoxel.x >= WIDTH ) return 0.0;
-	if (ivoxel.y < 0 || ivoxel.y >= LENGTH) return 0.0;
-	if (ivoxel.z < 0 || ivoxel.z >= HEIGHT) return 0.0;
+	float is_inside = float(
+		ivoxel.x >= 0 && ivoxel.x <= WIDTH  &&
+		ivoxel.y >= 0 && ivoxel.y <= LENGTH &&	
+		ivoxel.z >= 0 && ivoxel.z <= HEIGHT	
+	);
+	// if (ivoxel.x < 0 || ivoxel.x >= WIDTH ) return 0.0;
+	// if (ivoxel.y < 0 || ivoxel.y >= LENGTH) return 0.0;
+	// if (ivoxel.z < 0 || ivoxel.z >= HEIGHT) return 0.0;
 
 	sdf = arrSDFs[ivoxel.x + ivoxel.y*WIDTH + ivoxel.z*(WIDTH*LENGTH)];
 
-	return sdf;
+	return sdf*is_inside;
 }
 
 Material GetBlockMat_V2(in float block, in vec3 relative_collision_point, in int step_Diretion)
@@ -236,28 +240,28 @@ bool InsideScene(in vec3 rayOrigin)
 	// vec3 s = step(corner_1, rayOrigin) - step(corner_2, rayOrigin); //if we are inside of the box
 
 	// if(s.x * s.y * s.z <= 0.1) return false;
+	// return true;
 
-	if(rayOrigin.x <= corner_1.x || rayOrigin.x >= corner_2.x ||
-	   rayOrigin.y <= corner_1.y || rayOrigin.y >= corner_2.y ||
-	   rayOrigin.z <= corner_1.z || rayOrigin.z >= corner_2.z 
-	   ) return false;
-
-	return true;
+	return (
+		rayOrigin.x >= corner_1.x && rayOrigin.x <= corner_2.x &&
+	   	rayOrigin.y >= corner_1.y && rayOrigin.y <= corner_2.y &&
+	   	rayOrigin.z >= corner_1.z && rayOrigin.z <= corner_2.z
+	);
 }
 
-bool InsideScene_byBlockPos(in vec3 block_pos)
-{
-	vec3 corner_1 = vec3(0 ,0 ,0);
-	vec3 corner_2 = vec3(WIDTH,LENGTH,HEIGHT);
+// bool InsideScene_byBlockPos(in vec3 block_pos)
+// {
+// 	vec3 corner_1 = vec3(0 ,0 ,0);
+// 	vec3 corner_2 = vec3(WIDTH,LENGTH,HEIGHT);
 
-	vec3 s = step(corner_1, block_pos) - step(corner_2, block_pos); //if we are inside of the box
+// 	vec3 s = step(corner_1, block_pos) - step(corner_2, block_pos); //if we are inside of the box
 
-	if(s.x * s.y * s.z == 0) return false;
+// 	if(s.x * s.y * s.z == 0) return false;
 
-	return true;
-}
+// 	return true;
+// }
 
-bool IntersectWithScene(in vec3 rayOrigin, in vec3 rayDirection, out float fraction)
+void IntersectWithScene(in vec3 rayOrigin, in vec3 rayDirection, out float fraction)
 {
 	vec3 corner_1 = vec3(0 ,0 ,0);
 	vec3 corner_2 = vec3(WIDTH,LENGTH,HEIGHT);
@@ -273,26 +277,22 @@ bool IntersectWithScene(in vec3 rayOrigin, in vec3 rayDirection, out float fract
 
 	fraction = fraction_near;
 
-	if((fraction_far > fraction_near) && (fraction_near > 0.0)){
-		return true;
-	}
-	else return false;
+	// if((fraction_far > fraction_near) && (fraction_near > 0.0)){
+	// 	return true;
+	// }
+	// else return false;
 }
 //if(!initTvals(tMax, tDelta, block_pos, rayOrigin, rayDirection, block_fraction)) return false; //does not intersect with scene
 bool initTvals(out vec3 tMax, out vec3 tDelta, out vec3 blockPos, in vec3 rayOrigin, in vec3 rayDirection, out float block_fraction)
 {
 	vec3 effective_origin = rayOrigin;
 	block_fraction = 0;
+	float fraction_to_get_to_scene = 0.0;
 	if(!InsideScene(rayOrigin))
-	{
-		float fraction_to_get_to_scene = 0.0;
-		if (IntersectWithScene(rayOrigin, rayDirection, fraction_to_get_to_scene)){
-			block_fraction = fraction_to_get_to_scene + 0.001;
-			effective_origin = rayOrigin + rayDirection*block_fraction;  
-		}
-		else { //does intersect with scene
-			return false;
-		}
+	{	
+		IntersectWithScene(rayOrigin, rayDirection, fraction_to_get_to_scene);
+		block_fraction = fraction_to_get_to_scene - 0.001;
+		// effective_origin = rayOrigin + rayDirection*block_fraction;
 	}
 
 	vec3 block_corner1 = floor(effective_origin); //not real center
@@ -307,9 +307,9 @@ bool initTvals(out vec3 tMax, out vec3 tDelta, out vec3 blockPos, in vec3 rayOri
 	block_corner2 /= rayDirection;
 
 	//now we have 2 corners. lest compute max_fractions for each directon to hit block side
-	tMax.x = max(block_corner1.x, block_corner2.x); //1 of theese will be negative so max is just to get positive
-	tMax.y = max(block_corner1.y, block_corner2.y);
-	tMax.z = max(block_corner1.z, block_corner2.z);
+	tMax.x = + max(block_corner1.x, block_corner2.x); //1 of theese will be negative so max is just to get positive
+	tMax.y = + max(block_corner1.y, block_corner2.y);
+	tMax.z = + max(block_corner1.z, block_corner2.z);
 
 	tDelta = 1.0 / abs(rayDirection); //how many dir vectors needeed to move 1.0 across each axys
 
@@ -318,7 +318,7 @@ bool initTvals(out vec3 tMax, out vec3 tDelta, out vec3 blockPos, in vec3 rayOri
 // reInitTvals(tMax, block_pos, rayOrigin, rayDirection, block_fraction);
 void reInitTvals(out vec3 tMax, out vec3 blockPos, in vec3 rayOrigin, in vec3 rayDirection, in float current_fraction)
 {
-	vec3 effective_origin = rayOrigin + rayDirection * current_fraction;
+	vec3 effective_origin = rayOrigin + rayDirection * (current_fraction+0.001);
 	
 	vec3 block_corner1 = floor(effective_origin); //not real center
 	vec3 block_corner2 = block_corner1 + vec3(1.0); //now real center
@@ -332,9 +332,9 @@ void reInitTvals(out vec3 tMax, out vec3 blockPos, in vec3 rayOrigin, in vec3 ra
 	block_corner2 /= rayDirection;
 
 	//now we have 2 corners. lest compute max_fractions for each directon to hit block side
-	tMax.x = max(block_corner1.x, block_corner2.x); //1 of theese will be negative so max is just to get positive
-	tMax.y = max(block_corner1.y, block_corner2.y);
-	tMax.z = max(block_corner1.z, block_corner2.z);
+	tMax.x = current_fraction+0.001 + max(block_corner1.x, block_corner2.x); //1 of theese will be negative so max is just to get positive
+	tMax.y = current_fraction+0.001 + max(block_corner1.y, block_corner2.y);
+	tMax.z = current_fraction+0.001 + max(block_corner1.z, block_corner2.z);
 }
 
 bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out vec3 normal, out Material material)
@@ -361,52 +361,56 @@ bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out ve
 	// ivec3 vecWhat_Is_Step;
 	// vec3 fvecWhat_Is_Step;
 
-	// float block_fraction = 0.0;
-	if(!initTvals(tMax, tDelta, block_pos, rayOrigin, rayDirection, block_fraction)) return false; //does not intersect with scene
+	float init_block_fraction;
+	if(!initTvals(tMax, tDelta, block_pos, rayOrigin, rayDirection, init_block_fraction)) return false; //does not intersect with scene
 
-	// block_fraction
+	block_fraction = init_block_fraction;
 	
 	
-	float sdf = get_SDF(block_pos);
-	int i = 0;
+	// float sdf = get_SDF(block_pos);
+	// int i = 0;
 	// if(sdf > 1.0) return false;
-	while(sdf > 0.5){ //move according to sdf value
-	// while(i < 5){ //move according to sdf value
+	// while(sdf > 0.5){ //move according to sdf value
+	// // while(i < 5){ //move according to sdf value
 		
-		//increase fraction by sdf
-		block_fraction += sdf;
+	// 	//increase fraction by sdf
+	// 	block_fraction += sdf;
 
-		vec3 new_Pos = rayOrigin + rayDirection*block_fraction;
+	// 	vec3 new_Pos = rayOrigin + rayDirection*block_fraction;
 
-		sdf = get_SDF(new_Pos);
+	// 	sdf = get_SDF(new_Pos);
 
-		// if(sdf < 0.5) break;
-		// i++;
-	}
-	// then we re-init everything we need to: block_pos, Tvals
-	reInitTvals(tMax, block_pos, rayOrigin, rayDirection, block_fraction);
+	// 	// if(sdf < 0.5) break;
+	// 	// i++;
+	// }
+	// // then we re-init everything we need to: block_pos, Tvals
+	// reInitTvals(tMax, block_pos, rayOrigin, rayDirection, block_fraction);
 
 	float current_block = GetBlock(block_pos);
 	int iterations = 0;
 	while (true) {
-
 		// float sdf = get_SDF(block_pos);
-
 		// if(sdf > 0.5)
 		// {
 		// 	block_fraction += sdf;
+			
 		// 	reInitTvals(tMax, block_pos, rayOrigin, rayDirection, block_fraction);
+			  
 		// 	iterations++;
+		// 	if(iterations > 32){
+		// 		block_hit = false;
+		// 		break;
+		// 	}
 		// 	continue;
 		// }
 
-
 		fstep_Diretion.x = float(tMax.x < tMax.y && tMax.x < tMax.z);
-		fstep_Diretion.y = float(tMax.x >= tMax.y && tMax.y < tMax.z);
-		fstep_Diretion.z = float((tMax.z < tMax.x) && (tMax.z < tMax.y));
+		fstep_Diretion.y = float(tMax.x > tMax.y && tMax.y < tMax.z);  
+		fstep_Diretion.z = float(tMax.z < tMax.x && tMax.z < tMax.y);
 
 
 		block_pos += fsteps * fstep_Diretion;
+		block_fraction += dot(tDelta, fstep_Diretion);
 		tMax += tDelta * fstep_Diretion;
 
 		current_block = GetBlock(block_pos);
@@ -418,25 +422,25 @@ bool CastRay(in vec3 rayOrigin, in vec3 rayDirection, out float fraction, out ve
 		}
 		
 		iterations++;
-		// if(iterations > 32)
-		if(!InsideScene_byBlockPos(block_pos) || iterations > 32)
+		if(iterations > 64)
+		// if(!InsideScene_byBlockPos(block_pos) || iterations > 48)
 		{
 			block_hit = false;
 			break;
 		}
 	};
 
-	normal = vec3(0);
+	// normal = vec3(0);
 	vec3 tFinal = tMax - tDelta;
 
 	normal = -fsteps * fstep_Diretion;
-	block_fraction += dot(tFinal, fstep_Diretion);
+	// block_fraction = init_block_fraction dot(tFinal, fstep_Diretion);
 
 	// block_fraction += block_fraction;
 	// if(block_hit)
 	// {
 		vec3 collision_point = (rayOrigin + rayDirection*block_fraction);
-		vec3 relative_collision_point = collision_point - (vec3(block_pos) + vec3(0.5)); 
+		vec3 relative_collision_point = collision_point - (block_pos + vec3(0.5)); 
 		// vec2 collision_point_projection = GetBlockPointProjection(relative_collision_point);
 
 		// material = GetBlockMat(current_block, collision_point_projection);

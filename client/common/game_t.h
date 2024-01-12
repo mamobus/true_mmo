@@ -24,6 +24,7 @@ typedef struct
     GLuint framebuffer;
     GLuint framebuffer_1;
     GLuint normalbuffer;
+    GLuint albedobuffer;
     GLuint framebuffer_2;
     GLuint uni_time, uni_count;
     GLuint uni_camerapos_raytrace;

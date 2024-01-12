@@ -2,6 +2,7 @@
 
 #include <math.h>
 
+
 typedef union vec3d {
 	 double m[3];
 	 struct {

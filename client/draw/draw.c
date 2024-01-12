@@ -53,6 +53,7 @@ void setup_draw(game_t* game)
             game->RT.framebuffer   = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
             game->RT.framebuffer_1 = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
             game->RT.normalbuffer  = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
+            game->RT.albedobuffer  = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
             game->RT.framebuffer_2 = createEmptyImage2D(game->window.width, game->window.height, GL_RGBA32F, GL_FLOAT);
     const vertex2 verts_for_simples_texture [6] = {
         {{-1,-1}, {+0,+0}},
@@ -294,6 +295,8 @@ void raytrace(game_t* game)
     glBindImageTexture(0, game->RT.framebuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     glBindImageTexture(1, game->RT.normalbuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    glBindImageTexture(4, game->RT.albedobuffer, 0, false, 0, GL_READ_WRITE, GL_RGBA32F);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     glDispatchCompute((game->window.width+1) / 8, (game->window.height+1) / 8, 1); //run raytracer
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);

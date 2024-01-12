@@ -3,21 +3,16 @@
 
 precision highp int;
 precision highp float;
-// precision highp vec3;
 
-// layout(binding = 0) uniform sampler2D framebuffer;
 layout(binding = 0, rgba32f) uniform image2D framebuffer;
 layout(binding = 1, rgba32f) uniform image2D normalbuffer;
 layout(binding = 2, rgba32f) uniform image2D new_denoised_framebuffer;
 layout(binding = 3, rgba32f) uniform image2D old_denoised_framebuffer;
-// uniform sampler2D spritesheet_texture;
-
-// uniform sampler2D framebuffer;
 
 uniform vec3 camerashift;
 uniform float time;
 
-// #define PI 3.1415926535
+#define PI 3.1415926535
 #define DENOISING_RADIUS 2
 
 vec4 sampleOldFramebuffer(vec2 uvCoords)
@@ -60,29 +55,37 @@ void main(void)
 	}
     vec2 pos = vec2(pix) / vec2(size.x - 1, size.y - 1);
 
-    // vec3 normal = imageLoad(normalbuffer, pix).xyz;
-    // vec3 pixel_color = imageLoad(framebuffer, pix).xyz;
-    // vec3 summary_color = vec3(0);
-    // float blur_value = 0;
-    // for (int xx = -DENOISING_RADIUS; xx <= DENOISING_RADIUS; xx++)
-    // {
-    //     for (int yy = -DENOISING_RADIUS; yy <= DENOISING_RADIUS; yy++)
-    //     {   
-    //         ivec2 current_pixel = pix + ivec2(xx,yy);
-    //         vec3 current_pixel_color = imageLoad(framebuffer, current_pixel).xyz;
+    vec3 normal = imageLoad(normalbuffer, pix).xyz;
+    vec3 pixel_color = imageLoad(framebuffer, pix).xyz;
+    vec3 summary_color = vec3(0);
+    float blur_value = 0;
+    for (int xx = -DENOISING_RADIUS; xx <= DENOISING_RADIUS; xx++)
+    {
+        for (int yy = -DENOISING_RADIUS; yy <= DENOISING_RADIUS; yy++)
+        {   
+            float dist, dist2;
 
-    //         // <name>_blur means blur because difference in <name>
-    //         float position_blur = exp(-(float(xx*xx + yy*yy)) * 1.2);
+            ivec2 current_pixel = pix + ivec2(xx,yy);
+            vec3 current_pixel_color = imageLoad(framebuffer, current_pixel).xyz;
+            // <name>_blur means blur because difference in <name>
+            float sigma_pos, sigma_norm;
+            sigma_pos  = 0.8;
+            sigma_norm = 0.8;
 
-    //         vec3 current_normal = imageLoad(normalbuffer, current_pixel).xyz;
-    //         float normal_blur = exp(-distance(current_normal, normal) * 1.2);
 
-    //         float color_blur = exp(-distance(current_pixel_color, pixel_color));
-            
-    //         summary_color += normal_blur * position_blur * current_pixel_color;
-    //         blur_value    += normal_blur * position_blur;
-    //     }
-    // }
+
+                dist2 = float(xx*xx + yy*yy);
+            float position_blur = min(exp(-dist2 * sigma_pos ), 1.0);
+
+                vec3 current_normal = imageLoad(normalbuffer, current_pixel).xyz;
+                vec3 diff = current_normal - normal;
+                dist2 = dot(diff, diff);
+            float normal_blur   = min(exp(-dist2 * sigma_norm), 1.0);
+
+            summary_color += normal_blur * position_blur * current_pixel_color;
+            blur_value    += normal_blur * position_blur;
+        }
+    }
     
 	vec3 ray_dir    = normalize(vec3(-0.612375, -0.612375, -0.5));
 	// vec3 ray_dir = normalize(vec3(-2.8284271, -2.8284271, -3));
@@ -93,8 +96,8 @@ void main(void)
 	
 	vec3 camera_shift = camerashift;
 
-	float view_width  = size.x / 32.0; //in block_diags
-	float view_height = size.y / 32.0; //in blocks
+	float view_width  = size.x / 32.0;
+	float view_height = size.y / 32.0;
 
     vec3 screenpPojectionForCamera = camera_shift - ray_dir * dot(ray_dir, camera_shift);
     vec2 screenshift;

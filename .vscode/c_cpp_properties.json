@@ -7,9 +7,9 @@
                 "${workspaceFolder}/server",
                 "${workspaceFolder}/includes"
             ],
-            "cStandard": "c11",
-            "cppStandard": "c++11",
-            "intelliSenseMode": "gcc-x86"
+            "cStandard": "gnu23",
+            "cppStandard": "gnu++23",
+            "intelliSenseMode": "windows-gcc-x64"
         }
     ],
     "version": 4

@@ -8,6 +8,8 @@
 #include <assert.h>
 #include <time.h>
 
+#include "../includes/sl_vec.h"
+
 // #define shift_point(point, signx,signy,signz) \
 // do{\
 // point = pos; \
@@ -288,32 +290,33 @@ int f(double x, double y)
 
 // #define TEST(x) printf(##x); x;
 
-struct vec3
-{
-    float x,y,z;
-};
+// struct vec3
+// {
+//     float x,y,z;
+// };
 
-struct material
-{
-    struct vec3 emmitance;   //for each color
-    struct vec3 reflectance; //for each color
-    float roughness;
-    float opacity;
-};
+// struct material
+// {
+//     struct vec3 emmitance;   //for each color
+//     struct vec3 reflectance; //for each color
+//     float roughness;
+//     float opacity;
+// };
 
-struct block_t
-{
-	struct material mat;
-};
+// struct block_t
+// {
+// 	struct material mat;
+// };
 
-float rf()
-{
-    return ((float) rand()) / RAND_MAX;
-}
+// float rf()
+// {
+//     return ((float) rand()) / RAND_MAX;
+// }
+
 
 int main()
 {
-    srand(3);
+    // srand(3);
     // main_1();
     // main_2();
     // main_3();
@@ -326,23 +329,23 @@ int main()
     // F(-0.7, -0.7);
 
     // TEST(a==a)
-    printf("%X %X", (0x2 | 0x30), (0x7 == 0x7 | 0x30));
+    // printf("%X %X", (0x2 | 0x30), (0x7 == 0x7 | 0x30));
 
-    for (int i=0; i < 2; i++)
-    {
+    // for (int i=0; i < 2; i++)
+    // {
         // printf("{");
-        for (int j=0; j < 2; j++)
-        {
+        // for (int j=0; j < 2; j++)
+        // {
             // printf("{");
-            for (int k=0; k < 2; k++)
-            {
-                printf("{{%.2f, %.2f, %.2f}, {%.2f, %.2f, %.2f}, %.2f, %.2f}, ", rf(),rf(),rf(),  rf(),rf(),rf(),  rf(), rf());
-                printf("vec3(%.2f, %.2f, %.2f)\n", rf(),rf(),rf());
-            }
+            // for (int k=0; k < 2; k++)
+            // {
+            //     printf("{{%.2f, %.2f, %.2f}, {%.2f, %.2f, %.2f}, %.2f, %.2f}, ", rf(),rf(),rf(),  rf(),rf(),rf(),  rf(), rf());
+            //     printf("vec3(%.2f, %.2f, %.2f)\n", rf(),rf(),rf());
+            // }
             // printf("},\n");
-        }
+        // }
         // printf("},\n");
-    }
+    // }
 
     // printf("%e\n", 1024);
     // printf("%o\n", 1024);
@@ -353,4 +356,59 @@ int main()
     // printf("%X\n", -1073741819);
     // printf("%b\n", 0x123f);
     // printf("%n\n", 1024);
+
+// #define print_vec2(vec) printf("%.1f : %.1f\n", vec.x, vec.y)
+#define print_vec3(vec) printf("%.2f : %.2f : %.2f\n", vec.x, vec.y, vec.z)
+#define print_vec4(vec) printf("%.2f : %.2f : %.2f : %.2f\n", vec.x, vec.y, vec.z, vec.w)
+
+//     vec2 v;
+    
+//     v = _vec2_xy(1, 444);
+//     print_vec2(v);
+//     v = vec2(vec2(1.7, 444));
+//     print_vec2(v);
+//     v = vec2(vec2(vec2(1.7, 444)));
+//     print_vec2(v);
+
+    // test(v);
+    // test(7);
+    
+    
+    vec3 v3;
+    // v3 = vec3(1,2,3);
+    // print_vec3(v3);
+    // print_vec3(v3);
+
+    // int* p = &7;
+
+    // #define maxint(a,b) ({int _a = (a), _b = (b); _a > _b ? _a : _b;})
+    
+    // const int one = 1;
+    // v3 = vec3(1,2,3);
+    v3 = vec3(ivec2(7.6, 3.2), ivec2(7777.7,666.99).x);
+
+
+
+    // int a = ({int i; 
+    // _Generic ((i),
+    //     float : ({i=666;}),
+    //     int : ({i=7;})
+    // );
+    // i;})
+    // ;
+
+    // v3 = vec3(one,vec2(one,one));
+    // v3 = Ass(1,1,1);
+    // int mx = maxint(1,2);
+    print_vec3(v3);
+
+    dvec4 v4;
+    v4 = dvec4(1.77, vec3(2.5,1.5,77).yz, 666.55);
+    dvec3 sv3 = dvec3(7,7,7);    
+    
+    print_vec4(v4);
+    dvec3 v = v4.xyz;
+    double val = mul(v, 1.0).x;
+    printf("%.8f %.8f %.8f\n", val, length(cross(vec3(77,34,-3), vec3(99,6,6))));
+
 }

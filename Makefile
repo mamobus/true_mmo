@@ -78,7 +78,7 @@ client_headers := \
 
 
 client_: $(client_obj) 
-	gcc $(client_flags) $(client_obj) $(client_libs) $(special_flags)
+	gcc $(client_flags) $(client_obj) $(client_libs) $(special_flags) -fsanitize=address
 
 $(compiled)/vec.o: includes/vec.c $(client_headers)
 	gcc -c includes/vec.c -o $(compiled)/vec.o $(client_include_flags) $(client_libs)
@@ -146,6 +146,8 @@ init:
 	mkdir precompiled
 
 opt:
-	gcc $(client_flags) $(client_src) $(client_libs) $(special_flags_optimized)
+	gcc $(client_flags) $(client_src) $(client_libs) $(special_flags_optimized) -ftime-report
 	cd ./builds && \
 	client.exe
+
+# export_:
