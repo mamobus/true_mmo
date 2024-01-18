@@ -26,6 +26,7 @@ client_obj := \
 	$(compiled)/hud.o \
 	$(compiled)/vec.o \
 	$(compiled)/network.o \
+	$(compiled)/flecs.o \
 	$(compiled)/vector.o
 
 client_src := \
@@ -44,7 +45,8 @@ client_src := \
 	client/physics/update/update.c \
 	client/network/network.c \
 	includes/vec.c \
-	includes/vector.c
+	includes/vector.c\
+	includes/flecs/flecs.c
 
 client_headers := \
 	client/common/player.h \
@@ -78,7 +80,7 @@ client_headers := \
 
 
 client_: $(client_obj) 
-	gcc $(client_flags) $(client_obj) $(client_libs) $(special_flags) -fsanitize=address
+	gcc $(client_flags) $(client_obj) $(client_libs) $(special_flags)
 
 $(compiled)/vec.o: includes/vec.c $(client_headers)
 	gcc -c includes/vec.c -o $(compiled)/vec.o $(client_include_flags) $(client_libs)
@@ -128,6 +130,10 @@ $(compiled)/update.o: client/physics/update/update.c $(client_headers)
 $(compiled)/vector.o: includes/vector.c $(client_headers)
 	gcc -c includes/vector.c -o $(compiled)/vector.o $(client_include_flags) $(client_libs)
 
+$(compiled)/flecs.o: includes/flecs/flecs.c includes/flecs/flecs.h
+	gcc -c includes/flecs/flecs.c -o $(compiled)/flecs.o $(client_include_flags) -lWs2_32
+
+
 builds/imorter.exe: 
 	gcc importer/import.c $(special_flags_optimized) -o builds/imorter.exe -O3
 # full:
@@ -135,6 +141,8 @@ import_: importer/import.c
 	gcc importer/import.c $(special_flags) -o builds/imorter.exe
 	"./builds/imorter.exe"
 
+test: client/test.c $(compiled)/flecs.o
+	gcc client/test.c $(compiled)/flecs.o -o test -lws2_32
 
 run: client_
 	cd ./builds && \
@@ -146,7 +154,7 @@ init:
 	mkdir precompiled
 
 opt:
-	gcc $(client_flags) $(client_src) $(client_libs) $(special_flags_optimized) -ftime-report
+	gcc $(client_flags) $(client_src) $(client_libs) $(special_flags_optimized) -ftime-report -fanalyzer
 	cd ./builds && \
 	client.exe
 

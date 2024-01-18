@@ -325,7 +325,11 @@ void raytrace(game_t* game)
     
 
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    glDispatchCompute((game->window.width+1) / 8, (game->window.height+1) / 8, 1); //run raytracer
+    glDispatchCompute((game->window.width+1) / 16, (game->window.height+1) / 8, 1); //run denoiser
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    glDispatchCompute((game->window.width+1) / 16, (game->window.height+1) / 8, 1); //run denoiser
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+    glDispatchCompute((game->window.width+1) / 16, (game->window.height+1) / 8, 1); //run denoiser
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     // to make so image has finished before read
 

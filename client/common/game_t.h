@@ -9,6 +9,7 @@
 #include <draw/camera/camera_t.h>
 #include <draw/window/window_t.h>
 #include <draw/textures/texture_manager_t.h>
+// #include <entity/entity_t.h>
 #include <logic/entity_t.h>
 #include <map/chunk_t.h>
 #include <physics/collision/collision_t.h>

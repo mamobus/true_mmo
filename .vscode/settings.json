@@ -93,7 +93,10 @@
         "ratio": "c",
         "iterator": "c",
         "cmath": "cpp",
-        "tgmath.h": "c"
+        "tgmath.h": "c",
+        "flecs.h": "c",
+        "xmemory": "c",
+        "entity_t.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "C_Cpp.default.compilerPath": "E:\\msys64\\mingw64\\bin\\gcc.exe"

@@ -10,6 +10,33 @@
 
 #include "../includes/sl_vec.h"
 
+#define _printf_vec2d(prefix, specifier, vec) printf(specifier " " specifier "\n", (*((prefix##vec2*)(&vec))).x, (*((prefix##vec2*)(&vec))).y)
+#define _printf_vec3d(prefix, specifier, vec) printf(specifier " " specifier " " specifier "\n", (*((prefix##vec3*)(&vec))).x, (*((prefix##vec3*)(&vec))).y, (*((prefix##vec3*)(&vec))).z)
+#define _printf_vec4d(prefix, specifier, vec) printf(specifier " " specifier " " specifier " " specifier "\n", (*((prefix##vec4*)(&vec))).x, (*((prefix##vec4*)(&vec))).y, (*((prefix##vec4*)(&vec))).z, (*((prefix##vec4*)(&vec))).w)
+
+#define printf_vec(vec) \
+({typeof(vec) vec_copy = vec;\
+_Generic((vec),\
+   _ivec2 : _printf_vec2d(i, "%d", vec_copy),\
+    ivec2 : _printf_vec2d(i, "%d", vec_copy),\
+    ivec3 : _printf_vec3d(i, "%d", vec_copy),\
+    ivec4 : _printf_vec4d(i, "%d", vec_copy),\
+   _vec2  : _printf_vec2d( , "%.3f", vec_copy),\
+    vec2  : _printf_vec2d( , "%.3f", vec_copy),\
+    vec3  : _printf_vec3d( , "%.3f", vec_copy),\
+    vec4  : _printf_vec4d( , "%.3f", vec_copy),\
+   _dvec2 : _printf_vec2d(d, "%.3lf", vec_copy),\
+    dvec2 : _printf_vec2d(d, "%.3lf", vec_copy),\
+    dvec3 : _printf_vec3d(d, "%.3lf", vec_copy),\
+    dvec4 : _printf_vec4d(d, "%.3lf", vec_copy),\
+   _bvec2 : _printf_vec2d(b, "%d", vec_copy),\
+    bvec2 : _printf_vec2d(b, "%d", vec_copy),\
+    bvec3 : _printf_vec3d(b, "%d", vec_copy),\
+    bvec4 : _printf_vec4d(b, "%d", vec_copy),\
+    default : _create_type_error()\
+);\
+vec_copy;})
+
 // #define shift_point(point, signx,signy,signz) \
 // do{\
 // point = pos; \
@@ -313,102 +340,81 @@ int f(double x, double y)
 //     return ((float) rand()) / RAND_MAX;
 // }
 
+// #include "entity.h"
+// #include "../includes/flecs/flecs.c"
+#include "../includes/flecs/flecs.h"
+
+typedef struct physics_component{
+    dvec3 pos;
+    dvec3 vel;
+} physics_component;
+
+typedef struct tag_player tag_player;
+typedef struct tag_npc tag_npc;
+typedef struct tag_monster tag_monster;
+typedef struct tag_boss tag_boss;
 
 int main()
 {
+    ecs_world_t* world = ecs_init();
+
+    ECS_COMPONENT(world, physics_component);
+
+    
+    
+    ECS_TAG(world, tag_player);
+    ECS_TAG(world, tag_npc);
+    ECS_TAG(world, tag_monster);
+    ECS_TAG(world, tag_boss);
+
+
+    ecs_entity_t e1 = ecs_new_id(world);
+    ecs_set(world, e1, physics_component, {dvec3(1,1,1), dvec3(2,2,2)});
+    // const physics_component* pc = ecs_get(world, e1, physics_component);
+
+    ecs_entity_t e2 = ecs_new_id(world);
+    ecs_set(world, e2, physics_component, {dvec3(6,6,6), dvec3(7,7,7)});
+    ecs_add(world, e2, tag_npc);
+    ecs_entity_t e3 = ecs_new_id(world);
+    ecs_set(world, e3, physics_component, {dvec3(1,1,2), dvec3(2,2,2)});
+    ecs_add(world, e3, tag_npc);
+    ecs_add(world, e3, tag_player);
+
+    // const physics_component* pc = ecs_get(world, e2, physics_component);
+
+    // printf("%d\n", e1);
+    // printf("%d\n", e2);
+    printf("%d\n", ecs_id(physics_component));
+    // printf("%d\n", ecs_id(tag_player));
+    // printf("%d\n", ecs_id(tag_npc));
+    // printf("%d\n", ecs_id(tag_monster));
+    // printf("%d\n", ecs_id(tag_boss));
+
+    ecs_query_t* qry = ecs_query_init(world, &(ecs_query_desc_t) {
+        .filter.terms = {
+            {.id = ecs_id(physics_component)},
+            {.id = ecs_id(tag_npc)}
+        }
+    });
+
+    ecs_iter_t it = ecs_query_iter(world, qry);
+    while(ecs_query_next(&it))
+    {
+        physics_component* pcs = ecs_field(&it, physics_component, 1);
+
+        for (int i = 0; i < it.count; i ++) {
+            printf_vec(pcs[i].pos);
+    }
+    }
+
+    // printf_vec(pc->pos);
+    // printf_vec(pc->vel);
+    
+
+    
     // srand(3);
     // main_1();
     // main_2();
     // main_3();
     // main_2();
-
-    // F(1, 1);
-    // F(0, 1);
-    // F(1, 0);
-    // F(0.7, 0.7);
-    // F(-0.7, -0.7);
-
-    // TEST(a==a)
-    // printf("%X %X", (0x2 | 0x30), (0x7 == 0x7 | 0x30));
-
-    // for (int i=0; i < 2; i++)
-    // {
-        // printf("{");
-        // for (int j=0; j < 2; j++)
-        // {
-            // printf("{");
-            // for (int k=0; k < 2; k++)
-            // {
-            //     printf("{{%.2f, %.2f, %.2f}, {%.2f, %.2f, %.2f}, %.2f, %.2f}, ", rf(),rf(),rf(),  rf(),rf(),rf(),  rf(), rf());
-            //     printf("vec3(%.2f, %.2f, %.2f)\n", rf(),rf(),rf());
-            // }
-            // printf("},\n");
-        // }
-        // printf("},\n");
-    // }
-
-    // printf("%e\n", 1024);
-    // printf("%o\n", 1024);
-    // printf("%a\n", 1024);
-    // printf("%g\n", 1024);
-    // printf("%h\n", 1024);
-    // printf("%x\n", 0x123f);
-    // printf("%X\n", -1073741819);
-    // printf("%b\n", 0x123f);
-    // printf("%n\n", 1024);
-
-// #define print_vec2(vec) printf("%.1f : %.1f\n", vec.x, vec.y)
-#define print_vec3(vec) printf("%.2f : %.2f : %.2f\n", vec.x, vec.y, vec.z)
-#define print_vec4(vec) printf("%.2f : %.2f : %.2f : %.2f\n", vec.x, vec.y, vec.z, vec.w)
-
-//     vec2 v;
-    
-//     v = _vec2_xy(1, 444);
-//     print_vec2(v);
-//     v = vec2(vec2(1.7, 444));
-//     print_vec2(v);
-//     v = vec2(vec2(vec2(1.7, 444)));
-//     print_vec2(v);
-
-    // test(v);
-    // test(7);
-    
-    
-    vec3 v3;
-    // v3 = vec3(1,2,3);
-    // print_vec3(v3);
-    // print_vec3(v3);
-
-    // int* p = &7;
-
-    // #define maxint(a,b) ({int _a = (a), _b = (b); _a > _b ? _a : _b;})
-    
-    // const int one = 1;
-    // v3 = vec3(1,2,3);
-    v3 = vec3(ivec2(7.6, 3.2), ivec2(7777.7,666.99).x);
-
-
-
-    // int a = ({int i; 
-    // _Generic ((i),
-    //     float : ({i=666;}),
-    //     int : ({i=7;})
-    // );
-    // i;})
-    // ;
-
-    // v3 = vec3(one,vec2(one,one));
-    // v3 = Ass(1,1,1);
-    // int mx = maxint(1,2);
-    print_vec3(v3);
-
-    dvec4 v4;
-    v4 = dvec4(1.77, vec3(2.5,1.5,77).yz, 666.55);
-    dvec3 sv3 = dvec3(7,7,7);    
-    
-    print_vec4(v4);
-    dvec3 v = v4.xyz;
-    double val = mul(v, 1.0).x;
-    printf("%.8f %.8f %.8f\n", val, length(cross(vec3(77,34,-3), vec3(99,6,6))));
-
 }
