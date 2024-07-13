@@ -1,23 +1,20 @@
 # True MMO
 
-yeah, im just making perfect MMORPG in my view
+yeah, im just trying to make perfect MMORPG
 
 *but im not a designer so its 3d game with  2d pixel-art sprites that are defenetly not stolen*
 
 ## Installation
 
-
-Use makefile to init, compile and run.
+Use make to init, compile and run.
 
 ```bash
 make init
 make run
 ```
-use -jN flag for faster compilation, where n is ~number of threads you have
-
 ## Usage
 
-Is there? You cant really play mmo without server. And i didnt host any yet
+Is there any? You cant really play mmo without server. And i didnt host any yet
 
 ## Features
 
